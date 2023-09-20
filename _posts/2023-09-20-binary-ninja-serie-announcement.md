@@ -1,19 +1,21 @@
 ---
 title: Binary Ninja Serie Announcement
 date: 2023-09-20 10:00:00 +0200
-categories: [Binary Ninja, Tutorial]
+categories: [Binary Ninja]
 tags: [reverse engineering, exploit, automation, binja]
 comments: false
 author: zerotistic
 ---
 
-# Binary Ninja Serie Announcement
-I'm going to start a serie of posts about Binary Ninja. I'm going to start from the very beginning, so if you are already a Binary Ninja user, you can probably skip the first posts. I'm going to attempt to cover all topics, from how to use Binary Ninja to knowing the internals so well you could do PRs to Vector35's repositories.
+Hello everyone! I'm excited to make my debut on this blog. Here, I'll be sharing insights into my research, various projects, and my reflections. However, today's post isn't focused on those topics. Instead, I want to dive into Binary Ninja and let you know about an upcoming serie dedicated to it. I have a deep love for this tool, but I've noticed a shortage of blogs and tutorials covering it. While the existing documentation is helpful, it falls short in some aspects. Therefore, I've taken it upon myself to craft a series that delves into Binary Ninja in detail. In this introductory post, I'll outline what you can expect to find in the series and clarify what won't be covered. 
 
-At the time of writing, I believe I already known somewhat well Binary Ninja, however this blog post will also serve as a mean to learn new things and to improve my knowledge of the tool. This means that I might rewrite and update some parts as I learn new things. 
+## So what can you expect? 
+I'll start from the very basics, making it accessible even for newcomers. Experienced Binary Ninja users might find the initial posts skippable. My aim is to encompass everything, from using Binary Ninja effectively to understanding its inner workings well enough to contribute to Vector35's repositories.
 
-I'm going to try to keep the posts as simple as possible, but I'm not going to sacrifice the quality of the content for the sake of simplicity. This means that, while I cover Binary Ninja's usage, I will NOT be teaching you how to reverse or how to use Python, C, or any other language. I will assume you already know how to do that.
+As of writing this, I consider myself reasonably proficient with Binary Ninja. Nonetheless, this blog will also serve as a platform for me to acquire new knowledge and enhance my understanding of the tool. This means that I might revise and update certain sections as I continue learning.
 
-This post is hopefully the first of a long serie. I'm going to try to post at least once a week, but I can't promise anything. 
+I'll strive to maintain simplicity in my posts without compromising the quality of the content. While I'll cover various aspects of Binary Ninja's usage, I won't be offering tutorials on reverse engineering or programming languages like Python and C (unless very specific cases). I'll assume you already possess some familiarity with those topics.
 
-See you soon! 
+This post marks the beginning of what I hope will be an extensive series. I'll aim to post at least once a week, though I can't make any concrete promises.
+
+Stay tuned, and I'll be back soon with more!
