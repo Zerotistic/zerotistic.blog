@@ -4,6 +4,7 @@ date: 2023-09-21 10:00:00 +0200
 categories: [Binary Ninja, Tutorial]
 tags: [reverse engineering, exploit, automation, binja]
 comments: false
+author: zerotistic
 ---
 
 # Binary Ninja Serie Announcement
