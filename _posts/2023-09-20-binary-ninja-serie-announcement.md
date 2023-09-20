@@ -1,8 +1,8 @@
 ---
 title: Binary Ninja Serie Announcement
 date: 2023-09-21 10:00:00 +0200
-categories: ["BINARY NINJA", "TUTORIAL"]
-tags: ["reverse engineering", "exploit", "automation", "binja"]
+categories: [Binary Ninja, Tutorial]
+tags: [reverse engineering, exploit, automation, binja]
 comments: false
 ---
 
