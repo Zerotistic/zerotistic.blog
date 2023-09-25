@@ -1,5 +1,5 @@
 ---
-title: Binary Ninja\: Zero to Hero 1
+title: "Binary Ninja: Zero to Hero 1"
 date: 2023-09-25 10:00:00 +0200
 categories: [Binary Ninja]
 tags: [reverse engineering, exploit, automation, binja]
