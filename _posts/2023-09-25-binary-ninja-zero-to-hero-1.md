@@ -54,7 +54,7 @@ In the future, I will be sharing numerous posts that delve into the API's utilit
 ### Bonus
 - Binja supports custom UI themes, allowing anyone to customize their working environment. 
 - Binja supports the use of the [BinSync](https://github.com/binsync/binsync) plugin, a collaborative reversing tool built on the Git versioning system. This plugin allows for fine-grained reverse engineering collaboration across different decompilers.
-- [Binary Ninja Cloud](https://cloud.binary.ninja/) is available for free, although there are some functional limitations (API, plugins not available, etc. are also available).
+- [Binary Ninja Cloud](https://cloud.binary.ninja/) is available for free, although there are some functional limitations (API, plugins, etc. are not available).
 
 ## Basic usage
 In this section, I will showcase all of the major and basic utilities at your disposition, as well as give you their shortcut and tips if I have any. This can be from swiftly moving from one function to another to simply renaming a variable.
@@ -62,4 +62,28 @@ In this section, I will showcase all of the major and basic utilities at your di
 First and foremost, when it comes to reverse engineering, one of your initial tasks is renaming a variable, function, or structure. This process is relatively straightforward: simply right-click and choose "Rename Symbol," or you can use the shortcut Ctrl+N, which will prompt you to enter the new name. You can do the same for the types, by selecting "Change Type" or using `Ctrl+Y`. 
 
 <iframe frameborder="0" class="juxtapose" width="100%" height="736" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6906d860-5b93-11ee-b5be-6595d9b17862"></iframe>
+_Function view before and after being renamed_
 
+Much improved, wouldn't you agree? You might also observe that I've included a comment describing a variable as a "canary." To add such a comment, simply select one or multiple lines, then right-click and choose "Enter Comment," or utilize the ; notation.
+
+By the way, while I'm here, allow me to introduce you to the [0CD](https://github.com/0xb0bb/0CD) plugin. As stated in the readme, it's "a compilation of small quality-of-life enhancements frequently encountered in CTFs or similar toy problems." As far as my knowledge goes, it currently focuses on renaming canaries and retyping, and it's compatible only with Linux. In an upcoming blog post, I plan to enhance its compatibility to encompass Windows and other architectures. For now, I encourage you to install it as part of our next step: the installation of plugins.
+
+Quickly before though, let me show you how much nicer 0CD makes the canaries:
+<iframe frameborder="0" class="juxtapose" width="100%" height="437.00000000000006" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6765b9da-5ba8-11ee-b5be-6595d9b17862"></iframe>
+_Canaries before and after using 0CD_
+
+Now, let's discuss how to install plugins. In this step, we'll install 0CD so that you can utilize it throughout this blog series. You have two options: you can either select "Plugins" -> "Manage plugins" or use the shortcut Ctrl+Maj+M. Regardless of your choice, after installation, you'll need to restart Binary Ninja. You can do this by either closing the application and reopening it or using the Ctrl+P shortcut, typing "Restart," and selecting it. The benefit of the second option is that it will restore all your previous work. Voilà! You installed your first Binja plugin.
+
+Now that you've learned how to rename, retype, install plugins, and use shortcuts effectively, let's talk about another important feature: navigating between functions. Since you won't be concentrating solely on one function, you need the ability to move between functions seamlessly.
+
+Binary Ninja offers a convenient way to do this. You can simply scroll up or down, and the view will transition to new functions as you scroll. However, if the function you're looking for is quite far away, you have two options:
+- Using the "Symbols" Section: Navigate to the "Symbols" section, where you can either scroll through the list or use the search function to find the specific function you want to jump to.
+- Using the `g`` Shortcut: Press the `g`` key, and a prompt will appear. Here, you can enter the name or address of the function you wish to navigate to. This method allows for quick and precise navigation to a specific function, regardless of its location within the binary.
+
+At this stage, you should be comfortable with basic reversing and navigating through functions. However, you may find it beneficial to explore other views, such as the Graph view. Switching between views is straightforward. You can either select the dropdown list (usually located under the "Linear" label) and choose "Graph," or simply press Enter to toggle between views.
+<iframe frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d649351a-5ba9-11ee-b5be-6595d9b17862"></iframe>
+_Exemple of graph view_
+
+With these fundamentals under your belt, you're well-equipped to dive into reverse engineering and pwn challenges using Binary Ninja! In your next post, you can explore additional plugins, delve into different views like IL views and SSA, and unlock the full potential of Binary Ninja with tools like the stack view, tags, and the memory map. Happy reversing and pwning!
+
+See you soon!
