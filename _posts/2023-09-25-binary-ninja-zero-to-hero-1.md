@@ -30,7 +30,7 @@ Binja is an extensive and intricate project, resulting in the development of num
 
 ### Decompiler
 Primarily, at the heart of a decompiler's functionality is its ability to do precisely that: decompile code. It's a fundamental expectation, after all. Within Binja, users can traverse binary code interactively, accessing disassembled code while making annotations as required. Binja provides multiple views, including disassembly, LILL, MLIL, HLIL, Pseudo-C, and SSA views. In forthcoming posts, I'll delve deeper into these views, and you'll come to appreciate their practical utility. At this stage, it's not essential to delve into the specifics of what each view offers. Typically, when starting, most users tend to primarily utilize disassembly and Pseudo-C views. These two perspectives provide a solid foundation for initial exploration and analysis.
-![Exemple of the decompiler's view](decomp.png)
+![Exemple of the decompiler's view](../assets/img/hero-1/decomp.png)
 _Exemple of the decompiler's view_
 
 ### Multi-architecture support
@@ -38,7 +38,7 @@ Another one of Binja's notable strengths lies in its extensive support for multi
 
 ### Control Flow Graph
 In the process of analyzing a function, understanding its flow is often crucial. Flow pertains to how the binary executes, depending on whether specific conditions are met or not. Binja offers a graphical representation of this control flow, which greatly facilitates tracking the execution path. This view serves multiple purposes, and a noteworthy example is the [Lighthouse](https://github.com/gaasedelen/lighthouse) plugin. Lighthouse is particularly valuable as it allows users to visualize the code coverage of a fuzzer on a binary.
-![Exemple of the CFG's view](graph.png)
+![Exemple of the CFG's view](../assets/img/hero-1/graph.png)
 _Exemple of the Control Flow Graph's view_
 
 ### Debugging
