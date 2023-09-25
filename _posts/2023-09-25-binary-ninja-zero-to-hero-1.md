@@ -5,9 +5,9 @@ categories: [Binary Ninja]
 tags: [reverse engineering, exploit, automation, binja]
 comments: false
 author: zerotistic
-img_path: ../assets/img/hero-1/
+img_path: /assets/img/hero-1/
 image:
-    path: ../assets/img/binja-logo.png
+    path: /assets/img/binja-logo.png
     alt: Binary Ninja's logo
 ---
 
