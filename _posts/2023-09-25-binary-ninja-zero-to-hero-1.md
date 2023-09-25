@@ -14,7 +14,7 @@ image:
 Hi everyone, and welcome to the first post of the serie `Binary Ninja: Zero to Hero`! This post will be an introduction to Binary Ninja and an overview of its different components, more than an tutorial of some kind. It will also be used as a teaser of what I will write about and what competences you'll gain from this serie. So let's get started!
 
 ## About Binary Ninja
-Binary Ninja - from now on referred to as Binja -  is developped by [Vector35](https://vector35.com/). Binja came to life around 6 years from now (writing this late 2023). It has numerous [Open-Source](https://github.com/Vector35/) components which makes it very adaptable. Binja's adaptability is a key strength, as it allow a diverse range of plugins. This feature empowers users to tailor their analysis workflows according to their requirements. Furthermore, Binja benefits from a thriving open-source community that has actively [contributed numerous plugins](https://github.com/Vector35/community-plugins/).
+Binary Ninja - from now on referred to as Binja - is developped by [Vector35](https://vector35.com/). Binja came to life around 6 years from now (writing this late 2023). It has numerous [Open-Source](https://github.com/Vector35/) components which makes it very adaptable. Binja's adaptability is a key strength, as it allow a diverse range of plugins. This feature empowers users to tailor their analysis workflows according to their requirements. Furthermore, Binja benefits from a thriving open-source community that has actively [contributed numerous plugins](https://github.com/Vector35/community-plugins/).
 
 Regular updates and ongoing development efforts further bolster Binja's reliability. 
 
@@ -22,6 +22,8 @@ Regular updates and ongoing development efforts further bolster Binja's reliabil
 Binary Ninja comes in three versions: Non-commercial (Personal), Commercial, and Enterprise. The Non-commercial and Commercial versions use individual license files, while the Enterprise version uses a floating license system. This system allows licenses to be checked out from the Enterprise Server by any client for a specified duration.
 The disparities between Non-commercial and Commercial licenses are quite limited, encompassing just two distinctions: the ability to utilize them for commercial purposes and access to the headless API.
 In contrast, the Enterprise version not only offers these features but also includes Single Sign-On (SSO), Project Management capabilities, Floating licenses, and Access Control features.
+
+One particularly appealing aspect of the licensing arrangement is that your payment covers a year of updates for Binja, rather than a year of usage. This implies that when you make a payment, you'll receive updates for a year, but you can continue using Binja beyond that period (although I strongly advise everyone to renew annually, given the numerous valuable updates available).
 
 You can find more information [here](https://binary.ninja/purchase/).
 
@@ -78,7 +80,7 @@ Now that you've learned how to rename, retype, install plugins, and use shortcut
 
 Binary Ninja offers a convenient way to do this. You can simply scroll up or down, and the view will transition to new functions as you scroll. However, if the function you're looking for is quite far away, you have two options:
 - Using the "Symbols" Section: Navigate to the "Symbols" section, where you can either scroll through the list or use the search function to find the specific function you want to jump to.
-- Using the `g`` Shortcut: Press the `g`` key, and a prompt will appear. Here, you can enter the name or address of the function you wish to navigate to. This method allows for quick and precise navigation to a specific function, regardless of its location within the binary.
+- Using the `g` Shortcut: Press the `g` key, and a prompt will appear. Here, you can enter the name or address of the function you wish to navigate to. This method allows for quick and precise navigation to a specific function, regardless of its location within the binary.
 
 At this stage, you should be comfortable with basic reversing and navigating through functions. However, you may find it beneficial to explore other views, such as the Graph view. Switching between views is straightforward. You can either select the dropdown list (usually located under the "Linear" label) and choose "Graph," or simply press Enter to toggle between views.
 <iframe frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d649351a-5ba9-11ee-b5be-6595d9b17862"></iframe>
