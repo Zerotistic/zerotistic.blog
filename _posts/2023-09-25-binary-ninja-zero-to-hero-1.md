@@ -7,7 +7,7 @@ comments: false
 author: zerotistic
 img_path: /assets/img/hero-1/
 image:
-    path: binja-logo.png
+    path: binja-logo.jpg
     alt: Binary Ninja's logo
 ---
 
