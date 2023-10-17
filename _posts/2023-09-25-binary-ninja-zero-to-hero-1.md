@@ -86,6 +86,6 @@ At this stage, you should be comfortable with basic reversing and navigating thr
 <iframe frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d649351a-5ba9-11ee-b5be-6595d9b17862"></iframe>
 _Exemple of graph view_
 
-With these fundamentals under your belt, you're well-equipped to dive into reverse engineering and pwn challenges using Binary Ninja! In your next post, you can explore additional plugins, delve into different views like IL views and SSA, and unlock the full potential of Binary Ninja with tools like the stack view, tags, and the memory map. Happy reversing and pwning!
+With these fundamentals under your belt, you're well-equipped to dive into reverse engineering and pwn challenges using Binary Ninja! In your next post, we will explore additional plugins, delve into different views such as the *LIL and SSA, and unlock the full potential of Binary Ninja's UI with tools like the stack view, tags, and the memory map. Happy reversing and pwning!
 
 See you soon!
