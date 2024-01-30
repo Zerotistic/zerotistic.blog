@@ -7,7 +7,7 @@ comments: false
 author: zerotistic
 img_path: /assets/img/
 image:
-    path: codeql.jpg
+    path: codeql.png
     alt: CodeQL's logo
 ---
 
