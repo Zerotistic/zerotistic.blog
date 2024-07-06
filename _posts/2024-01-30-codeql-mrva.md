@@ -59,7 +59,7 @@ When running a CodeQL query, you define a taint tracking configuration that spec
 A taint tracking configuration refers to the setup of rules and definitions that specify how the analysis should track and trace the propagation of potentially malicious or untrusted data, known as "taint", within a program. 
 
 The concept of taint checking is to identify variables or data that can be modified by an external user or an untrusted source, such as user input from a web form. Taint analysis helps to identify potential security risks associated with this untrusted data and track its flow through the program. Sources are the inputs or data that could be potentially manipulated by an attacker, sinks are the vulnerable points where the manipulated data can cause harm, and sanitizers are the functions or methods that sanitise or validate the data.
-![](/img/codeql-mrva/source_sink.png)
+![](/codeql-mrva/source_sink.png)
 Once you've successfully identified the sources and sinks in your code, your main mission is to establish whether data from a source ultimately makes its way to a sink. This objective can be tackled using various approaches.
 
 For instance, in a scenario where you have 5 sources and 60 sinks, it's relatively straightforward. You can trace the pathways from each source to their final destination in a sink.
@@ -67,7 +67,7 @@ For instance, in a scenario where you have 5 sources and 60 sinks, it's relative
 However, the situation takes on a more intricate dimension when you're dealing with 60 sources and only 5 sinks. In such cases, individually tracking each source becomes a troublesome task. This is when you will change your approach and use a new method that involves starting from the sinks and tracing back to pinpoint the corresponding source.
 
 In essence, the approach you choose depends on the specific circumstances of your code. This is where CodeQL proves invaluable. It automates the process of locating vulnerabilities by utilizing your defined sources and sinks, along with the conditions you specify, like asking, "Can my source data reach a sink without passing through a sanitizer?" CodeQL adapts to your specific case, helping you identify and address potential issues efficiently.
-![](/img/codeql-mrva/source_sink_example.png)
+![](/codeql-mrva/source_sink_example.png)
 
 > Note: LiveOverflow made a great video about it - I highly recommend it if you're new to these concepts: [Sources and Sinks - Code Review Basics](https://www.youtube.com/watch?v=ZaOtY4i5w_U)
 
