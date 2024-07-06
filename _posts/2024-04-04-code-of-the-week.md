@@ -19,3 +19,8 @@ Please, enjoy the reading!
 [Code of the Week #3](https://www.hackcyom.com/2024/03/code-of-the-week-3/)
 
 [Code of the Week #4](https://www.hackcyom.com/2024/03/code-of-the-week-4/)
+
+[Code of the Week #5](https://www.hackcyom.com/2024/06/code-of-the-week-5/)
+
+[Code of the Week #6](https://www.hackcyom.com/2024/07/code-of-the-week-6/)
+
