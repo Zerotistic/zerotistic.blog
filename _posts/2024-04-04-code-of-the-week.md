@@ -24,3 +24,4 @@ Please, enjoy the reading!
 
 [Code of the Week #6](https://www.hackcyom.com/2024/07/code-of-the-week-6/)
 
+[Code of the Week #7](https://www.hackcyom.com/2024/08/code-of-the-week-7/)
