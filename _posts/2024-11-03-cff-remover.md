@@ -182,9 +182,23 @@ def _find_state_variable(self, func: Function,
         for var in hlil.vars:
             var_name = str(var.name)
             potential_states.add(var_name)
+    
+    mlil = func.medium_level_il
+    if mlil:
+        print("Analyzing MLIL for variables...")
+        for block in mlil.basic_blocks:
+            for ins in block:
+                if hasattr(ins, 'vars_read'):
+                    for var in ins.vars_read:
+                        var_name = str(var)
+                        potential_states.add(var_name)
+                if hasattr(ins, 'vars_written'):
+                    for var in ins.vars_written:
+                        var_name = str(var)
+                        potential_states.add(var_name)
 ```
 
-O look at both Binary Ninja's High Level IL (HLIL) and Medium Level IL (MLIL) representations. The HLIL gives us a high-level view of variables, while MLIL shows us exactly how they're used in control flow decisions.
+I look at both Binary Ninja's High Level IL (HLIL) and Medium Level IL (MLIL) representations. The HLIL gives us a high-level view of variables, while MLIL shows us exactly how they're used in control flow decisions.
 
 I also analyze instruction tokens directly:
 ```py
@@ -337,7 +351,7 @@ My initial thoughts were about using a pure Hidden Markov Model (HMM) for recove
 A pure HMM approach would model the problem as:
 - States = Basic Blocks,
 - Observations = State Variable Values,
-- Transitions = P(next_block | current_block, state_value)
+- Transitions = P(next_block \| current_block, state_value)
 
 However, this has several limitations:
 1. HMMs assume probabilistic transitions, but CFF transitions are deterministic
@@ -380,9 +394,9 @@ def _analyze_state_transitions(self):
                         state_transitions.add((current_state, value))
 ```
 
-This phase gives us a directed graph G = (V,E) where:
-- V = Set of state values
-- E = {(s₁,s₂) | state can transition from s₁ to s₂}
+This phase gives us a directed graph `G = (V,E)` where:
+- `V` = Set of state values
+- `E = {(s₁,s₂)` | state can transition from `s₁` to `s₂`}
 
 Consider this flattened code:
 ```c
