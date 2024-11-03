@@ -396,7 +396,7 @@ def _analyze_state_transitions(self):
 
 This phase gives us a directed graph `G = (V,E)` where:
 - `V` = Set of state values
-- `E = {(s₁,s₂)` | state can transition from `s₁` to `s₂`}
+- `E` = {(s₁,s₂) \| state can transition from `s₁` to `s₂`}
 
 Consider this flattened code:
 ```c
