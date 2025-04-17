@@ -11,7 +11,7 @@ image:
     alt: CodeQL's logo
 ---
 
-Hi, today is a blog post on CodeQL MRVA. I've written this article for my current company, [Hackcyom](https://www.hackcyom.com/). Please feel free to read the article on their website: [Rediscovering vulnerabilities with CodeQL MRVA](https://www.hackcyom.com/2024/01/rediscovering-vulnerabilities-with-codeql-mrva/)
+Hi, today is a blog post on CodeQL MRVA. I've written this article for my previous company, [Hackcyom](https://www.hackcyom.com/). Please feel free to read the article on their website: [Rediscovering vulnerabilities with CodeQL MRVA](https://www.hackcyom.com/2024/01/rediscovering-vulnerabilities-with-codeql-mrva/)
 
 -------
 

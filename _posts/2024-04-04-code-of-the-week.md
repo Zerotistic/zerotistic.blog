@@ -9,7 +9,7 @@ author: zerotistic
 
 Hello everybody! I have been busy with various things lately and didn't post anything new lately. However, as part of my daily job, I have started writing a blog post series on code review. It is meant to cover less known and logic bugs - because I believe that there are already thousands of blog posts on "normal" bugs likle XSS, SQLi… and that it is thus less interesting.
 
-Below you will find linked all the posts I've made so far, and will update regularly.
+Below you will find linked all the posts I've made. This is the complete list.
 Please, enjoy the reading!
 
 [Code of the Week #1](https://www.hackcyom.com/2024/02/code-of-the-week/)
