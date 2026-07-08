@@ -1,0 +1,214 @@
+---
+import { getPosts, getSubposts } from "@/lib/content"
+import { formatDate } from "@/lib/utils"
+
+const posts = await getPosts()
+const series = await getSubposts()
+
+const entries = posts.map((post) => {
+  const parts = series.get(post.id) ?? []
+  const tags = [
+    ...new Set([post, ...parts].flatMap((entry) => entry.data.tags ?? [])),
+  ]
+  return { post, partCount: parts.length, tags }
+})
+
+const allTags = [...new Set(entries.flatMap((e) => e.tags))].sort()
+---
+
+<post-list>
+  <filter-bar role="group" aria-label="Filter posts by tag">
+    <button type="button" data-tag="" aria-pressed="true">all</button>
+    {allTags.map((tag) => (
+        <button type="button" data-tag={tag} aria-pressed="false">
+          {tag}
+        </button>
+      ))}
+  </filter-bar>
+  <ol style={`--rows:${entries.length}`}>
+    {entries.map(({ post, partCount, tags }, i) => (
+        <li data-tags={tags.join(" ")} style={`--i:${i}`}>
+          <time datetime={post.data.date.toISOString()}>
+            {formatDate(post.data.date)}
+          </time>
+          <a href={`/posts/${post.id}`}>
+            <span>{post.data.title}</span>
+            {partCount > 0 && (
+              <series-badge>series · {partCount} parts</series-badge>
+            )}
+          </a>
+          <entry-tags>
+            {tags.map((tag) => (
+              <span>#{tag}</span>
+            ))}
+          </entry-tags>
+        </li>
+      ))}
+  </ol>
+  <p class="empty" hidden>No posts with that tag.</p>
+</post-list>
+
+<script>
+  class PostFilter extends HTMLElement {
+    connectedCallback() {
+      const buttons = [...this.querySelectorAll<HTMLButtonElement>("button")]
+      const items = [...this.querySelectorAll<HTMLLIElement>("li")]
+      const empty = this.querySelector<HTMLElement>(".empty")
+
+      const apply = (tag: string) => {
+        let shown = 0
+        for (const li of items) {
+          const match = !tag || (li.dataset.tags ?? "").split(" ").includes(tag)
+          li.hidden = !match
+          if (match) shown++
+        }
+        for (const b of buttons)
+          b.setAttribute("aria-pressed", String(b.dataset.tag === tag))
+        if (empty) empty.hidden = shown > 0
+      }
+
+      for (const b of buttons) {
+        b.addEventListener("click", () => {
+          if (matchMedia("(pointer: coarse)").matches) navigator.vibrate?.(5)
+          apply(b.dataset.tag ?? "")
+        })
+      }
+    }
+  }
+
+  if (!customElements.get("post-list"))
+    customElements.define("post-list", PostFilter)
+</script>
+
+<style>
+  filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-end: var(--space-m);
+
+    button {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+      padding-block: 0.15rem;
+      padding-inline: var(--space-2xs);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      background: transparent;
+      cursor: pointer;
+      transition:
+        color 0.15s ease,
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+
+      &:hover {
+        color: var(--foreground);
+        border-color: var(--sand-8);
+      }
+
+      &:active {
+        translate: 0 1px;
+      }
+
+      &[aria-pressed="true"] {
+        color: var(--accent);
+        border-color: var(--accent);
+        background-color: var(--accent-muted);
+      }
+    }
+  }
+
+  post-list ol {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+  }
+
+  post-list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-s);
+    padding-block: var(--space-2xs);
+    border-block-start: 1px solid var(--border);
+    animation: row-in 0.4s ease both;
+    animation-delay: calc(var(--i) * 60ms);
+
+    &:last-child {
+      border-block-end: 1px solid var(--border);
+    }
+
+    &[hidden] {
+      display: none;
+    }
+
+    > time {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      font-variant-numeric: tabular-nums;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+
+    > a {
+      display: inline;
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      text-underline-offset: 0.2em;
+
+      span {
+        text-wrap: balance;
+      }
+    }
+
+    series-badge {
+      display: inline-block;
+      margin-inline-start: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      letter-spacing: 0;
+      color: var(--accent);
+      border: 1px solid var(--accent-muted);
+      border-radius: var(--radius-full);
+      padding-inline: var(--space-2xs);
+      white-space: nowrap;
+      translate: 0 -0.1em;
+    }
+
+    entry-tags {
+      grid-column: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+    }
+  }
+
+  post-list .empty {
+    padding-block: var(--space-m);
+    color: var(--muted-foreground);
+    font-size: var(--step--1);
+  }
+
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    post-list li {
+      animation: none;
+    }
+  }
+</style>

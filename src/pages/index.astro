@@ -1,0 +1,99 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import PostList from "@/components/PostList.astro"
+import Layout from "@/layouts/Layout.astro"
+---
+
+<Layout>
+  <MetaPage slot="head" />
+  <home-intro>
+    <h1>zerotistic<cursor-block aria-hidden="true"></cursor-block></h1>
+    <p>
+      Automation nerd, vulnerability researcher and probably unhinged. Security
+      researcher at <a
+        href="https://hiddenlayer.com"
+        target="_blank"
+        rel="noopener noreferrer">HiddenLayer</a
+      >, CTF player for <a
+        href="https://ctf.mt/"
+        target="_blank"
+        rel="noopener noreferrer">Friendly Maltese Citizens</a
+      >.
+    </p>
+    <p class="dim">
+      Notes on reverse engineering, pwn, Binary Ninja, automation and dumb
+      ideas. Find me on <a
+        href="https://github.com/Zerotistic"
+        target="_blank"
+        rel="noopener noreferrer">GitHub</a
+      > and <a href="https://x.com/Zerotistic" target="_blank" rel="noopener noreferrer"
+        >X</a
+      >.
+    </p>
+  </home-intro>
+
+  <PostList />
+</Layout>
+
+<style>
+  home-intro {
+    display: block;
+    margin-block-end: var(--space-l);
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    h1 {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      font-family: var(--font-mono);
+      font-size: var(--step-2);
+      line-height: calc(var(--leading-offset) + 1em);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      margin-block-end: var(--space-xs);
+    }
+
+    cursor-block {
+      display: inline-block;
+      inline-size: 0.5em;
+      block-size: 1em;
+      translate: 0 0.08em;
+      background-color: var(--accent);
+      animation: home-cursor 0.5s steps(1) 4 forwards;
+    }
+
+    p {
+      color: var(--prose-foreground);
+
+      + p {
+        margin-block-start: var(--space-2xs);
+      }
+
+      &.dim {
+        color: var(--muted-foreground);
+        font-size: var(--step--1);
+      }
+    }
+  }
+
+  @keyframes home-cursor {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    home-intro cursor-block {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>

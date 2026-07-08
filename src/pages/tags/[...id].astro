@@ -1,0 +1,110 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getTags } from "@/lib/content"
+import { formatDate } from "@/lib/utils"
+import type { CollectionEntry } from "astro:content"
+
+export async function getStaticPaths() {
+  const tags = await getTags()
+  return [...tags].map(([tag, posts]) => ({
+    params: { id: tag },
+    props: { tag, posts },
+  }))
+}
+
+type Props = { tag: string; posts: CollectionEntry<"blog">[] }
+
+const { tag, posts } = Astro.props
+---
+
+<Layout
+  crumbs={[
+    { label: "Tags", href: "/tags" },
+    { label: `#${tag}`, href: `/tags/${tag}` },
+  ]}
+>
+  <MetaPage
+    slot="head"
+    title={`Posts tagged "${tag}"`}
+    description={`A collection of posts tagged with ${tag}.`}
+    noindex
+  />
+  <page-heading>
+    <h1>#{tag}</h1>
+    <p>
+      {posts.length}
+      {posts.length === 1 ? "post" : "posts"}
+    </p>
+  </page-heading>
+  <ol>
+    {posts.map((post) => (
+        <li>
+          <time datetime={post.data.date.toISOString()}>
+            {formatDate(post.data.date)}
+          </time>
+          <a href={`/posts/${post.id}`}>{post.data.title}</a>
+        </li>
+      ))}
+  </ol>
+</Layout>
+
+<style>
+  page-heading {
+    display: block;
+    margin-block-end: var(--space-l);
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: var(--step-2);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    p {
+      margin-block-start: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+    }
+  }
+
+  ol {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-s);
+    padding-block: var(--space-2xs);
+    border-block-start: 1px solid var(--border);
+
+    &:last-child {
+      border-block-end: 1px solid var(--border);
+    }
+
+    time {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      font-variant-numeric: tabular-nums;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+
+    a {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      text-underline-offset: 0.2em;
+    }
+  }
+</style>
