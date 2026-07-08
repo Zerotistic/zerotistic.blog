@@ -14,6 +14,7 @@ import "@/styles/layout.css"
 import "@/styles/icon-button.css"
 import "@/styles/bar.css"
 import "@/styles/shape.css"
+import "@/styles/motion.css"
 
 import Footer from "@/components/Footer.astro"
 import MetaHead from "@/components/MetaHead.astro"
@@ -46,6 +47,14 @@ const { crumbs } = Astro.props
         <page-footer><Footer /></page-footer>
       </page-content>
     </page-grid>
+
+    <script is:inline>
+      console.log(
+        "%c zerotistic ",
+        "background:#111110;color:#8ea6c8;font-family:monospace;font-weight:600;padding:3px 8px;border-radius:4px",
+        "flag{curious_ones_read_the_console} — say hi on discord: zerotistic",
+      )
+    </script>
   </body>
 </html>
 

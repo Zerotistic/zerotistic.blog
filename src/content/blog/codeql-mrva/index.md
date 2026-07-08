@@ -11,7 +11,7 @@ image: ./assets/codeql.png
 ---
 
 :::note
-I originally wrote this article for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [Rediscovering vulnerabilities with CodeQL MRVA](https://www.hackcyom.com/2024/01/rediscovering-vulnerabilities-with-codeql-mrva/).
+I originally wrote this article for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [Rediscovering vulnerabilities with CodeQL MRVA](https://www.hackcyom.com/services/blog/Rediscovering%20vulnerabilities%20with%20CodeQL%20MRVA).
 :::
 
 A while ago a friend sent me a link to a blog post by Maikypedia titled "[Finding Vulnerabilities with MRVA CodeQL](https://maikypedia.gitlab.io/posts/finding-vulns-with-mrva-codeql/)". I found myself captivated by CodeQL and MRVA, prompting me to embark on a deeper exploration. In this article my aim is to guide you through the journey of configuring MRVA, crafting a CodeQL query designed to uncover LDAP injection vulnerabilities, and sharing my discovery of such a vulnerability within a GitHub repository boasting over 24,000 stars. So, without further ado, let's dive right in!

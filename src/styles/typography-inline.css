@@ -1,11 +1,10 @@
 prose-content {
   a {
-    --underline: var(--accent-muted);
+    --underline: color-mix(in oklab, var(--foreground) 30%, transparent);
     color: var(--foreground);
 
     &:hover {
-      --underline: var(--accent);
-      color: var(--accent);
+      --underline: var(--foreground);
     }
   }
 

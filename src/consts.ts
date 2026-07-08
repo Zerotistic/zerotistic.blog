@@ -15,7 +15,7 @@ export const SITE = {
 
 export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
   { href: "https://github.com/Zerotistic", label: "GitHub", icon: GitHub },
-  { href: "https://x.com/Zerotistic", label: "X", icon: Twitter },
+  { href: "https://x.com/gegrgtezrze", label: "X", icon: Twitter },
   { href: "/rss.xml", label: "RSS", icon: RSS },
 ]
 

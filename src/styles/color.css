@@ -13,11 +13,6 @@
   --sand-11: light-dark(#63635e, #b5b3ad);
   --sand-12: light-dark(#21201c, #eeeeec);
 
-  /* Radix Grass — the single earned accent, phosphor-adjacent */
-  --grass-9:  light-dark(#46a758, #46a758);
-  --grass-10: light-dark(#3e9b4f, #53b365);
-  --grass-11: light-dark(#2a7e3b, #71d083);
-
   --red-9:  light-dark(#e5484d, #e5484d);
   --red-11: light-dark(#ce2c31, #ff9592);
 
@@ -30,9 +25,10 @@
   --destructive:        var(--red-11);
   --border:             var(--sand-6);
 
-  --accent:             var(--grass-11);
-  --accent-solid:       var(--grass-9);
-  --accent-muted:       color-mix(in oklab, var(--accent) 22%, transparent);
+  /* One quiet accent that inverts with the theme: warm clay in light,
+     cool steel in dark. Used only on the cursor and active states. */
+  --accent:             light-dark(#9c5a34, #8ea6c8);
+  --accent-muted:       color-mix(in oklab, var(--accent) 20%, transparent);
   --ring:               var(--accent);
 
   color-scheme: light dark;

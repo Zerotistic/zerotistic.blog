@@ -19,7 +19,7 @@ facts:
 ---
 
 :::note
-I originally wrote this writeup for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [RealWorldCTF: Let's party in the house — Write Up](https://www.hackcyom.com/2024/01/rwctf-lets-party-in-the-house-wu/).
+I originally wrote this writeup for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [RealWorldCTF: Let's party in the house — Write Up](https://www.hackcyom.com/services/blog/rwctf-lets-party-in-the-house-wu).
 :::
 
 This weekend the [RealWorld CTF](https://realworldctf.com/) happened. This is one of the most famous and prestigious CTFs in the world. I played with "Friendly Maltese Citizens" and took 3rd place. This article is a writeup of the challenge "Let's party in the house", a binary exploitation challenge of difficulty "Schrödinger" (the rating scale is baby/medium/hard/schrödinger).

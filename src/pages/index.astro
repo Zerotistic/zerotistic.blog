@@ -2,27 +2,40 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PostList from "@/components/PostList.astro"
 import Layout from "@/layouts/Layout.astro"
+
+const roles = [
+  "automation nerd",
+  "vulnerability researcher",
+  "reverse engineer",
+  "pwn enthusiast",
+  "probably unhinged",
+]
 ---
 
 <Layout>
   <MetaPage slot="head" />
   <home-intro>
     <h1>zerotistic<cursor-block aria-hidden="true"></cursor-block></h1>
-    <p>
-      Automation nerd, vulnerability researcher and probably unhinged. Security
-      researcher at <a
+    <p class="lead">
+      <rotating-role data-roles={JSON.stringify(roles)}>{roles[0]}</rotating-role>
+    </p>
+    <p class="bio">
+      Security researcher at <a
         href="https://hiddenlayer.com"
         target="_blank"
         rel="noopener noreferrer">HiddenLayer</a
-      >, CTF player for <a
+      >, CTF player for 
+      <a
+        href="https://sekai.team/"
+        target="_blank"
+        rel="noopener noreferrer">Project Sekai</a
+      > and       
+      <a
         href="https://ctf.mt/"
         target="_blank"
         rel="noopener noreferrer">Friendly Maltese Citizens</a
-      >.
-    </p>
-    <p class="dim">
-      Notes on reverse engineering, pwn, Binary Ninja, automation and dumb
-      ideas. Find me on <a
+      >. Notes on reverse engineering, pwn, Binary Ninja and dumb ideas. Find me
+      on <a
         href="https://github.com/Zerotistic"
         target="_blank"
         rel="noopener noreferrer">GitHub</a
@@ -34,6 +47,44 @@ import Layout from "@/layouts/Layout.astro"
 
   <PostList />
 </Layout>
+
+<script>
+  class RotatingRole extends HTMLElement {
+    timer?: ReturnType<typeof setInterval>
+
+    connectedCallback() {
+      let roles: string[] = []
+      try {
+        roles = JSON.parse(this.dataset.roles ?? "[]")
+      } catch {
+        return
+      }
+      if (
+        roles.length < 2 ||
+        matchMedia("(prefers-reduced-motion: reduce)").matches
+      )
+        return
+
+      let i = 0
+      const swap = () => {
+        i = (i + 1) % roles.length
+        this.classList.add("swapping")
+        setTimeout(() => {
+          this.textContent = roles[i]
+          this.classList.remove("swapping")
+        }, 280)
+      }
+      this.timer = setInterval(swap, 2600)
+    }
+
+    disconnectedCallback() {
+      clearInterval(this.timer)
+    }
+  }
+
+  if (!customElements.get("rotating-role"))
+    customElements.define("rotating-role", RotatingRole)
+</script>
 
 <style>
   home-intro {
@@ -49,11 +100,10 @@ import Layout from "@/layouts/Layout.astro"
       align-items: center;
       gap: 0.15rem;
       font-family: var(--font-mono);
-      font-size: var(--step-2);
+      font-size: var(--step-3);
       line-height: calc(var(--leading-offset) + 1em);
       font-weight: var(--font-weight-medium);
       letter-spacing: 0;
-      margin-block-end: var(--space-xs);
     }
 
     cursor-block {
@@ -62,24 +112,46 @@ import Layout from "@/layouts/Layout.astro"
       block-size: 1em;
       translate: 0 0.08em;
       background-color: var(--accent);
-      animation: home-cursor 0.5s steps(1) 4 forwards;
+      animation: cursor-blink 1.2s steps(1) infinite;
     }
 
-    p {
-      color: var(--prose-foreground);
+    .lead {
+      min-block-size: calc(var(--leading-offset) + 1em);
+      margin-block-start: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step-0);
+      letter-spacing: 0;
+      color: var(--foreground);
+    }
 
-      + p {
-        margin-block-start: var(--space-2xs);
-      }
+    rotating-role {
+      display: inline-block;
+      will-change: opacity, filter, translate;
+      transition:
+        opacity 0.28s ease,
+        filter 0.28s ease,
+        translate 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 
-      &.dim {
+      &::before {
+        content: "// ";
         color: var(--muted-foreground);
-        font-size: var(--step--1);
       }
+
+      &.swapping {
+        opacity: 0;
+        filter: blur(3px);
+        translate: 0 -0.3em;
+      }
+    }
+
+    .bio {
+      max-inline-size: 42rem;
+      margin-block-start: var(--space-s);
+      color: var(--prose-foreground);
     }
   }
 
-  @keyframes home-cursor {
+  @keyframes cursor-blink {
     0%,
     50% {
       opacity: 1;
@@ -94,6 +166,10 @@ import Layout from "@/layouts/Layout.astro"
     home-intro cursor-block {
       animation: none;
       opacity: 1;
+    }
+
+    home-intro rotating-role {
+      transition: none;
     }
   }
 </style>

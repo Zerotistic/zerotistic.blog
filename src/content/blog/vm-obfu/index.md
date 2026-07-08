@@ -11,7 +11,7 @@ image: ./assets/vm-obfu-logo.png
 ---
 
 :::note
-I originally wrote this article for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [Virtual Machine based obfuscation: An Overview](https://www.hackcyom.com/2024/09/vm-obfuscation-overview/).
+I originally wrote this article for my previous company, [Hackcyom](https://www.hackcyom.com/). You can also read it on their website: [Virtual Machine based obfuscation: An Overview](https://www.hackcyom.com/services/blog/vm-obfuscation-overview).
 :::
 
 Virtual Machine-based (VM-based) obfuscation is a technique in the field of software security focused on altering the readability and structure of code to protect it from analysis. This approach involves modifying straightforward, executable code into a format that mimics the instruction set of a given CPU, making it difficult for anyone to reverse engineer the software.

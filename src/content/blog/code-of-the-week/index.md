@@ -13,10 +13,10 @@ I've been busy with various things lately and didn't post anything new. However,
 
 Below you'll find all the posts I've made linked. This is the complete list. Please, enjoy the reading!
 
-- [Code of the Week #1](https://www.hackcyom.com/2024/02/code-of-the-week/)
-- [Code of the Week #2](https://www.hackcyom.com/2024/02/code-of-the-week-2/)
-- [Code of the Week #3](https://www.hackcyom.com/2024/03/code-of-the-week-3/)
-- [Code of the Week #4](https://www.hackcyom.com/2024/03/code-of-the-week-4/)
-- [Code of the Week #5](https://www.hackcyom.com/2024/06/code-of-the-week-5/)
-- [Code of the Week #6](https://www.hackcyom.com/2024/07/code-of-the-week-6/)
-- [Code of the Week #7](https://www.hackcyom.com/2024/08/code-of-the-week-7/)
+- [Code of the Week #1](https://www.hackcyom.com/services/blog/code-of-the-week)
+- [Code of the Week #2](https://www.hackcyom.com/services/blog/code-of-the-week-2)
+- [Code of the Week #3](https://www.hackcyom.com/services/blog/code-of-the-week-3)
+- [Code of the Week #4](https://www.hackcyom.com/services/blog/code-of-the-week-4)
+- [Code of the Week #5](https://www.hackcyom.com/services/blog/code-of-the-week-5)
+- [Code of the Week #6](https://www.hackcyom.com/services/blog/code-of-the-week-6)
+- [Code of the Week #7](https://www.hackcyom.com/services/blog/code-of-the-week-7)

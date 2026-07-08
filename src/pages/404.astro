@@ -4,9 +4,76 @@ import Layout from "@/layouts/Layout.astro"
 ---
 
 <Layout crumbs={[{ label: "404", href: "/404" }]}>
-  <MetaPage slot="head" title="404" />
-  <prose-content>
-    <h1>404</h1>
-    <p>This page does not exist.</p>
-  </prose-content>
+  <MetaPage slot="head" title="404" noindex />
+  <not-found>
+    <h1>404<cursor-block aria-hidden="true"></cursor-block></h1>
+    <code>flag&#123;th1s_p4ge_d0esnt_ex1st&#125;</code>
+    <p>
+      You reached a page that isn't here. Skill issue, probably mine.
+      Head <a href="/">back home</a> or dig through the
+      <a href="/posts">posts</a>.
+    </p>
+  </not-found>
 </Layout>
+
+<style>
+  not-found {
+    display: block;
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    h1 {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      font-family: var(--font-mono);
+      font-size: var(--step-3);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    cursor-block {
+      display: inline-block;
+      inline-size: 0.5em;
+      block-size: 1em;
+      translate: 0 0.08em;
+      background-color: var(--accent);
+      animation: cursor-blink 1.2s steps(1) infinite;
+    }
+
+    code {
+      display: inline-block;
+      margin-block-start: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step-0);
+      color: var(--muted-foreground);
+    }
+
+    p {
+      max-inline-size: 36rem;
+      margin-block-start: var(--space-s);
+      color: var(--prose-foreground);
+    }
+  }
+
+  @keyframes cursor-blink {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    51%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    not-found cursor-block {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
