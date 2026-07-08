@@ -31,5 +31,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "lru-cache": "11.5.1"
+    }
   }
 }
