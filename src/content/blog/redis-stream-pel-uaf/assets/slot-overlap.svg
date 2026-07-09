@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 350" role="img" aria-labelledby="title desc">
+  <title id="title">64 byte slot overlap between streamNACK and dict</title>
+  <desc id="desc">A freed 64 byte streamNACK allocation reused as a Redis dict, with the first two fields overlapping useful leak fields.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --blue: #2563eb;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+        --purple: #7c3aed;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --blue: #60a5fa;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+          --purple: #a78bfa;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .title { font-size: 17px; font-weight: 700; }
+      .caption { font-size: 13px; fill: var(--muted); }
+      .label { font-size: 13px; font-weight: 700; }
+      .small { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 12; }
+      .cell { stroke: var(--stroke); stroke-width: 1.2; rx: 6; }
+      .nack { fill: color-mix(in srgb, var(--blue) 12%, var(--panel)); }
+      .dict { fill: color-mix(in srgb, var(--green) 12%, var(--panel)); }
+      .leak { fill: color-mix(in srgb, var(--red) 14%, var(--panel)); stroke: var(--red); }
+      .id { fill: color-mix(in srgb, var(--amber) 12%, var(--panel)); }
+      .write { fill: color-mix(in srgb, var(--purple) 12%, var(--panel)); }
+      .line { stroke: var(--stroke); stroke-width: 1.2; }
+      .arrow { fill: none; stroke: var(--red); stroke-width: 1.8; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+  </defs>
+
+  <g transform="translate(0 -72)">
+  <rect x="40" y="92" width="880" height="286" class="panel" />
+  <text x="64" y="128" class="label">c1 stale PEL view: streamNACK</text>
+  <text x="64" y="255" class="label">new live object view: dict</text>
+
+  <g transform="translate(64 150)">
+    <rect x="0" y="0" width="105" height="58" class="cell leak" />
+    <rect x="105" y="0" width="105" height="58" class="cell leak" />
+    <rect x="210" y="0" width="105" height="58" class="cell nack" />
+    <rect x="315" y="0" width="105" height="58" class="cell nack" />
+    <rect x="420" y="0" width="210" height="58" class="cell id" />
+    <rect x="630" y="0" width="105" height="58" class="cell write" />
+    <rect x="735" y="0" width="105" height="58" class="cell write" />
+
+    <text x="13" y="23" class="small">delivery</text>
+    <text x="27" y="39" class="small">time</text>
+    <text x="119" y="23" class="small">delivery</text>
+    <text x="130" y="39" class="small">count</text>
+    <text x="233" y="32" class="small">consumer</text>
+    <text x="329" y="32" class="small">cgroup ref</text>
+    <text x="504" y="32" class="small">id</text>
+    <text x="645" y="32" class="small">pel_prev</text>
+    <text x="750" y="32" class="small">pel_next</text>
+
+    <text x="3" y="80" class="small">+0</text>
+    <text x="108" y="80" class="small">+8</text>
+    <text x="210" y="80" class="small">+16</text>
+    <text x="315" y="80" class="small">+24</text>
+    <text x="420" y="80" class="small">+32</text>
+    <text x="630" y="80" class="small">+48</text>
+    <text x="735" y="80" class="small">+56</text>
+  </g>
+
+  <g transform="translate(64 278)">
+    <rect x="0" y="0" width="105" height="58" class="cell leak" />
+    <rect x="105" y="0" width="105" height="58" class="cell leak" />
+    <rect x="210" y="0" width="630" height="58" class="cell dict" />
+    <text x="36" y="32" class="small">type</text>
+    <text x="122" y="25" class="small">ht_table</text>
+    <text x="145" y="41" class="small">[0]</text>
+    <text x="431" y="32" class="small">rest of dict fields</text>
+  </g>
+
+  <path d="M116 210 C112 235 112 255 116 278" class="arrow" />
+  <path d="M221 210 C217 235 217 255 221 278" class="arrow" />
+  <text x="232" y="394" class="caption">XINFO leaks dict-&gt;type and dict-&gt;ht_table[0] through stale NACK fields.</text>
+  </g>
+</svg>

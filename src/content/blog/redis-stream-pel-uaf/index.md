@@ -191,6 +191,9 @@ while (raxNext(&ri)) {
 
 That frees the NACK for `100-1`, but c1 still retains it in its PEL. This creates the use-after-free.
 
+![Diagram showing c1 and c2 sharing one streamNACK, then c1 retaining a pointer after c2 is deleted](./assets/shared-nack-state.svg)
+*The invalid state is not a wild pointer yet. It starts as two valid indexes pointing at the same NACK.*
+
 ## Why Redis 8.6 makes this exploitable
 
 The stale pointer in c1's PEL is only useful if we can put another object in the freed NACK slot before Redis reads it again.
@@ -221,6 +224,9 @@ This gives the freed slot two meanings. c1 still reads it as a `streamNACK`, whi
 |--------|-----------------|-------------------------------------|
 | +0     | delivery_time   | type (pointer into PIE .data)       |
 | +8     | delivery_count  | ht_table[0] (heap pointer to bucket array) |
+
+![Diagram showing the same 64 byte allocation interpreted as streamNACK fields and dict fields](./assets/slot-overlap.svg)
+*The leak works because Redis prints the stale NACK fields after the allocator has reused the slot as a dict.*
 
 `XINFO STREAM FULL` walks c1's PEL and prints `delivery_time` and `delivery_count` as integers. If the freed NACK slot has been reused by a dict, those two integers are no longer timestamps and counters. They are `dict->type`, a PIE pointer, and `dict->ht_table[0]`, a heap pointer.
 
@@ -325,6 +331,9 @@ The second assignment also fires if `pel_next` is non NULL:
 
 I treat the first assignment as the write primitive and route the second one into padding in the fake object used later.
 
+![Diagram showing pel_prev controlling the destination and pel_next controlling the value in pelListUnlink](./assets/pel-unlink-write.svg)
+*`pel_prev` chooses where the first assignment writes. `pel_next` is the pointer written there.*
+
 The remaining problem is packing those two pointers into a Redis string allocation. A 60 byte SDS value occupies a 64 byte allocation:
 
 - 3 bytes of `sdshdr8`
@@ -375,6 +384,9 @@ The embedded entry starts at allocation offset 41. Its `sdshdr8` fields are:
 The low bits of `0x11` mark the key as SDS_TYPE_8. Bit 4 marks the value as `VALUE_PTR`, meaning the value is not inline. Instead, Redis reads an 8 byte pointer from a fixed offset relative to the fake entry and dereferences it when `HGET` returns the value.
 
 For this layout, that value pointer is at data offset 33. `SETRANGE fakeht 33 <addr>` changes the pointer, and `HGET h:reader "X"` reads from `addr`.
+
+![Diagram showing the reader hash redirected to a fake hash table whose fake entry points at an arbitrary target address](./assets/fake-hash-read.svg)
+*After `h:reader->ht_table[0]` points at `fakeht`, `HGET h:reader "X"` follows the fake entry and dereferences the address set by `SETRANGE`.*
 
 ```python
 def build_fakeht(fakeht_addr, initial_target=0):
@@ -494,6 +506,9 @@ The cleanup after the call is also important. After `system` returns, Redis cont
 In the tested Redis 8.6.1 build, `entryHashDictType` has zero-initialized optional callback fields starting at offset +40. That zeroed region lives in Redis' `.data` section, so its offset from `type_addr` is stable across ASLR. Setting `h:target->ht_table[0] = type_addr + 40` makes the four-bucket lookup read NULL bucket slots and return nil.
 
 So the final object corruption is small: change two pointers in `h:target`.
+
+![Diagram showing the target hash with type pointing to fakeht as a fake dictType and ht_table pointing to a zeroed data region](./assets/code-exec-dict.svg)
+*The last writes turn `h:target` into a call site: `type->hashFunction` points at `system`, and the field string becomes its argument.*
 
 ```python
 # Write h:target->type = fakeht_addr  (system_addr is now at fakeht_addr[0:8])

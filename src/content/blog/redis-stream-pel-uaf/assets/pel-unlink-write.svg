@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 350" role="img" aria-labelledby="title desc">
+  <title id="title">pelListUnlink write primitive</title>
+  <desc id="desc">A reclaimed NACK slot contains controlled SDS bytes. pel_prev controls the write destination and pel_next controls the written value.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+        --purple: #7c3aed;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+          --purple: #a78bfa;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .title { font-size: 17px; font-weight: 700; }
+      .caption { font-size: 13px; fill: var(--muted); }
+      .label { font-size: 13px; font-weight: 700; }
+      .small { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 12; }
+      .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; rx: 8; }
+      .sds { fill: color-mix(in srgb, var(--amber) 13%, var(--box)); stroke: var(--amber); }
+      .target { fill: color-mix(in srgb, var(--green) 13%, var(--box)); stroke: var(--green); }
+      .value { fill: color-mix(in srgb, var(--purple) 13%, var(--box)); stroke: var(--purple); }
+      .side { fill: color-mix(in srgb, var(--red) 10%, var(--box)); stroke: var(--red); stroke-dasharray: 5 4; }
+      .arrow { fill: none; stroke: var(--line); stroke-width: 1.8; marker-end: url(#arrow); }
+      .arrow-red { fill: none; stroke: var(--red); stroke-width: 1.8; stroke-dasharray: 5 4; marker-end: url(#arrow-red); }
+      .arrow-green { fill: none; stroke: var(--green); stroke-width: 2; marker-end: url(#arrow-green); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--line)" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--green)" />
+    </marker>
+  </defs>
+
+  <g transform="translate(0 -72)">
+  <rect x="40" y="92" width="880" height="286" class="panel" />
+
+  <rect x="82" y="138" width="250" height="132" class="sds" />
+  <text x="105" y="164" class="label">reclaimed NACK slot</text>
+  <text x="105" y="192" class="small">offset +48: pel_prev</text>
+  <text x="105" y="211" class="small">offset +56: pel_next</text>
+  <text x="105" y="246" class="small">but bytes come from attacker</text>
+  <text x="105" y="265" class="small">controlled SDS data</text>
+
+  <rect x="408" y="118" width="210" height="74" class="target" />
+  <text x="430" y="147" class="label">target field</text>
+  <text x="430" y="167" class="small">pel_prev = target - 56</text>
+
+  <rect x="408" y="240" width="210" height="74" class="value" />
+  <text x="430" y="269" class="label">value pointer</text>
+  <text x="430" y="289" class="small">pel_next = value</text>
+
+  <rect x="696" y="180" width="160" height="82" class="side" />
+  <text x="724" y="211" class="label">safe padding</text>
+  <text x="724" y="231" class="small">side write lands</text>
+  <text x="724" y="249" class="small">where it is harmless</text>
+
+  <path d="M332 188 C365 178 380 160 408 154" class="arrow" />
+  <path d="M332 225 C365 245 380 270 408 277" class="arrow" />
+  <path d="M618 155 C658 155 662 210 696 216" class="arrow-red" />
+  <path d="M618 277 C650 277 662 236 696 232" class="arrow-red" />
+
+  <path d="M508 192 C508 214 508 218 508 240" class="arrow-green" />
+  <text x="396" y="214" class="label">*(pel_prev + 56) = pel_next</text>
+  <text x="268" y="352" class="caption">Useful write: *(pel_prev + 56) = pel_next. The side write lands in padding.</text>
+  </g>
+</svg>

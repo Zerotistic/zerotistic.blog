@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" role="img" aria-labelledby="title desc">
+  <title id="title">Fake hash table arbitrary read</title>
+  <desc id="desc">h:reader has its bucket table redirected to fakeht. HGET of key X follows a fake entry whose VALUE_PTR points at the chosen read address.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --blue: #2563eb;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+        --purple: #7c3aed;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --blue: #60a5fa;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+          --purple: #a78bfa;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .title { font-size: 17px; font-weight: 700; }
+      .caption { font-size: 13px; fill: var(--muted); }
+      .label { font-size: 13px; font-weight: 700; }
+      .small { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 12; }
+      .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; rx: 8; }
+      .reader { fill: color-mix(in srgb, var(--green) 12%, var(--box)); stroke: var(--green); }
+      .fake { fill: color-mix(in srgb, var(--amber) 12%, var(--box)); stroke: var(--amber); }
+      .entry { fill: color-mix(in srgb, var(--blue) 12%, var(--box)); stroke: var(--blue); }
+      .target { fill: color-mix(in srgb, var(--purple) 12%, var(--box)); stroke: var(--purple); }
+      .write { fill: color-mix(in srgb, var(--red) 10%, var(--box)); stroke: var(--red); }
+      .arrow { fill: none; stroke: var(--line); stroke-width: 1.8; marker-end: url(#arrow); }
+      .arrow-red { fill: none; stroke: var(--red); stroke-width: 1.8; marker-end: url(#arrow-red); }
+      .arrow-green { fill: none; stroke: var(--green); stroke-width: 1.9; marker-end: url(#arrow-green); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--line)" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--green)" />
+    </marker>
+  </defs>
+
+  <g transform="translate(0 -72)">
+  <rect x="40" y="92" width="880" height="340" class="panel" />
+
+  <rect x="82" y="140" width="190" height="132" class="reader" />
+  <text x="108" y="166" class="label">h:reader dict</text>
+  <text x="108" y="197" class="small">type = entryHashDictType</text>
+  <text x="108" y="216" class="small">ht_table[0] = fakeht</text>
+  <text x="108" y="248" class="small">HGET h:reader "X"</text>
+
+  <rect x="360" y="122" width="240" height="190" class="fake" />
+  <text x="386" y="149" class="label">fakeht SDS string</text>
+  <rect x="388" y="176" width="184" height="50" class="box" />
+  <text x="406" y="198" class="small">4 bucket slots</text>
+  <text x="406" y="215" class="small">all point to fake entry</text>
+  <rect x="388" y="246" width="184" height="46" class="entry" />
+  <text x="406" y="265" class="small">key = "X"</text>
+  <text x="406" y="282" class="small">flags = VALUE_PTR</text>
+
+  <rect x="690" y="132" width="178" height="72" class="write" />
+  <text x="712" y="161" class="label">SETRANGE</text>
+  <text x="712" y="181" class="small">fakeht + 33 = addr</text>
+
+  <rect x="690" y="264" width="178" height="72" class="target" />
+  <text x="712" y="293" class="label">target address</text>
+  <text x="712" y="313" class="small">bytes returned by HGET</text>
+
+  <path d="M272 206 C312 206 322 198 360 198" class="arrow-green" />
+  <path d="M572 201 C620 201 640 170 690 168" class="arrow-red" />
+  <path d="M572 270 C620 270 640 300 690 300" class="arrow" />
+  <path d="M778 204 C778 232 778 236 778 264" class="arrow" />
+
+  <text x="270" y="359" class="caption">VALUE_PTR makes HGET dereference the pointer stored at fakeht + 33.</text>
+  </g>
+</svg>

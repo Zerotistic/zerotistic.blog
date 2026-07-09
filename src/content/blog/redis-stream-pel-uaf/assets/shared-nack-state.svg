@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">Shared NACK use after free</title>
+  <desc id="desc">Three states showing valid pending entries, a restored shared NACK, and a dangling consumer PEL pointer after deleting c2.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --blue: #2563eb;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --blue: #60a5fa;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .caption { font-size: 13px; fill: var(--muted); }
+      .title { font-size: 17px; font-weight: 700; }
+      .label { font-size: 13px; font-weight: 700; }
+      .small { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 12; }
+      .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; rx: 8; }
+      .nack { fill: color-mix(in srgb, var(--blue) 12%, var(--box)); stroke: var(--blue); }
+      .consumer { fill: color-mix(in srgb, var(--green) 12%, var(--box)); stroke: var(--green); }
+      .danger { fill: color-mix(in srgb, var(--red) 12%, var(--box)); stroke: var(--red); }
+      .freed { fill: color-mix(in srgb, var(--red) 8%, var(--box)); stroke: var(--red); stroke-dasharray: 5 4; }
+      .arrow { fill: none; stroke: var(--line); stroke-width: 1.7; marker-end: url(#arrow); }
+      .arrow-red { fill: none; stroke: var(--red); stroke-width: 1.9; stroke-dasharray: 5 4; marker-end: url(#arrow-red); }
+      .arrow-green { fill: none; stroke: var(--green); stroke-width: 1.7; marker-end: url(#arrow-green); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--line)" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--green)" />
+    </marker>
+  </defs>
+
+  <g transform="translate(0 -66)">
+  <g transform="translate(35 86)">
+    <rect class="panel" width="280" height="300" />
+    <text x="18" y="31" class="label">1. Valid object</text>
+    <rect x="20" y="58" width="92" height="42" class="box" />
+    <text x="35" y="84" class="small">group PEL</text>
+    <rect x="20" y="138" width="92" height="42" class="consumer" />
+    <text x="47" y="164" class="small">c1 PEL</text>
+    <rect x="20" y="218" width="92" height="42" class="consumer" />
+    <text x="47" y="244" class="small">c2 PEL</text>
+
+    <rect x="176" y="84" width="76" height="48" class="nack" />
+    <text x="193" y="105" class="small">NACK A</text>
+    <text x="190" y="121" class="small">100-1</text>
+    <rect x="176" y="198" width="76" height="48" class="nack" />
+    <text x="193" y="219" class="small">NACK B</text>
+    <text x="190" y="235" class="small">300-1</text>
+
+    <path d="M112 79 C140 79 145 99 176 106" class="arrow" />
+    <path d="M112 159 C145 159 148 127 176 115" class="arrow-green" />
+    <path d="M112 239 C145 239 148 222 176 222" class="arrow-green" />
+  </g>
+
+  <g transform="translate(340 86)">
+    <rect class="panel" width="280" height="300" />
+    <text x="18" y="31" class="label">2. Restored object</text>
+    <rect x="20" y="58" width="92" height="42" class="box" />
+    <text x="35" y="84" class="small">group PEL</text>
+    <rect x="20" y="138" width="92" height="42" class="consumer" />
+    <text x="47" y="164" class="small">c1 PEL</text>
+    <rect x="20" y="218" width="92" height="42" class="consumer" />
+    <text x="47" y="244" class="small">c2 PEL</text>
+
+    <rect x="172" y="128" width="84" height="58" class="danger" />
+    <text x="193" y="150" class="small">NACK A</text>
+    <text x="189" y="166" class="small">100-1</text>
+    <text x="173" y="203" class="small">consumer = c2</text>
+
+    <path d="M112 79 C145 79 151 139 172 148" class="arrow" />
+    <path d="M112 159 C142 159 151 157 172 157" class="arrow-red" />
+    <path d="M112 239 C145 239 151 176 172 168" class="arrow-red" />
+    <text x="25" y="282" class="small">c1 was not revisited during load</text>
+  </g>
+
+  <g transform="translate(645 86)">
+    <rect class="panel" width="280" height="300" />
+    <text x="18" y="31" class="label">3. Delete c2</text>
+    <rect x="20" y="58" width="92" height="42" class="box" />
+    <text x="35" y="84" class="small">group PEL</text>
+    <rect x="20" y="138" width="92" height="42" class="consumer" />
+    <text x="47" y="164" class="small">c1 PEL</text>
+    <rect x="20" y="218" width="92" height="42" class="box" />
+    <text x="41" y="244" class="small">c2 gone</text>
+
+    <rect x="172" y="128" width="84" height="58" class="freed" />
+    <text x="196" y="150" class="small">freed</text>
+    <text x="190" y="166" class="small">NACK A</text>
+    <text x="178" y="203" class="small">slot reusable</text>
+
+    <path d="M112 159 C144 159 151 157 172 157" class="arrow-red" />
+    <text x="25" y="282" class="small">c1 still holds the stale pointer</text>
+  </g>
+  </g>
+</svg>

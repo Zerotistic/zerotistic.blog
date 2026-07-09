@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" role="img" aria-labelledby="title desc">
+  <title id="title">Final dict corruption for code execution</title>
+  <desc id="desc">h:target type points to fakeht used as a fake dictType containing system, while ht_table points to a zeroed data region so lookup returns cleanly.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+        --purple: #7c3aed;
+        --blue: #2563eb;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+          --purple: #a78bfa;
+          --blue: #60a5fa;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .caption { font-size: 13px; fill: var(--muted); }
+      .label { font-size: 13px; font-weight: 700; }
+      .small { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 12; }
+      .dict { fill: color-mix(in srgb, var(--green) 12%, var(--box)); stroke: var(--green); }
+      .fake { fill: color-mix(in srgb, var(--amber) 12%, var(--box)); stroke: var(--amber); }
+      .zero { fill: color-mix(in srgb, var(--blue) 10%, var(--box)); stroke: var(--blue); }
+      .call { fill: color-mix(in srgb, var(--purple) 12%, var(--box)); stroke: var(--purple); }
+      .cmd { fill: color-mix(in srgb, var(--red) 10%, var(--box)); stroke: var(--red); }
+      .arrow { fill: none; stroke: var(--line); stroke-width: 1.8; marker-end: url(#arrow); }
+      .arrow-red { fill: none; stroke: var(--red); stroke-width: 1.9; marker-end: url(#arrow-red); }
+      .arrow-green { fill: none; stroke: var(--green); stroke-width: 1.9; marker-end: url(#arrow-green); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--line)" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--green)" />
+    </marker>
+  </defs>
+
+  <rect x="40" y="28" width="880" height="312" class="panel" />
+
+  <rect x="82" y="82" width="210" height="134" class="dict" />
+  <text x="110" y="112" class="label">h:target dict</text>
+  <text x="110" y="144" class="small">type = fakeht</text>
+  <text x="110" y="164" class="small">ht_table[0] = zero area</text>
+  <text x="110" y="194" class="small">field = command string</text>
+
+  <rect x="382" y="58" width="210" height="92" class="fake" />
+  <text x="410" y="88" class="label">fakeht as dictType</text>
+  <text x="410" y="118" class="small">hashFunction = system</text>
+
+  <rect x="382" y="212" width="210" height="72" class="zero" />
+  <text x="410" y="242" class="label">zeroed .data region</text>
+  <text x="410" y="263" class="small">bucket slots read as NULL</text>
+
+  <rect x="690" y="70" width="180" height="72" class="cmd" />
+  <text x="714" y="99" class="label">HGET field</text>
+  <text x="714" y="120" class="small">"id &gt; /tmp/pwned"</text>
+
+  <rect x="690" y="206" width="180" height="72" class="call" />
+  <text x="714" y="235" class="label">system(field)</text>
+  <text x="714" y="256" class="small">then lookup returns nil</text>
+
+  <path d="M292 142 C330 124 345 98 382 98" class="arrow-green" />
+  <path d="M292 164 C330 186 345 238 382 248" class="arrow" />
+  <path d="M592 104 C630 104 652 106 690 106" class="arrow-red" />
+  <path d="M780 142 C780 170 780 178 780 206" class="arrow-red" />
+
+  <text x="250" y="316" class="caption">The corrupted hash call site supplies the command string as system's first argument.</text>
+</svg>
