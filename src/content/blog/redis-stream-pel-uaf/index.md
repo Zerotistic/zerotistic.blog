@@ -43,9 +43,9 @@ I did not start with Streams. I started with the parts of Redis that turn bytes 
 Streams stood out pretty quickly.
 
 A stream is an append only log. On its own, that is simple enough. The interesting part is consumer groups. A group tracks which entries were delivered, which ones are still pending, and which consumer owns each pending
-entry. That pending state lives in the PEL, the Pending Entries List. There are two views of the same pending state. The group has a global PEL. Each consumer also has its own PEL. Both views point at the same `streamNACK` objects. That is the invariant I cared about: one pending stream ID should map to one NACK, and one NACK should belong to one consumer.
+entry. That pending state lives in the PEL, the Pending Entries List. There are two views of the same pending state. The group has a global PEL and then each consumer also has its own PEL. Both views point at the same `streamNACK` objects. That is the invariant I cared about: one pending stream ID should map to one NACK, and one NACK should belong to one consumer.
 
-The loader checked the first half of that invariant. It made sure the NACK existed in the group PEL before inserting it into a consumer PEL. But it did not check the second half. That missing check is enough to make two consumers point at the same `streamNACK`. Deleting one consumer frees it. The other consumer keeps the stale pointer. In Redis 8.6 this becomes exploitable because `streamNACK` grew to 64 bytes, which puts it in the same jemalloc size class as `dict`. The stale pointer can first be read as dict fields, then reused as a write gadget, and
+The loader checked the first half of that invariant. It made sure the NACK existed in the group PEL before inserting it into a consumer PEL, but it did not check the second half. That missing check is enough to make two consumers point at the same `streamNACK`. Deleting one consumer frees it while the other consumer keeps the stale pointer. In Redis 8.6 this becomes exploitable because `streamNACK` grew to 64 bytes, which puts it in the same jemalloc size class as `dict`. The stale pointer can first be read as dict fields, then reused as a write gadget, and
 finally used to redirect a Redis hash lookup into `system()`.
 
 ## The vulnerability
@@ -78,15 +78,12 @@ while (pel_size--) {
 }
 ```
 
-That lookup checks the first half of the invariant. The pending ID must exist in the group PEL.
-
-Then Redis assigns the NACK to the consumer being loaded:
-
+That lookup verifies the first half of the invariant: the pending ID must be present in the group PEL. Redis then assigns the NACK to the consumer being loaded:
 ```c
 nack->consumer = consumer;
 ```
 
-The missing check is the one that should happen before that assignment. Redis never verifies that another consumer has not already claimed the same NACK.
+The missing check is the one that should happen before that assignment but Redis never verifies that another consumer has not already claimed the same NACK.
 
 The `raxTryInsert` call only protects the current consumer's PEL. If the same stream ID appears twice under c1, the second insert fails. If the same stream ID appears once under c1 and once under c2, both inserts succeed.
 
@@ -107,7 +104,7 @@ The rest of the post walks through those transitions in order: first making the 
 
 ## Creating the shared NACK
 
-The first goal is not to corrupt memory directly. It is to create an impossible stream state:
+The first goal is not to corrupt memory directly but to create an impossible stream state:
 
 - the group PEL contains one NACK for `100-1`
 - c1 points to that NACK
@@ -127,7 +124,7 @@ XREADGROUP GROUP g c1 COUNT 2 STREAMS mystream >   # c1 gets 100-1 and 200-1
 XREADGROUP GROUP g c2 COUNT 1 STREAMS mystream >   # c2 gets 300-1
 ```
 
-The resulting state is valid. c1 owns `100-1` and `200-1`. c2 owns `300-1`. The group PEL contains all three NACKs.
+The resulting state is valid: c1 owns `100-1` and `200-1`, c2 owns `300-1`, and the group PEL contains all three NACKs.
 
 The patch is small: edit c2's consumer record so its PEL also contains `100-1`.
 
@@ -192,7 +189,7 @@ while (raxNext(&ri)) {
 }
 ```
 
-That frees the NACK for `100-1`. c1 still has it in its PEL. This is the UAF.
+That frees the NACK for `100-1`, but c1 still retains it in its PEL. This creates the use-after-free.
 
 ## Why Redis 8.6 makes this exploitable
 
@@ -288,7 +285,7 @@ Running `do_leak` three times and taking the majority value of `delivery_time` g
 
 ## A write primitive in pelListUnlink
 
-The leak gives addresses. The next step is to write to them.
+The leak gives addresses so the next step is to write to them.
 
 The same two fields that made Redis 8.6 exploitable, `pel_prev` and `pel_next`, give a write primitive when Redis unlinks a NACK from the time ordered PEL list. If the stale NACK slot is reclaimed with a string value, those two fields come from attacker controlled SDS bytes.
 
