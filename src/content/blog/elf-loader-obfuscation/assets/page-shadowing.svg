@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 260" role="img" aria-labelledby="title desc">
+  <title id="title">Page shadowing: a second PT_LOAD replaces the first analyst-page mapping</title>
+  <desc id="desc">A five-byte second segment rounds to a full page and, via MAP_FIXED, replaces the analyst program page with the attacker program page at the same virtual address.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+        --amber: #d97706;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+          --amber: #fbbf24;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .tag { font-size: 11px; fill: var(--muted); }
+      .addr { font-size: 10px; fill: var(--muted); }
+      .analyst { fill: color-mix(in srgb, var(--green) 18%, transparent); stroke: var(--green); stroke-width: 1.5; }
+      .attacker { fill: color-mix(in srgb, var(--red) 16%, transparent); stroke: var(--red); stroke-width: 1.5; }
+      .decl { fill: color-mix(in srgb, var(--amber) 24%, transparent); stroke: var(--amber); stroke-width: 1.5; }
+      .arrow { fill: none; stroke: var(--red); stroke-width: 1.8; marker-end: url(#arrow-red); }
+      .tick { stroke: var(--stroke); stroke-width: 1; }
+    </style>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+  </defs>
+
+  <text x="60" y="16" class="addr" text-anchor="middle">0x401000</text>
+  <text x="900" y="16" class="addr" text-anchor="middle">0x402000</text>
+  <line x1="60" y1="24" x2="60" y2="96" class="tick" />
+  <line x1="900" y1="24" x2="900" y2="96" class="tick" />
+
+  <text x="60" y="42" class="tag">PT_LOAD #1, file 0x1000</text>
+  <rect x="60" y="48" width="840" height="48" class="analyst" />
+  <text x="480" y="78" class="tag" text-anchor="middle">"Hello analyst!"</text>
+
+  <rect x="490" y="112" width="90" height="26" class="decl" />
+  <text x="535" y="130" class="tag" text-anchor="middle">5 bytes</text>
+  <path d="M480 138 L480 158" class="arrow" />
+  <text x="620" y="132" class="tag" fill="var(--red)">PT_LOAD #2, file 0x2180 → rounds to 0x2000</text>
+
+  <line x1="60" y1="166" x2="60" y2="230" class="tick" />
+  <line x1="900" y1="166" x2="900" y2="230" class="tick" />
+  <text x="60" y="182" class="tag">kernel mapping, same address</text>
+  <rect x="60" y="188" width="840" height="48" class="attacker" />
+  <text x="480" y="218" class="tag" text-anchor="middle">"Hello attacker!" (from file 0x2000)</text>
+</svg>

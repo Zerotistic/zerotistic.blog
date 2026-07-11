@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="title desc">
+  <title id="title">Loader startup timeline across three columns: file, kernel, ld.so</title>
+  <desc id="desc">Nine steps from reading program headers to running the entry point, showing which component consumes which memory at each point.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .title { font-size: 15px; font-weight: 700; }
+      .col-title { font-size: 13px; font-weight: 700; fill: var(--muted); }
+      .step { font-size: 12px; }
+      .callout { font-size: 11.5px; fill: var(--red); font-weight: 700; }
+      .node { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; rx: 6; }
+      .hot { fill: color-mix(in srgb, var(--red) 14%, var(--box)); stroke: var(--red); stroke-width: 2; rx: 6; }
+      .rail { stroke: var(--stroke); stroke-width: 2; }
+      .arrow { fill: none; stroke: var(--line); stroke-width: 1.6; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--line)" />
+    </marker>
+  </defs>
+
+  <text x="480" y="28" class="title" text-anchor="middle">Startup timeline: file → kernel → ld.so</text>
+
+  <text x="150" y="56" class="col-title" text-anchor="middle">FILE</text>
+  <text x="480" y="56" class="col-title" text-anchor="middle">KERNEL</text>
+  <text x="810" y="56" class="col-title" text-anchor="middle">LD.SO</text>
+
+  <!-- FILE column: single origin node -->
+  <rect x="70" y="80" width="160" height="34" class="node" />
+  <text x="150" y="102" class="step" text-anchor="middle">original PHDRs</text>
+
+  <!-- KERNEL column: sequential mapping steps -->
+  <line x1="480" y1="114" x2="480" y2="286" class="rail" />
+  <rect x="400" y="80" width="160" height="34" class="node" />
+  <text x="480" y="102" class="step" text-anchor="middle">map PT_LOAD #1</text>
+
+  <rect x="400" y="134" width="160" height="34" class="node" />
+  <text x="480" y="156" class="step" text-anchor="middle">map PT_LOAD #2</text>
+
+  <rect x="400" y="188" width="160" height="34" class="hot" />
+  <text x="480" y="210" class="step" text-anchor="middle">replace earlier page</text>
+
+  <rect x="400" y="242" width="160" height="34" class="node" />
+  <text x="480" y="264" class="step" text-anchor="middle">build auxv (AT_PHDR)</text>
+
+  <path d="M480 114 L480 128" class="arrow" />
+  <path d="M480 168 L480 182" class="arrow" />
+  <path d="M480 222 L480 236" class="arrow" />
+
+  <!-- FILE -> KERNEL handoff -->
+  <path d="M150 114 C150 150, 320 97, 396 97" class="arrow" />
+
+  <!-- LD.SO column: consumes the finished mapping -->
+  <line x1="810" y1="276" x2="810" y2="394" class="rail" />
+  <rect x="730" y="242" width="160" height="34" class="hot" />
+  <text x="810" y="264" class="step" text-anchor="middle">read PHDRs via AT_PHDR</text>
+
+  <rect x="730" y="296" width="160" height="34" class="node" />
+  <text x="810" y="318" class="step" text-anchor="middle">parse .dynamic</text>
+
+  <rect x="730" y="350" width="160" height="34" class="hot" />
+  <text x="810" y="372" class="step" text-anchor="middle">apply relocations</text>
+
+  <path d="M810 276 L810 290" class="arrow" />
+  <path d="M810 330 L810 344" class="arrow" />
+
+  <!-- KERNEL -> LD.SO handoff -->
+  <path d="M560 259 L726 259" class="arrow" />
+
+  <text x="810" y="410" class="callout" text-anchor="middle">reads kernel-mapped memory</text>
+</svg>

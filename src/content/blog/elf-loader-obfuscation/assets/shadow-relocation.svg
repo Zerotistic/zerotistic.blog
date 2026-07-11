@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">Shadow relocation: the same GOT slot resolves to a different symbol</title>
+  <desc id="desc">The on-disk Elf64_Rela entry names symbol 2, read. The mapped, shadowed copy at the same GOT offset names symbol 1, write. The call instruction and PLT stub never change.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --panel: #fffdf8;
+        --box: #ffffff;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --panel: #1f1d1a;
+          --box: #24221f;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .label { font-size: 12px; font-weight: 700; }
+      .tag { font-size: 11px; fill: var(--muted); }
+      .caption { font-size: 12px; fill: var(--muted); }
+      .panel { fill: var(--panel); stroke: var(--stroke); stroke-width: 1.5; rx: 10; }
+      .field { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; }
+      .sym-disk { fill: color-mix(in srgb, var(--green) 16%, var(--box)); stroke: var(--green); stroke-width: 2; }
+      .sym-mapped { fill: color-mix(in srgb, var(--red) 14%, var(--box)); stroke: var(--red); stroke-width: 2; }
+      .arrow-green { fill: none; stroke: var(--green); stroke-width: 2; marker-end: url(#arrow-green); }
+      .arrow-red { fill: none; stroke: var(--red); stroke-width: 2; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--green)" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--red)" />
+    </marker>
+  </defs>
+
+  <text x="40" y="26" class="tag">call read@plt → GOT[0x3ff8] (unchanged in both views)</text>
+
+  <text x="40" y="56" class="tag">on-disk .rela.plt</text>
+  <rect x="40" y="64" width="160" height="42" class="field" />
+  <text x="50" y="90" class="tag">r_offset 0x3ff8</text>
+  <rect x="210" y="64" width="180" height="42" class="field" />
+  <text x="220" y="90" class="tag">JUMP_SLOT</text>
+  <rect x="400" y="64" width="120" height="42" class="sym-disk" />
+  <text x="412" y="90" class="label">sym 2: read</text>
+
+  <text x="40" y="152" class="tag">mapped copy (shadow page)</text>
+  <rect x="40" y="160" width="160" height="42" class="field" />
+  <text x="50" y="186" class="tag">r_offset 0x3ff8</text>
+  <rect x="210" y="160" width="180" height="42" class="field" />
+  <text x="220" y="186" class="tag">JUMP_SLOT</text>
+  <rect x="400" y="160" width="120" height="42" class="sym-mapped" />
+  <text x="412" y="186" class="label">sym 1: write</text>
+
+  <path d="M520 85 C 570 85, 570 110, 610 112" class="arrow-green" />
+  <path d="M520 181 C 570 181, 570 156, 610 154" class="arrow-red" />
+
+  <rect x="610" y="64" width="310" height="138" class="panel" />
+  <text x="765" y="90" class="label" text-anchor="middle">GOT[0x3ff8] after ld.so runs</text>
+  <line x1="630" y1="102" x2="900" y2="102" stroke="var(--stroke)" stroke-width="1" />
+  <text x="630" y="128" class="tag">disk:</text>
+  <text x="630" y="150" font-size="13" fill="var(--green)">→ read()</text>
+  <text x="630" y="174" class="tag">mapped:</text>
+  <text x="630" y="196" font-size="13" fill="var(--red)">→ write()</text>
+
+  <text x="480" y="240" class="caption" text-anchor="middle">process calls whichever ld.so resolved: write()</text>
+</svg>

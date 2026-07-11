@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 200" role="img" aria-labelledby="title desc">
+  <title id="title">Reconstruction divergence between segment reconstruction and kernel mapping</title>
+  <desc id="desc">A five-byte declared segment sits inside a 4 KiB page. Static reconstruction sees only the five bytes. Linux maps the entire page executable.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8f5ef;
+        --text: #202124;
+        --muted: #5f646d;
+        --stroke: #d7cec2;
+        --line: #525866;
+        --green: #059669;
+        --red: #dc2626;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171615;
+          --text: #f2eee7;
+          --muted: #b6aea3;
+          --stroke: #3f3932;
+          --line: #b8b1a7;
+          --green: #34d399;
+          --red: #f87171;
+        }
+      }
+      svg { background: var(--bg); }
+      text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; fill: var(--text); }
+      .tag { font-size: 11px; fill: var(--muted); }
+      .addr { font-size: 10px; fill: var(--muted); }
+      .declared { fill: color-mix(in srgb, var(--green) 22%, transparent); stroke: var(--green); stroke-width: 1.5; }
+      .undeclared { fill: transparent; stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 4 3; }
+      .tick { stroke: var(--stroke); stroke-width: 1; }
+    </style>
+  </defs>
+
+  <text x="58" y="12" class="addr" text-anchor="end">0x401000</text>
+  <text x="86" y="12" class="addr" text-anchor="start">0x401005</text>
+  <text x="900" y="12" class="addr" text-anchor="middle">0x402000</text>
+  <line x1="60" y1="16" x2="60" y2="24" class="tick" />
+  <line x1="84" y1="16" x2="84" y2="24" class="tick" />
+  <line x1="900" y1="16" x2="900" y2="24" class="tick" />
+
+  <text x="60" y="40" class="tag">segment reconstruction</text>
+  <rect x="60" y="46" width="24" height="36" class="declared" />
+  <rect x="84" y="46" width="816" height="36" fill="none" stroke="var(--stroke)" stroke-width="1" stroke-dasharray="2 3" />
+
+  <text x="60" y="106" class="tag">kernel mapping</text>
+  <rect x="60" y="112" width="24" height="36" class="declared" />
+  <rect x="84" y="112" width="816" height="36" class="undeclared" />
+
+  <text x="72" y="178" class="tag" text-anchor="middle">p_filesz</text>
+  <text x="492" y="178" class="tag" text-anchor="middle">mapped R+X, not in p_filesz</text>
+</svg>
