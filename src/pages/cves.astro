@@ -1,0 +1,881 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import Layout from "@/layouts/Layout.astro"
+
+type Severity = "critical" | "high" | "medium"
+
+type Finding = {
+  id: string
+  title: string
+  summary: string
+  published: string
+  score: string
+  cvss: "3.1" | "4.0"
+  severity: Severity
+  url: string
+  advisory?: { label: string; href: string }
+}
+
+type Product = {
+  id: string
+  name: string
+  context: string
+  findings: Finding[]
+}
+
+const cveUrl = (id: string) => `https://www.cve.org/CVERecord?id=${id}`
+
+const products: Product[] = [
+  {
+    id: "anubis",
+    name: "Anubis",
+    context: "Web AI firewall",
+    findings: [
+      {
+        id: "CVE-2026-62314",
+        title: "Policy bypass via a client-controlled X-Original-URI header",
+        summary:
+          "A client-controlled header was trusted before the request path, allowing matching ALLOW rules to bypass the Anubis challenge.",
+        published: "2026-07-15",
+        score: "5.8",
+        cvss: "3.1",
+        severity: "medium",
+        url: cveUrl("CVE-2026-62314"),
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/TecharoHQ/anubis/security/advisories/GHSA-6wcg-mqvh-fcvg",
+        },
+      },
+    ],
+  },
+  {
+    id: "chromadb",
+    name: "ChromaDB",
+    context: "AI-native database",
+    findings: [
+      {
+        id: "CVE-2026-45829",
+        title: "Pre-authentication remote code execution",
+        summary:
+          "An unauthenticated attacker could submit a malicious model repository with trust_remote_code enabled and execute code on the server.",
+        published: "2026-05-18",
+        score: "10.0",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-45829"),
+      },
+      {
+        id: "CVE-2026-45833",
+        title: "Authenticated remote code execution",
+        summary:
+          "A user with collection-update permission could load a malicious model repository with trust_remote_code and execute code on the server.",
+        published: "2026-06-12",
+        score: "9.4",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-45833"),
+      },
+      {
+        id: "CVE-2026-8828",
+        title: "Cross-tenant authorization bypass in ChromaDB Rust",
+        summary:
+          "Any authenticated user could read, write, update, or delete collections belonging to another tenant.",
+        published: "2026-06-12",
+        score: "8.8",
+        cvss: "4.0",
+        severity: "high",
+        url: cveUrl("CVE-2026-8828"),
+      },
+      {
+        id: "CVE-2026-45830",
+        title: "Cross-tenant authorization bypass in ChromaDB Python",
+        summary:
+          "Any authenticated user could read, write, update, or delete collections belonging to another tenant.",
+        published: "2026-06-12",
+        score: "8.8",
+        cvss: "4.0",
+        severity: "high",
+        url: cveUrl("CVE-2026-45830"),
+      },
+      {
+        id: "CVE-2026-45831",
+        title: "SimpleRBAC cross-tenant authorization bypass",
+        summary:
+          "The provider checked whether a user held a permission, but not which tenant, database, or collection that permission applied to.",
+        published: "2026-06-12",
+        score: "8.8",
+        cvss: "4.0",
+        severity: "high",
+        url: cveUrl("CVE-2026-45831"),
+      },
+      {
+        id: "CVE-2026-45832",
+        title: "Authorization bypass through V1 collection endpoints",
+        summary:
+          "The V1 endpoints passed no tenant or database to the authorization layer, allowing its controls to be bypassed.",
+        published: "2026-06-12",
+        score: "8.8",
+        cvss: "4.0",
+        severity: "high",
+        url: cveUrl("CVE-2026-45832"),
+      },
+    ],
+  },
+  {
+    id: "flair",
+    name: "Flair",
+    context: "NLP framework",
+    findings: [
+      {
+        id: "CVE-2026-3071",
+        title: "Arbitrary code execution through model deserialization",
+        summary:
+          "Loading a malicious language model could trigger unsafe deserialization and execute arbitrary code.",
+        published: "2026-02-26",
+        score: "8.4",
+        cvss: "3.1",
+        severity: "high",
+        url: cveUrl("CVE-2026-3071"),
+      },
+    ],
+  },
+  {
+    id: "misp",
+    name: "MISP",
+    context: "Threat intelligence platform",
+    findings: [
+      {
+        id: "CVE-2025-66386",
+        title: "Path traversal in the EventReport image viewer",
+        summary:
+          "A site administrator could traverse outside the intended path when viewing an EventReport picture.",
+        published: "2025-11-28",
+        score: "4.1",
+        cvss: "3.1",
+        severity: "medium",
+        url: cveUrl("CVE-2025-66386"),
+      },
+    ],
+  },
+  {
+    id: "keras",
+    name: "Keras",
+    context: "Deep-learning framework",
+    findings: [
+      {
+        id: "CVE-2025-49655",
+        title: "Safe-mode bypass through TorchModuleWrapper",
+        summary:
+          "A malicious Keras file could execute arbitrary code when loaded, despite safe mode being enabled.",
+        published: "2025-10-17",
+        score: "9.8",
+        cvss: "3.1",
+        severity: "critical",
+        url: cveUrl("CVE-2025-49655"),
+      },
+    ],
+  },
+  {
+    id: "backend-ai",
+    name: "Backend.AI",
+    context: "AI compute platform",
+    findings: [
+      {
+        id: "CVE-2025-49651",
+        title: "Missing authorization for interactive sessions",
+        summary:
+          "An attacker could take over active sessions and access, steal, or alter data available inside them.",
+        published: "2025-06-09",
+        score: "8.1",
+        cvss: "3.1",
+        severity: "high",
+        url: cveUrl("CVE-2025-49651"),
+      },
+      {
+        id: "CVE-2025-49652",
+        title: "Arbitrary account creation through missing access control",
+        summary:
+          "Unauthenticated users could create accounts and reach private data even when registration was disabled.",
+        published: "2025-06-09",
+        score: "9.8",
+        cvss: "3.1",
+        severity: "critical",
+        url: cveUrl("CVE-2025-49652"),
+      },
+      {
+        id: "CVE-2025-49653",
+        title: "Credential exposure leading to account takeover",
+        summary:
+          "Sensitive data exposed through active sessions could reveal management-platform credentials.",
+        published: "2025-06-09",
+        score: "8.0",
+        cvss: "3.1",
+        severity: "high",
+        url: cveUrl("CVE-2025-49653"),
+      },
+    ],
+  },
+]
+
+const findingCount = products.reduce(
+  (count, product) => count + product.findings.length,
+  0,
+)
+const criticalCount = products
+  .flatMap((product) => product.findings)
+  .filter((finding) => finding.severity === "critical").length
+---
+
+<Layout>
+  <MetaPage
+    slot="head"
+    title="CVEs"
+    description="A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling."
+  />
+
+  <nav slot="toc" class="project-nav" data-bar aria-label="Project index">
+    <p class="index-label">
+      <span class="index-title">
+        <span aria-hidden="true">//</span>
+        projects
+      </span>
+      <span class="count-label">CVEs</span>
+    </p>
+    <ol>
+      {products.map((product, productIndex) => (
+          <li>
+            <a
+              href={`#${product.id}`}
+              aria-current={productIndex === 0 ? "location" : undefined}
+            >
+              <span>{product.name}</span>
+              <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
+                {product.findings.length.toString().padStart(2, "0")}
+              </span>
+            </a>
+          </li>
+        ))}
+    </ol>
+  </nav>
+
+  <header class="page-heading">
+    <p class="eyebrow">
+      <span aria-hidden="true">//</span>
+      vulnerability research
+    </p>
+    <h1>cves</h1>
+    <p class="intro">
+      I find bugs where model loading, authorization boundaries, parsers, and
+      stateful systems get weird. This is a running index of vulnerabilities
+      I've discovered and helped disclose.
+    </p>
+    <p class="pipeline-note">
+      Additional findings are moving through coordinated disclosure.
+    </p>
+  </header>
+
+  <dl class="stats" aria-label="CVE summary">
+    <div>
+      <dt>published CVEs</dt>
+      <dd>{findingCount.toString().padStart(2, "0")}</dd>
+    </div>
+    <div>
+      <dt>projects</dt>
+      <dd>{products.length.toString().padStart(2, "0")}</dd>
+    </div>
+    <div>
+      <dt>critical</dt>
+      <dd>{criticalCount.toString().padStart(2, "0")}</dd>
+    </div>
+  </dl>
+
+  <div class="product-index" aria-label="Vulnerabilities grouped by product">
+    {products.map((product, productIndex) => (
+        <section
+          id={product.id}
+          class="product-group"
+          aria-labelledby={`${product.id}-heading`}
+          style={`--group-index:${productIndex}`}
+        >
+          <header class="product-heading">
+            <h2 id={`${product.id}-heading`}>{product.name}</h2>
+            <p>
+              {product.context} · {product.findings.length} {product.findings.length === 1 ? "CVE" : "CVEs"}
+            </p>
+          </header>
+
+          <ol class="finding-list">
+            {product.findings.map((finding) => (
+                <li>
+                  <article>
+                    <div class="record-meta">
+                      <code>{finding.id}</code>
+                      <span
+                        class="score"
+                        data-severity={finding.severity}
+                        title={`${finding.severity} severity`}
+                      >
+                        CVSS {finding.cvss} · {finding.score}
+                      </span>
+                    </div>
+                    <h3>{finding.title}</h3>
+                    <p>{finding.summary}</p>
+                    <footer class="record-footer">
+                      <time datetime={finding.published}>{finding.published}</time>
+                      <div class="record-links">
+                        <a
+                          href={finding.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          CVE record <span aria-hidden="true">↗</span>
+                        </a>
+                        {finding.advisory && (
+                          <a
+                            href={finding.advisory.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {finding.advisory.label} <span aria-hidden="true">↗</span>
+                          </a>
+                        )}
+                      </div>
+                    </footer>
+                  </article>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))}
+  </div>
+
+  <aside class="duplicate-finding" aria-labelledby="redis-finding">
+    <p class="eyebrow"><span aria-hidden="true">//</span> duplicate finding</p>
+    <h2 id="redis-finding">Redis · CVE-2026-25243</h2>
+    <p>
+      I independently found the Redis Streams use-after-free behind this CVE,
+      but my report was marked as a duplicate. My exploit chain takes a
+      different route to remote code execution, so I documented it anyway.
+    </p>
+    <div class="duplicate-links">
+      <a href="/posts/redis-stream-pel-uaf">
+        Read the technical write-up <span aria-hidden="true">→</span>
+      </a>
+      <a
+        href={cveUrl("CVE-2026-25243")}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        CVE record <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        href="https://x.com/gegrgtezrze/status/2062320078280859820"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Original note <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </aside>
+
+  <p class="score-note">
+    Scores shown are CNA-provided base scores from the linked CVE records.
+  </p>
+</Layout>
+
+<style>
+  .project-nav {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+
+    .index-label {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-2xs);
+      margin-block-end: var(--space-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+
+      .index-title > span {
+        color: var(--accent);
+      }
+    }
+
+    .count-label {
+      font-size: 0.8em;
+      font-weight: var(--font-weight-normal);
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+    }
+
+    ol {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3xs);
+    }
+
+    a {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-2xs);
+      color: var(--muted-foreground);
+      text-decoration-line: none;
+
+      &:hover,
+      &[aria-current] {
+        color: var(--foreground);
+      }
+    }
+
+    .index-count {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .index-count {
+      opacity: 0.55;
+    }
+
+    @media (width < 64rem) {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+      min-inline-size: 0;
+
+      .index-label {
+        flex: none;
+        display: block;
+        margin-block-end: 0;
+      }
+
+      .count-label {
+        display: none;
+      }
+
+      ol {
+        min-inline-size: 0;
+        flex: 1;
+        flex-direction: row;
+        gap: var(--space-s);
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      li {
+        flex: none;
+      }
+
+      a {
+        display: inline-flex;
+        gap: var(--space-3xs);
+        white-space: nowrap;
+      }
+
+      .index-count {
+        display: none;
+      }
+    }
+  }
+
+  .page-heading {
+    margin-block-end: var(--space-l);
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    .eyebrow {
+      margin-block-end: var(--space-2xs);
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: var(--step-3);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    .intro {
+      max-inline-size: 38rem;
+      margin-block-start: var(--space-s);
+      font-size: var(--step-0);
+      color: var(--prose-foreground);
+    }
+
+    .pipeline-note {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2xs);
+      margin-block-start: var(--space-s);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+
+      &::before {
+        content: "";
+        flex: none;
+        inline-size: 0.42rem;
+        block-size: 0.42rem;
+        border-radius: var(--radius-full);
+        background-color: var(--accent);
+      }
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+
+    span {
+      color: var(--accent);
+    }
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-block-end: var(--space-xl);
+    border-block: 1px solid var(--border);
+
+    div {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: var(--space-3xs);
+      padding-block: var(--space-s);
+
+      & + div {
+        padding-inline-start: var(--space-s);
+        border-inline-start: 1px solid var(--border);
+      }
+    }
+
+    dt {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+    }
+
+    dd {
+      font-family: var(--font-mono);
+      font-size: var(--step-2);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      color: var(--foreground);
+    }
+  }
+
+  .product-index {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .product-group {
+    scroll-margin-block-start: calc(
+      var(--bar-nav-height, 0px) +
+      var(--bar-toc-height, 0px) +
+      var(--space-s)
+    );
+    animation: group-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--group-index) * 55ms);
+  }
+
+  .product-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-block-end: var(--space-xs);
+
+    h2 {
+      font-family: var(--font-mono);
+      font-size: var(--step-1);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+    }
+
+    p {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      text-align: end;
+      color: var(--muted-foreground);
+    }
+
+    @media (width < 34rem) {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--space-3xs);
+
+      p {
+        text-align: start;
+      }
+    }
+  }
+
+  .finding-list {
+    border-block-start: 1px solid var(--border);
+
+    li {
+      border-block-end: 1px solid var(--border);
+    }
+
+    article {
+      padding-block: var(--space-s);
+      transition: padding-inline 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+      &:has(a:hover),
+      &:has(a:focus-visible) {
+        padding-inline: var(--space-2xs);
+      }
+    }
+
+    .record-meta,
+    .record-footer,
+    .record-links {
+      display: flex;
+      align-items: center;
+    }
+
+    .record-meta {
+      justify-content: space-between;
+      gap: var(--space-s);
+    }
+
+    code,
+    .score,
+    time,
+    .record-links {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+    }
+
+    code {
+      color: var(--foreground);
+    }
+
+    .score {
+      white-space: nowrap;
+
+      &::before {
+        content: "";
+        display: inline-block;
+        inline-size: 0.42rem;
+        block-size: 0.42rem;
+        margin-inline-end: var(--space-3xs);
+        border-radius: var(--radius-full);
+        background-color: currentColor;
+        vertical-align: 0.08em;
+      }
+
+      &[data-severity="critical"] {
+        color: var(--destructive);
+      }
+
+      &[data-severity="high"] {
+        color: color-mix(in oklab, var(--destructive) 62%, var(--foreground));
+      }
+
+      &[data-severity="medium"] {
+        color: var(--muted-foreground);
+      }
+    }
+
+    h3 {
+      margin-block-start: var(--space-2xs);
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+
+    article > p {
+      max-inline-size: 38rem;
+      margin-block-start: var(--space-3xs);
+      color: var(--prose-foreground);
+    }
+
+    .record-footer {
+      justify-content: space-between;
+      gap: var(--space-s);
+      margin-block-start: var(--space-xs);
+      color: var(--muted-foreground);
+    }
+
+    .record-links {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-s);
+
+      a {
+        color: var(--muted-foreground);
+
+        &:hover {
+          color: var(--foreground);
+        }
+
+        span {
+          color: var(--accent);
+        }
+      }
+    }
+
+    @media (width < 32rem) {
+      .record-meta,
+      .record-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--space-2xs);
+      }
+
+      .record-links {
+        justify-content: flex-start;
+      }
+    }
+  }
+
+  .duplicate-finding {
+    position: relative;
+    margin-block-start: var(--space-xl);
+    padding: var(--space-m);
+    overflow: hidden;
+    background-color: color-mix(in oklab, var(--muted) 55%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      inline-size: 0.2rem;
+      background-color: var(--accent);
+    }
+
+    h2 {
+      margin-block-start: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step-1);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+    }
+
+    > p:not(.eyebrow) {
+      max-inline-size: 37rem;
+      margin-block-start: var(--space-xs);
+      color: var(--prose-foreground);
+    }
+
+    .duplicate-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs) var(--space-s);
+      margin-block-start: var(--space-s);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+
+      a {
+        color: var(--foreground);
+      }
+
+      span {
+        color: var(--accent);
+      }
+    }
+  }
+
+  .score-note {
+    margin-block-start: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+  }
+
+  @keyframes group-in {
+    from {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .product-group {
+      animation: none;
+    }
+
+    .finding-list article {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const projectNav = document.querySelector<HTMLElement>(".project-nav")
+
+  if (projectNav) {
+    const projectList = projectNav.querySelector<HTMLOListElement>("ol")
+    const mobile = matchMedia("(width < 64rem)")
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
+    const links = new Map(
+      [...projectNav.querySelectorAll<HTMLAnchorElement>("a[href^='#']")].map(
+        (link) => [decodeURIComponent(link.hash.slice(1)), link],
+      ),
+    )
+
+    const setActive = (id: string) => {
+      for (const [projectId, link] of links) {
+        if (projectId === id) link.setAttribute("aria-current", "location")
+        else link.removeAttribute("aria-current")
+      }
+
+      const activeLink = links.get(id)
+      if (!mobile.matches || !projectList || !activeLink) return
+
+      const listBounds = projectList.getBoundingClientRect()
+      const linkBounds = activeLink.getBoundingClientRect()
+      if (
+        linkBounds.left < listBounds.left ||
+        linkBounds.right > listBounds.right
+      ) {
+        projectList.scrollTo({
+          left: projectList.scrollLeft + linkBounds.left - listBounds.left - 12,
+          behavior: reducedMotion.matches ? "auto" : "smooth",
+        })
+      }
+    }
+
+    const hashId = decodeURIComponent(location.hash.slice(1))
+    if (links.has(hashId)) setActive(hashId)
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id)
+        }
+      },
+      { rootMargin: "-15% 0px -70% 0px" },
+    )
+
+    for (const id of links.keys()) {
+      const section = document.getElementById(id)
+      if (section) observer.observe(section)
+    }
+  }
+</script>
