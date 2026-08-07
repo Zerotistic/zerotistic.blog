@@ -215,6 +215,27 @@ const products: Product[] = [
       },
     ],
   },
+  {
+    id: "style-dictionary",
+    name: "Style Dictionary",
+    context: "Design-token build system",
+    findings: [
+      {
+        id: "CVE-2026-XXXX",
+        title: "Prototype Pollution via constructor.prototype Bypasses CVE-2026-54639 Patch",
+        summary:
+          "An attacker could exploit maliciously crafted token data to pollute object prototypes, potentially altering application behavior or data.",
+        published: "2026-08-06",
+        score: "8.4",
+        cvss: "3.1",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/style-dictionary/style-dictionary/security/advisories/GHSA-xmr7-549p-98w3",
+        }
+      },
+    ]
+  },
 ]
 
 const findingCount = products.reduce(
