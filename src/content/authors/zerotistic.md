@@ -1,6 +1,6 @@
 ---
 name: Zerotistic
-avatar: /static/avatar.png
+avatar: /static/avatar-72.webp
 bio: Automation nerd, vulnerability researcher and probably unhinged.
 socials:
   github: https://github.com/Zerotistic

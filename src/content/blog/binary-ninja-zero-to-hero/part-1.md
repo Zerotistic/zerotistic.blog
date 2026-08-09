@@ -74,7 +74,7 @@ In this section I'll showcase all of the major and basic utilities at your dispo
 
 First and foremost, when it comes to reverse engineering, one of your initial tasks is renaming a variable, function, or structure. This process is relatively straightforward: simply right-click and choose "Rename Symbol", or use the shortcut `Ctrl+N`, which will prompt you to enter the new name. You can do the same for types, by selecting "Change Type" or using `Ctrl+Y`.
 
-<iframe frameborder="0" class="juxtapose" width="100%" height="736" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6906d860-5b93-11ee-b5be-6595d9b17862"></iframe>
+<iframe title="Function view before and after renaming" loading="lazy" frameborder="0" class="juxtapose" width="100%" height="736" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6906d860-5b93-11ee-b5be-6595d9b17862"></iframe>
 
 _Function view before and after being renamed_
 
@@ -84,7 +84,7 @@ By the way, while I'm here, allow me to introduce you to the [0CD](https://githu
 
 Quickly before that though, let me show you how much nicer 0CD makes the canaries:
 
-<iframe frameborder="0" class="juxtapose" width="100%" height="437" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6765b9da-5ba8-11ee-b5be-6595d9b17862"></iframe>
+<iframe title="Canary annotations before and after using 0CD" loading="lazy" frameborder="0" class="juxtapose" width="100%" height="437" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=6765b9da-5ba8-11ee-b5be-6595d9b17862"></iframe>
 
 _Canaries before and after using 0CD_
 
@@ -99,7 +99,7 @@ Binary Ninja offers a convenient way to do this. You can simply scroll up or dow
 
 At this stage you should be comfortable with basic reversing and navigating through functions. However, you may find it beneficial to explore other views, such as the Graph view. Switching between views is straightforward. You can either select the dropdown list (usually located under the "Linear" label) and choose "Graph", or simply press Enter to toggle between views.
 
-<iframe frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d649351a-5ba9-11ee-b5be-6595d9b17862"></iframe>
+<iframe title="Binary Ninja linear and graph views" loading="lazy" frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=d649351a-5ba9-11ee-b5be-6595d9b17862"></iframe>
 
 _Example of graph view_
 

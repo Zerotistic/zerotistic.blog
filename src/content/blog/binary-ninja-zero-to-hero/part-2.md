@@ -99,7 +99,7 @@ _CFG with SSA and phi (taken from Wikipedia)_
 
 This feature is built into Binja, and it's great. I'll showcase in future posts how you could use it. Here is what it looks like:
 
-<iframe frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=ea902caa-6d00-11ee-b5be-6595d9b17862"></iframe>
+<iframe title="Binary Ninja IL with and without SSA form" loading="lazy" frameborder="0" class="juxtapose" width="100%" height="643" src="https://cdn.knightlab.com/libs/juxtapose/latest/embed/index.html?uid=ea902caa-6d00-11ee-b5be-6595d9b17862"></iframe>
 
 ### Stack View
 

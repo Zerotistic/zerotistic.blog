@@ -12,7 +12,7 @@ type Finding = {
   score: string
   cvss: "3.1" | "4.0"
   severity: Severity
-  url: string
+  url?: string
   advisory?: { label: string; href: string }
 }
 
@@ -222,7 +222,8 @@ const products: Product[] = [
     findings: [
       {
         id: "CVE-2026-XXXX",
-        title: "Prototype Pollution via constructor.prototype Bypasses CVE-2026-54639 Patch",
+        title:
+          "Prototype Pollution via constructor.prototype Bypasses CVE-2026-54639 Patch",
         summary:
           "An attacker could exploit maliciously crafted token data to pollute object prototypes, potentially altering application behavior or data.",
         published: "2026-08-06",
@@ -232,9 +233,9 @@ const products: Product[] = [
         advisory: {
           label: "GitHub advisory",
           href: "https://github.com/style-dictionary/style-dictionary/security/advisories/GHSA-xmr7-549p-98w3",
-        }
+        },
       },
-    ]
+    ],
   },
 ]
 
@@ -340,13 +341,17 @@ const criticalCount = products
                     <footer class="record-footer">
                       <time datetime={finding.published}>{finding.published}</time>
                       <div class="record-links">
-                        <a
-                          href={finding.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          CVE record <span aria-hidden="true">↗</span>
-                        </a>
+                        {finding.url ? (
+                          <a
+                            href={finding.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            CVE record <span aria-hidden="true">↗</span>
+                          </a>
+                        ) : (
+                          <span class="record-pending">ID pending</span>
+                        )}
                         {finding.advisory && (
                           <a
                             href={finding.advisory.href}
@@ -745,6 +750,10 @@ const criticalCount = products
         span {
           color: var(--accent);
         }
+      }
+
+      .record-pending {
+        color: var(--muted-foreground);
       }
     }
 

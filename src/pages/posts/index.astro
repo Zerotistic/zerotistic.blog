@@ -1,6 +1,6 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
-import PostList from "@/components/PostList.astro"
+import PostArchive from "@/components/PostArchive.astro"
 import Layout from "@/layouts/Layout.astro"
 ---
 
@@ -8,9 +8,9 @@ import Layout from "@/layouts/Layout.astro"
   <MetaPage slot="head" title="Posts" />
   <page-heading>
     <h1>posts</h1>
-    <p>Everything I've written, newest first. Filter by tag.</p>
+    <p>Everything I've written, newest first.</p>
   </page-heading>
-  <PostList />
+  <PostArchive />
 </Layout>
 
 <style>

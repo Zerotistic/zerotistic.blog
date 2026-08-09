@@ -2,6 +2,8 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PostList from "@/components/PostList.astro"
 import Layout from "@/layouts/Layout.astro"
+import { getPosts, getSubposts } from "@/lib/content"
+import { formatDate, readingTime } from "@/lib/utils"
 
 const roles = [
   "automation nerd",
@@ -10,42 +12,90 @@ const roles = [
   "pwn enthusiast",
   "probably unhinged",
 ]
+
+const posts = await getPosts()
+const series = await getSubposts()
+const latest = posts[0]
+const latestChain = latest ? [latest, ...(series.get(latest.id) ?? [])] : []
+const latestTags = [
+  ...new Set(latestChain.flatMap((entry) => entry.data.tags ?? [])),
+]
+const latestReadingTime = readingTime(
+  latestChain.map((entry) => entry.body ?? "").join("\n"),
+)
 ---
 
 <Layout>
   <MetaPage slot="head" />
   <home-intro>
-    <h1>zerotistic<cursor-block aria-hidden="true"></cursor-block></h1>
+    <h1>vulnerability research &amp; reverse engineering</h1>
     <p class="lead">
-      <rotating-role data-roles={JSON.stringify(roles)}>{roles[0]}</rotating-role>
+      <rotating-role data-roles={JSON.stringify(roles)}
+        >{roles[0]}</rotating-role
+      >
     </p>
     <p class="bio">
-      Security researcher at <a
+      Security researcher at
+      <a
         href="https://hiddenlayer.com"
         target="_blank"
-        rel="noopener noreferrer">HiddenLayer</a
-      >, CTF player for 
-      <a
-        href="https://sekai.team/"
-        target="_blank"
-        rel="noopener noreferrer">Project Sekai</a
-      > and       
-      <a
-        href="https://ctf.mt/"
-        target="_blank"
-        rel="noopener noreferrer">Friendly Maltese Citizens</a
+        rel="noopener noreferrer"
+        >HiddenLayer</a
+      >, CTF player for
+      <a href="https://sekai.team/" target="_blank" rel="noopener noreferrer"
+        >Project Sekai</a
+      >
+      and
+      <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer"
+        >Friendly Maltese Citizens</a
       >. Notes on reverse engineering, pwn, Binary Ninja and dumb ideas. Find me
-      on <a
+      on
+      <a
         href="https://github.com/Zerotistic"
         target="_blank"
-        rel="noopener noreferrer">GitHub</a
-      > and <a href="https://x.com/gegrgtezrze" target="_blank" rel="noopener noreferrer"
+        rel="noopener noreferrer"
+        >GitHub</a
+      >
+      and
+      <a
+        href="https://x.com/gegrgtezrze"
+        target="_blank"
+        rel="noopener noreferrer"
         >X</a
       >.
     </p>
   </home-intro>
 
-  <PostList />
+  {latest && (
+    <section class="latest" aria-labelledby="latest-heading">
+      <section-heading>
+        <h2 id="latest-heading">latest</h2>
+      </section-heading>
+      <article>
+        <post-meta>
+          <time datetime={latest.data.date.toISOString()}>
+            {formatDate(latest.data.date)}
+          </time>
+          <span>{latestReadingTime}</span>
+        </post-meta>
+        <h3><a href={`/posts/${latest.id}`}>{latest.data.title}</a></h3>
+        <p>{latest.data.description}</p>
+        <post-tags aria-label="Tags">
+          {latestTags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}
+        </post-tags>
+      </article>
+    </section>
+  )}
+
+  {posts.length > 1 && (
+    <section class="recent" aria-labelledby="recent-heading">
+      <section-heading>
+        <h2 id="recent-heading">recent</h2>
+        <a href="/posts">all posts <span aria-hidden="true">→</span></a>
+      </section-heading>
+      <PostList start={1} limit={4} />
+    </section>
+  )}
 </Layout>
 
 <script>
@@ -96,23 +146,10 @@ const roles = [
     }
 
     h1 {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.15rem;
-      font-family: var(--font-mono);
+      max-inline-size: 35rem;
       font-size: var(--step-3);
       line-height: calc(var(--leading-offset) + 1em);
       font-weight: var(--font-weight-medium);
-      letter-spacing: 0;
-    }
-
-    cursor-block {
-      display: inline-block;
-      inline-size: 0.5em;
-      block-size: 1em;
-      translate: 0 0.08em;
-      background-color: var(--accent);
-      animation: cursor-blink 1.2s steps(1) infinite;
     }
 
     .lead {
@@ -126,9 +163,8 @@ const roles = [
 
     rotating-role {
       display: inline-block;
-      will-change: opacity, filter, translate;
+      will-change: filter, translate;
       transition:
-        opacity 0.28s ease,
         filter 0.28s ease,
         translate 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -138,9 +174,8 @@ const roles = [
       }
 
       &.swapping {
-        opacity: 0;
-        filter: blur(3px);
-        translate: 0 -0.3em;
+        filter: blur(1.5px);
+        translate: 0 -0.15em;
       }
     }
 
@@ -151,23 +186,105 @@ const roles = [
     }
   }
 
-  @keyframes cursor-blink {
-    0%,
-    50% {
-      opacity: 1;
+  section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-block-end: var(--space-xs);
+
+    h2,
+    a {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
     }
-    51%,
-    100% {
-      opacity: 0;
+
+    h2 {
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+
+    a {
+      color: var(--muted-foreground);
+
+      span {
+        color: var(--accent);
+      }
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    home-intro cursor-block {
-      animation: none;
-      opacity: 1;
+  .latest {
+    margin-block-end: var(--space-xl);
+
+    article {
+      padding-block: var(--space-m);
+      border-block: 1px solid var(--border);
     }
 
+    post-meta,
+    post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+    }
+
+    post-meta {
+      time {
+        font-variant-numeric: tabular-nums;
+      }
+
+      span::before {
+        content: "·";
+        margin-inline-end: var(--space-2xs);
+      }
+    }
+
+    h3 {
+      max-inline-size: 38rem;
+      margin-block-start: var(--space-2xs);
+      font-size: var(--step-2);
+      font-weight: var(--font-weight-medium);
+      line-height: calc(var(--leading-offset) + 1em);
+
+      a {
+        text-decoration-color: color-mix(
+          in oklab,
+          var(--foreground) 30%,
+          transparent
+        );
+      }
+    }
+
+    article > p {
+      max-inline-size: 38rem;
+      margin-block-start: var(--space-2xs);
+      color: var(--prose-foreground);
+    }
+
+    post-tags {
+      margin-block-start: var(--space-xs);
+
+      a {
+        color: var(--muted-foreground);
+        text-decoration-color: transparent;
+
+        &:hover {
+          color: var(--foreground);
+        }
+      }
+    }
+  }
+
+  .recent {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
     home-intro rotating-role {
       transition: none;
     }

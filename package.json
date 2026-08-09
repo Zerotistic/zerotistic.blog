@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
     "format": "biome format --write .",
@@ -30,7 +31,12 @@
     "temml": "^0.13.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.1"
+    "@astrojs/check": "^0.9.10",
+    "@biomejs/biome": "^2.5.1",
+    "@types/hast": "^3.0.5",
+    "@types/mdast": "^4.0.4",
+    "mdast-util-to-hast": "^13.2.1",
+    "typescript": "^6.0.3"
   },
   "pnpm": {
     "overrides": {

@@ -1,0 +1,201 @@
+---
+import PostRow from "@/components/PostRow.astro"
+import { getPosts, getSubposts, getTags } from "@/lib/content"
+
+const posts = await getPosts()
+const series = await getSubposts()
+const tags = await getTags()
+
+const entries = posts.map((post) => {
+  const parts = series.get(post.id) ?? []
+  const entryTags = [
+    ...new Set([post, ...parts].flatMap((entry) => entry.data.tags ?? [])),
+  ]
+  return { post, partCount: parts.length, tags: entryTags }
+})
+
+const years = Map.groupBy(entries, ({ post }) =>
+  post.data.date.getUTCFullYear().toString(),
+)
+---
+
+<post-archive>
+  <nav class="filters" aria-label="Filter posts by tag">
+    <a href="/posts" data-filter-tag="">all <span>{entries.length}</span></a>
+    {[...tags].map(([tag, taggedPosts]) => (
+      <a href={`/tags/${tag}`} data-filter-tag={tag}>
+        {tag} <span>{taggedPosts.length}</span>
+      </a>
+    ))}
+  </nav>
+
+  <p class="filter-status" aria-live="polite"></p>
+
+  <archive-groups>
+    {[...years].map(([year, yearEntries]) => (
+      <section data-year={year} aria-labelledby={`year-${year}`}>
+        <h2 id={`year-${year}`}>{year}</h2>
+        <ol>
+          {yearEntries.map((entry) => <PostRow {...entry} />)}
+        </ol>
+      </section>
+    ))}
+  </archive-groups>
+</post-archive>
+
+<style>
+  post-archive,
+  archive-groups,
+  section {
+    display: block;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-end: var(--space-l);
+
+    a {
+      padding: 0.18em var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      background-color: color-mix(in oklab, var(--muted) 55%, transparent);
+      border: 1px solid transparent;
+      border-radius: var(--radius-full);
+
+      &:hover {
+        color: var(--foreground);
+        border-color: var(--border);
+      }
+
+      &[aria-current="true"] {
+        color: var(--foreground);
+        background-color: var(--accent-muted);
+        border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+      }
+
+      span {
+        margin-inline-start: var(--space-3xs);
+        font-variant-numeric: tabular-nums;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .filter-status {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  archive-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  section {
+    h2 {
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-mono);
+      font-size: var(--step-1);
+      font-weight: var(--font-weight-medium);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      color: var(--foreground);
+    }
+  }
+
+  ol {
+    display: block;
+    list-style: none;
+  }
+</style>
+
+<script>
+  class PostArchive extends HTMLElement {
+    #onPopState = () => this.applyFromUrl()
+
+    connectedCallback() {
+      this.addEventListener("click", (event) => {
+        if (
+          !(event instanceof MouseEvent) ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return
+
+        const link = (event.target as Element).closest<HTMLAnchorElement>(
+          "a[data-filter-tag]",
+        )
+        if (!link) return
+
+        event.preventDefault()
+        const tag = link.dataset.filterTag ?? ""
+        const url = new URL(location.href)
+        if (tag) url.searchParams.set("tag", tag)
+        else url.searchParams.delete("tag")
+        history.pushState(null, "", `${url.pathname}${url.search}`)
+        this.apply(tag)
+      })
+
+      addEventListener("popstate", this.#onPopState)
+      this.applyFromUrl()
+    }
+
+    disconnectedCallback() {
+      removeEventListener("popstate", this.#onPopState)
+    }
+
+    applyFromUrl() {
+      const requested = new URL(location.href).searchParams.get("tag") ?? ""
+      const available = this.querySelector(
+        `a[data-filter-tag="${CSS.escape(requested)}"]`,
+      )
+      this.apply(available ? requested : "")
+    }
+
+    apply(tag: string) {
+      let count = 0
+      for (const row of this.querySelectorAll<HTMLElement>("[data-post-row]")) {
+        const visible =
+          !tag || (row.dataset.tags ?? "").split(" ").includes(tag)
+        row.hidden = !visible
+        if (visible) count += 1
+      }
+
+      for (const section of this.querySelectorAll<HTMLElement>("[data-year]")) {
+        section.hidden = !section.querySelector("[data-post-row]:not([hidden])")
+      }
+
+      for (const filter of this.querySelectorAll<HTMLAnchorElement>(
+        "a[data-filter-tag]",
+      )) {
+        if ((filter.dataset.filterTag ?? "") === tag)
+          filter.setAttribute("aria-current", "true")
+        else filter.removeAttribute("aria-current")
+      }
+
+      const status = this.querySelector<HTMLElement>(".filter-status")
+      if (status) {
+        const noun = count === 1 ? "post" : "posts"
+        status.textContent = tag
+          ? `Showing ${count} ${noun} tagged ${tag}.`
+          : `Showing all ${count} ${noun}.`
+      }
+    }
+  }
+
+  if (!customElements.get("post-archive"))
+    customElements.define("post-archive", PostArchive)
+</script>

@@ -24,7 +24,7 @@ This document is intended as a resource documenting the concept, implementation,
 
 In order to build up step-by-step to the hardening techniques and research directions, we start with the more basic core components. This section goes deeper into the foundational components of VM-based obfuscation: VM entry/exit, the VM dispatcher, and the handler table, with a focus on their roles, functioning, and implementation.
 
-#### VM entry/exit
+### VM entry/exit
 
 VM entry and exit are critical for transitioning between the native execution environment and the virtual machine context. They ensure that the execution state is preserved and restored appropriately.
 
@@ -56,7 +56,7 @@ void vm_exit(VMContext *vm_context, NativeContext *native_context) {
 }
 ```
 
-#### VM Dispatcher
+### VM Dispatcher
 
 The VM dispatcher is the control unit of the VM, responsible for the `fetch-decode-execute` cycle. It emulates a physical CPU's instruction cycle but in the context of the virtual machine, parsing and executing virtual instructions.
 
@@ -80,7 +80,7 @@ void vm_dispatcher(VMContext *vm_context) {
 }
 ```
 
-#### Handler Table
+### Handler Table
 
 The handler table defines the semantics of the individual virtual machine ISA instructions. This is essentially a table of function pointers, indexed by opcode, where each pointer references a handler dedicated to one virtual instruction. Handlers are responsible for decoding operands and updating the virtual machine's context according to the semantics of their respective instructions. Instruction handlers can operate in stack-based architectures (e.g. JVM, CPython), register-based architectures (e.g. Dalvik, Lua), or hybrid forms, manipulating data through a virtual stack or registers accordingly.
 
@@ -108,7 +108,7 @@ void handle_add(VMContext *vm_context, DecodedInstruction instr) {
 
 The security of a VM-based system can be enhanced through various hardening techniques aimed at obfuscating the internal workings and structure.
 
-##### Obfuscating individual VM components
+### Obfuscating individual VM components
 
 Handlers are conceptually simple. Apply various obfuscation techniques to the handlers, such as control flow flattening, instruction substitution, and the insertion of opaque predicates (conditions whose truth values are known to the author but difficult for an attacker to determine).
 
@@ -126,7 +126,7 @@ void obfuscated_handler_addition(VMContext *vm_context, DecodedInstruction instr
 }
 ```
 
-##### Duplicating VM handlers
+### Duplicating VM handlers
 
 Given that a handler table typically allows for a fixed number of entries (e.g. 256 for one-byte indexing), create multiple versions of the same handler, each differing slightly in its implementation (to disrupt code similarity analysis), and randomly assign these when populating the handler table.
 
@@ -140,11 +140,11 @@ void duplicate_handlers(Handler handler_table[]) {
 }
 ```
 
-##### No central VM dispatcher
+### No central VM dispatcher
 
 Avoid using a single central dispatcher, as it offers a fixed point for attackers to target. Instead, integrate dispatching logic directly into each handler, making the control flow more complex and less predictable.
 
-##### No explicit handler table
+### No explicit handler table
 
 Instead of maintaining a visible, directly accessible handler table, incorporate the next handler's address within the VM instruction itself, complicating static analysis and understanding of the control flow. Use dynamic techniques to determine the mapping between opcodes and handlers, such as computing the handler's address at runtime or using encrypted opcodes.
 
@@ -188,7 +188,7 @@ void dynamic_handler_mapping(VMContext *vm_context, EncryptedInstruction enc_ins
 
 In this example, `dynamic_lookup` uses a hash table to retrieve handlers. This setup allows handlers to be mapped in a non-linear and non-obvious way, increasing the difficulty of statically predicting the control flow.
 
-##### Blinding VM bytecode
+### Blinding VM bytecode
 
 Make static analysis more challenging by using flow-sensitive instruction decoding mechanisms, such as instruction "decryption" that varies based on specific runtime conditions. This approach also complicates bytecode patching by attackers, as modifications would necessitate correct re-encryption.
 
@@ -196,7 +196,7 @@ Make static analysis more challenging by using flow-sensitive instruction decodi
 
 Future research in VM-based obfuscation should focus on creating designs that are resilient against sophisticated attacks such as symbolic execution, program synthesis, and various forms of static and dynamic analysis. As we look to the horizon, the future of VM-based obfuscation is filled with potential. Here are some pioneering directions that could redefine the landscape of software protection.
 
-##### Complex and target-specific instruction sets
+### Complex and target-specific instruction sets
 
 Develop VM instruction sets that are specifically tailored to the application's logic, making the obfuscated code more resilient to automated deobfuscation tools and attacks based on pattern recognition. By designing complex and unique virtual instruction sets (VIS) for each application, obfuscators can create a layer of protection that is intricately tied to the application's specific functionality and logic. This customization increases the difficulty for attackers to generalize their analysis across different applications or even different parts of the same application.
 
@@ -251,7 +251,7 @@ void handle_checkUserCredit(VMContext* ctx, char* userId) {
 
 In this setup, the VM's instruction set directly corresponds to high-level business operations rather than low-level computational steps. This approach makes the VM's operation highly specific to the application's domain, thereby increasing the difficulty for an attacker to apply generic analysis tools or techniques effectively. By embedding domain-specific logic directly into the VM's architecture, the obfuscation becomes inherently more complex and intertwined with the application's unique functionality.
 
-##### Intertwining VM components
+### Intertwining VM components
 
 Traditional VM designs often separate concerns: dispatchers fetch and decode instructions, while handlers execute them. By intertwining these components, the boundaries between different stages of execution blur, making static and dynamic analysis much more challenging. One could implement a system where each handler, upon completing its operation, directly calculates and jumps to the address of the next handler based on both the current state of the VM and the result of its own execution. This approach removes the predictability of a central dispatcher and merges control flow decisions with operational logic.
 

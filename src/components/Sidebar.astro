@@ -81,6 +81,10 @@ const section = NAVIGATION.find(
       align-items: center;
       gap: var(--space-s);
     }
+
+    @media (width < 23rem) {
+      gap: var(--space-2xs);
+    }
   }
 
   sidebar-inner {
@@ -106,7 +110,7 @@ const section = NAVIGATION.find(
         block-size: 1.05em;
         translate: 0 0.12em;
         background-color: var(--accent);
-        animation: cursor-intro 0.5s steps(1) 4 forwards;
+        animation: cursor-intro 1.2s steps(1) 2;
       }
 
       &:hover cursor-block {
@@ -169,6 +173,10 @@ const section = NAVIGATION.find(
         display: none;
       }
     }
+
+    @media (width < 23rem) {
+      gap: var(--space-2xs);
+    }
   }
 
   nav li:has(> ul) > a {
@@ -190,11 +198,12 @@ const section = NAVIGATION.find(
 
   @keyframes cursor-intro {
     0%,
-    50% {
+    40%,
+    100% {
       opacity: 1;
     }
-    51%,
-    100% {
+    41%,
+    80% {
       opacity: 0;
     }
   }

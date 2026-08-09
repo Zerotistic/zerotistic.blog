@@ -9,8 +9,8 @@ export const SITE = {
     "Reverse engineering, pwn, automation and dumb ideas. Vulnerability research, Binary Ninja and CTF writeups.",
   locale: "en-US",
   dir: "ltr",
-  defaultPageImage: "/static/opengraph-image.png",
-  defaultPostImage: "/static/opengraph-image.png",
+  twitterHandle: "@gegrgtezrze",
+  defaultPageImage: "/og/site.png",
 } as const
 
 export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [

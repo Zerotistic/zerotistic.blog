@@ -50,9 +50,12 @@ const sections = rendered.map(({ entry, headings }, i) => ({
 const hasToc =
   sections.length > 1 || sections.some(({ headings }) => headings.length > 0)
 
-const crumbs = [{ label: parent.data.title, href: `/posts/${parent.id}` }]
-if (isSubpost(post.id)) {
-  crumbs.push({ label: post.data.title, href: `/posts/${post.id}` })
+const crumbs: { label: string; href: string }[] = []
+if (chain.length > 1) {
+  crumbs.push({ label: parent.data.title, href: `/posts/${parent.id}` })
+  if (isSubpost(post.id)) {
+    crumbs.push({ label: post.data.title, href: `/posts/${post.id}` })
+  }
 }
 ---
 
@@ -114,20 +117,20 @@ if (isSubpost(post.id)) {
           </post-meta>
           <p>{entry.data.description}</p>
           {entry.data.facts && (
-            <fact-table>
+            <dl class="fact-table">
               {entry.data.facts.event && (
-                <fact-row><dt>event</dt><dd>{entry.data.facts.event}</dd></fact-row>
+                <div class="fact-row"><dt>event</dt><dd>{entry.data.facts.event}</dd></div>
               )}
               {entry.data.facts.category && (
-                <fact-row><dt>category</dt><dd>{entry.data.facts.category}</dd></fact-row>
+                <div class="fact-row"><dt>category</dt><dd>{entry.data.facts.category}</dd></div>
               )}
               {entry.data.facts.target && (
-                <fact-row><dt>target</dt><dd>{entry.data.facts.target}</dd></fact-row>
+                <div class="fact-row"><dt>target</dt><dd>{entry.data.facts.target}</dd></div>
               )}
               {entry.data.facts.tools && (
-                <fact-row><dt>tools</dt><dd>{entry.data.facts.tools.join(", ")}</dd></fact-row>
+                <div class="fact-row"><dt>tools</dt><dd>{entry.data.facts.tools.join(", ")}</dd></div>
               )}
-            </fact-table>
+            </dl>
           )}
         </header>
         {entry.data.image && (
@@ -226,7 +229,7 @@ if (isSubpost(post.id)) {
         gap: var(--space-3xs);
 
         a {
-          color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+          color: var(--muted-foreground);
 
           &:hover {
             color: var(--foreground);
@@ -249,7 +252,7 @@ if (isSubpost(post.id)) {
       color: var(--muted-foreground);
     }
 
-    fact-table {
+    .fact-table {
       display: grid;
       grid-template-columns: auto 1fr;
       gap: var(--space-3xs) var(--space-m);
@@ -259,7 +262,7 @@ if (isSubpost(post.id)) {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
 
-      fact-row {
+      .fact-row {
         display: contents;
       }
 
