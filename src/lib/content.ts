@@ -9,9 +9,7 @@ export const titleText = (title: string) =>
 
 export const titleEmbedText = (title: string) =>
   title.replace(titleStrikethrough, (_match, text: string) =>
-    Array.from(text, (character) =>
-      /\s/u.test(character) ? character : `${character}\u0336`,
-    ).join(""),
+    Array.from(text, (character) => `${character}\u0336`).join(""),
   )
 
 export const titleHtml = (title: string) =>
