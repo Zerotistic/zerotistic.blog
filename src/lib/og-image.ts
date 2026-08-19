@@ -13,6 +13,11 @@ type TitleCharacter = {
   struck: boolean
 }
 
+type TitleWord = {
+  characters: TitleCharacter[]
+  spaceBefore: boolean
+}
+
 const escapeXml = (value: string) =>
   value.replace(
     /[&<>"']/g,
@@ -55,32 +60,46 @@ function parseTitle(value: string) {
 }
 
 function wrapTitle(value: string, maxLength = 34, maxLines = 3) {
-  const words: TitleCharacter[][] = []
+  const words: TitleWord[] = []
   let word: TitleCharacter[] = []
+  let spaceBefore = false
+  let pendingSpace: boolean | undefined
 
   for (const character of parseTitle(value)) {
     if (/\s/u.test(character.value)) {
-      if (word.length > 0) words.push(word)
-      word = []
+      if (word.length > 0) {
+        words.push({ characters: word, spaceBefore })
+        word = []
+      }
+      pendingSpace =
+        pendingSpace === undefined
+          ? character.struck
+          : pendingSpace && character.struck
     } else {
+      if (word.length === 0) {
+        spaceBefore = pendingSpace ?? false
+        pendingSpace = undefined
+      }
       word.push(character)
     }
   }
-  if (word.length > 0) words.push(word)
+  if (word.length > 0) words.push({ characters: word, spaceBefore })
 
   const lines: TitleCharacter[][] = []
   let line: TitleCharacter[] = []
 
   for (const word of words) {
     const candidateLength =
-      line.length + (line.length > 0 ? 1 : 0) + word.length
+      line.length + (line.length > 0 ? 1 : 0) + word.characters.length
     if (candidateLength <= maxLength || line.length === 0) {
-      if (line.length > 0) line.push({ value: " ", struck: false })
-      line.push(...word)
+      if (line.length > 0) {
+        line.push({ value: " ", struck: word.spaceBefore })
+      }
+      line.push(...word.characters)
       continue
     }
     lines.push(line)
-    line = word
+    line = word.characters
   }
   if (line.length > 0) lines.push(line)
 
@@ -107,7 +126,7 @@ function renderTitleLine(line: TitleCharacter[]) {
     if (!text) return
     const escaped = escapeXml(text)
     markup += struck
-      ? `<tspan text-decoration="line-through">${escaped}</tspan>`
+      ? `<tspan text-decoration="line-through">${escaped.replaceAll(" ", "&#x2010;")}</tspan>`
       : escaped
     text = ""
   }

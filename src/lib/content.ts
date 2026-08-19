@@ -9,9 +9,10 @@ export const titleText = (title: string) =>
 
 export const titleEmbedText = (title: string) =>
   title.replace(titleStrikethrough, (_match, text: string) => {
-    const characters = Array.from(text)
-    const last = characters.pop() ?? ""
-    return `\u0336${characters.map((character) => `${character}\u0336`).join("")}${last}`
+    const struck = Array.from(text, (character) => `${character}\u0336`).join(
+      "",
+    )
+    return `\u200a\u0336${struck}\u200a`
   })
 
 export const titleHtml = (title: string) =>
