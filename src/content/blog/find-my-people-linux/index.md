@@ -1,5 +1,5 @@
 ---
-title: "Reverse-engineering Find My People on Linux"
+title: "Reverse-engineering Find My People to stalk ~~my ex~~ a friend, cause I can"
 description: "How I registered a Linux machine with Apple's private services, received an existing Find My People key over IDS, and decrypted the live location without a Mac."
 date: 2026-08-19
 authors:
