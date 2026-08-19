@@ -8,9 +8,11 @@ export const titleText = (title: string) =>
   title.replace(titleStrikethrough, "$1")
 
 export const titleEmbedText = (title: string) =>
-  title.replace(titleStrikethrough, (_match, text: string) =>
-    Array.from(text, (character) => `${character}\u0336`).join(""),
-  )
+  title.replace(titleStrikethrough, (_match, text: string) => {
+    const characters = Array.from(text)
+    const last = characters.pop() ?? ""
+    return `\u0336${characters.map((character) => `${character}\u0336`).join("")}${last}`
+  })
 
 export const titleHtml = (title: string) =>
   title
