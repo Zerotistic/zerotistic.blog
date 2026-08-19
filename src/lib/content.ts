@@ -7,6 +7,13 @@ const titleStrikethrough = /~~([^~\n]+)~~/g
 export const titleText = (title: string) =>
   title.replace(titleStrikethrough, "$1")
 
+export const titleEmbedText = (title: string) =>
+  title.replace(titleStrikethrough, (_match, text: string) =>
+    Array.from(text, (character) =>
+      /\s/u.test(character) ? character : `${character}\u0336`,
+    ).join(""),
+  )
+
 export const titleHtml = (title: string) =>
   title
     .replaceAll("&", "&amp;")

@@ -8,6 +8,11 @@ type OgImage = {
   meta?: string
 }
 
+type TitleCharacter = {
+  value: string
+  struck: boolean
+}
+
 const escapeXml = (value: string) =>
   value.replace(
     /[&<>"']/g,
@@ -21,40 +26,110 @@ const escapeXml = (value: string) =>
       })[character]!,
   )
 
-function wrapText(value: string, maxLength = 34, maxLines = 3) {
-  const words = value.trim().split(/\s+/)
-  const lines: string[] = []
-  let line = ""
+function parseTitle(value: string) {
+  const characters: TitleCharacter[] = []
+  let cursor = 0
+
+  for (const match of value.matchAll(/~~([^~\n]+)~~/g)) {
+    const index = match.index
+    characters.push(
+      ...Array.from(value.slice(cursor, index), (character) => ({
+        value: character,
+        struck: false,
+      })),
+      ...Array.from(match[1], (character) => ({
+        value: character,
+        struck: true,
+      })),
+    )
+    cursor = index + match[0].length
+  }
+
+  characters.push(
+    ...Array.from(value.slice(cursor), (character) => ({
+      value: character,
+      struck: false,
+    })),
+  )
+  return characters
+}
+
+function wrapTitle(value: string, maxLength = 34, maxLines = 3) {
+  const words: TitleCharacter[][] = []
+  let word: TitleCharacter[] = []
+
+  for (const character of parseTitle(value)) {
+    if (/\s/u.test(character.value)) {
+      if (word.length > 0) words.push(word)
+      word = []
+    } else {
+      word.push(character)
+    }
+  }
+  if (word.length > 0) words.push(word)
+
+  const lines: TitleCharacter[][] = []
+  let line: TitleCharacter[] = []
 
   for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word
-    if (candidate.length <= maxLength || !line) {
-      line = candidate
+    const candidateLength =
+      line.length + (line.length > 0 ? 1 : 0) + word.length
+    if (candidateLength <= maxLength || line.length === 0) {
+      if (line.length > 0) line.push({ value: " ", struck: false })
+      line.push(...word)
       continue
     }
     lines.push(line)
     line = word
   }
-  if (line) lines.push(line)
+  if (line.length > 0) lines.push(line)
 
   if (lines.length > maxLines) {
-    const remaining = lines.slice(maxLines - 1).join(" ")
-    lines.splice(
-      maxLines - 1,
-      Infinity,
-      `${remaining.slice(0, maxLength - 1).trimEnd()}…`,
-    )
+    const remaining = lines
+      .slice(maxLines - 1)
+      .flatMap((part, index) =>
+        index === 0 ? part : [{ value: " ", struck: false }, ...part],
+      )
+    const truncated = remaining.slice(0, maxLength - 1)
+    while (truncated.at(-1)?.value === " ") truncated.pop()
+    truncated.push({ value: "…", struck: false })
+    lines.splice(maxLines - 1, Infinity, truncated)
   }
   return lines
 }
 
+function renderTitleLine(line: TitleCharacter[]) {
+  let markup = ""
+  let text = ""
+  let struck = line[0]?.struck ?? false
+
+  const flush = () => {
+    if (!text) return
+    const escaped = escapeXml(text)
+    markup += struck
+      ? `<tspan text-decoration="line-through">${escaped}</tspan>`
+      : escaped
+    text = ""
+  }
+
+  for (const character of line) {
+    if (character.struck !== struck) {
+      flush()
+      struck = character.struck
+    }
+    text += character.value
+  }
+  flush()
+  return markup
+}
+
 export async function generateOgImage({ title, description, meta }: OgImage) {
-  const lines = wrapText(title)
+  const lines = wrapTitle(title)
   const titleStart = lines.length === 1 ? 260 : lines.length === 2 ? 225 : 190
   const titleMarkup = lines
     .map(
       (line, index) =>
-        `<tspan x="84" y="${titleStart + index * 70}">${escapeXml(line)}</tspan>`,
+        `<tspan x="84" y="${titleStart + index * 70}">${renderTitleLine(line)}</tspan>`,
     )
     .join("")
   const descriptionY = titleStart + lines.length * 70 + 16

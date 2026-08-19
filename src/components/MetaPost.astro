@@ -1,7 +1,7 @@
 ---
 import { getEntries, type CollectionEntry } from "astro:content"
 import { SITE } from "@/consts"
-import { pageTitle, titleText } from "@/lib/content"
+import { pageTitle, titleEmbedText, titleText } from "@/lib/content"
 
 type Props = {
   post: CollectionEntry<"blog">
@@ -11,6 +11,7 @@ type Props = {
 const { post, canonical: canonicalPath } = Astro.props
 const { title, description, date } = post.data
 const cleanTitle = titleText(title)
+const embedTitle = titleEmbedText(title)
 
 const base = Astro.site ?? new URL(Astro.url.origin)
 const authors = await getEntries(post.data.authors)
@@ -24,7 +25,7 @@ const ogImage = new URL(`/og/${post.id}.png`, base)
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
 
-<meta property="og:title" content={cleanTitle}>
+<meta property="og:title" content={embedTitle}>
 <meta property="og:description" content={description}>
 <meta property="og:type" content="article">
 <meta property="og:url" content={url}>
@@ -36,7 +37,7 @@ const ogImage = new URL(`/og/${post.id}.png`, base)
 <meta property="og:image:height" content="630">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content={cleanTitle}>
+<meta name="twitter:title" content={embedTitle}>
 <meta name="twitter:description" content={description}>
 <meta name="twitter:image" content={ogImage}>
 <meta name="twitter:image:alt" content={cleanTitle}>

@@ -1,6 +1,5 @@
 import { generateOgImage } from "@/lib/og-image"
 import { formatDate } from "@/lib/utils"
-import { titleText } from "@/lib/content"
 import { getCollection, type CollectionEntry } from "astro:content"
 import type { APIRoute } from "astro"
 
@@ -16,7 +15,7 @@ export const GET: APIRoute = async ({ props }) => {
   const tags = (post.data.tags ?? []).map((tag) => `#${tag}`).join("  ")
   const meta = [formatDate(post.data.date), tags].filter(Boolean).join("  ·  ")
   const image = await generateOgImage({
-    title: titleText(post.data.title),
+    title: post.data.title,
     meta,
   })
   return new Response(image, {
