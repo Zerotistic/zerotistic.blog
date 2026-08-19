@@ -218,9 +218,9 @@ searchPartyToken:401
 
 Three tokens, three `401`s. Looking at the [MobileMe delegate exchange](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/account.py#L891-L929) made the reason pretty clear: the login acts as a token broker and gives each iCloud service its own credentials. Apparently, having "Find My" somewhere in the name wasn't enough.
 
-Even with the correct token, the request still wasn't complete. `initClient` wanted the account's FMF host, the APNs courier token belonging to this client, a fairly detailed client context, and a weird bundle of headers called **anisette**. The courier token is the base token for the APNs identity and the topic tokens used to filter pushes are derived from it.
+Even with the correct token, the request still wasn't complete. `initClient` wanted the account's Find My Friends (FMF) host, the courier token for this client's Apple Push Notification service (APNs) connection, a fairly detailed client context, and a weird bundle of headers called **anisette**. The courier token identifies this client to APNs, and the topic tokens used to filter pushes are derived from it.
 
-Anisette is basically extra proof that the request came from a provisioned Apple-like client. Some values stay tied to the emulated machine and another looks like a short-lived one-time code. It isn't the password or a Find My token, but Apple rejects the request without it. [FindMy.py generates those headers here](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/anisette.py#L128-L166) and [keeps the provisioned identity here](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/anisette.py#L288-L414).
+Anisette is basically extra proof that the request came from a provisioned Apple-like client. Some values stay tied to the emulated machine and another looks like a short-lived one-time code. It isn't the password or a Find My token, but Apple rejects the request without it. [FindMy.py generates those headers here](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/anisette.py#L128-L166) and [keeps the provisioned identity here](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/anisette.py#L288-L414). The `deviceUDID` below is just the Unique Device Identifier (UDID) I assigned to the emulated receiver.
 
 ```json title="reduced initClient request"
 {
@@ -242,7 +242,7 @@ Anisette is basically extra proof that the request came from a provisioned Apple
 }
 ```
 
-The route still says `friends/fmfd`, but current clients build that context in `findmylocated`. `currentTime` is Unix milliseconds, and subsequent refreshes also echo the model version Apple returned in `X-FMF-Model-Version`. Those details became important once I needed the server to treat this as a newly attached native client instead of merely returning the relationship list.
+The route still says `friends/fmfd`, but current clients build that context in `findmylocated`. `currentTime` is Unix milliseconds, and subsequent refreshes also echo the model version Apple returned in `X-FMF-Model-Version`.
 
 Once I had all of that matching what the native daemons send, Apple finally returned the accepted share:
 
@@ -258,13 +258,15 @@ Once I had all of that matching what the native daemons send, Apple finally retu
 }
 ```
 
-Great, I could now find my friend and get his opaque `fmId`. Except the location array was empty. The two flags, `secureLocationsCapable: true` and `fallbackToLegacyAllowed: false`, were a pretty good sign that this share had moved to the newer encrypted location path. :sob:
+`following` is basically the list of people sharing their location with me. Great, I could now find my friend and get his opaque `fmId`, but that was about it: no location and no key. The two flags, `secureLocationsCapable: true` and `fallbackToLegacyAllowed: false`, were a pretty good sign that this share had moved to the newer encrypted location path. :sob:
+
+At first I thought getting this response meant the client was set up properly, but clearly it didn't :(. Those boring context fields only became important later, when I needed Apple to notice this was a new client and send it the existing key.
 
 So I kept `initClient` for finding the relationship and moved on to pretending to be an actual Apple device, because that is what normal people do.
 
 ## Becoming an IDS device
 
-Finding the relationship was really the easy part. The encrypted path goes through IDS, Apple's private identity and messaging service. This is what ties an account handle to its registered devices, certificates, APNs tokens, and encryption keys. My browser session proved I was logged in, but it didn't make the Linux client one of those devices.
+Finding the relationship was really the easy part. The encrypted path goes through IDS, Apple's private device-identity and encrypted-messaging layer. IDS ties an account handle to its registered devices, certificates, push tokens, and message keys; the actual packets travel over APNs. My browser session proved I was logged in, but it didn't make the Linux client one of those devices.
 
 I found most of the older IDS and APNs code in a [pre-rewrite pypush commit](https://github.com/JJTech0130/pypush/tree/6336bba82697b838497ffd774f23e5640c877a85). Its login sent a password plist straight to `profile.ess.apple.com`. Apple accepted the password, asked for 2FA, and then rejected the code:
 
@@ -273,7 +275,7 @@ I found most of the older IDS and APNs code in a [pre-rewrite pypush commit](htt
 [2fa] Apple status 5068
 ```
 
-So the old pypush login was dead. The path that worked was **GrandSlam**, Apple's account login protocol, which [FindMy.py already implements](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/account.py#L794-L885). After SRP and 2FA I got an ADSID, which is another opaque account ID, and a short-lived PET (password-equivalent token). I used that PET to ask `signin/v2` for the `com.apple.private.ids` delegate instead of trying the password again.
+So the old pypush login was dead. The path that worked was [**GrandSlam**](https://theapplewiki.com/wiki/Grand_Slam_Authentication), Apple's account login protocol, which [FindMy.py already implements](https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/account.py#L794-L885). After a Secure Remote Password (SRP) exchange and two-factor authentication (2FA), I got an ADSID, another opaque identifier for the authenticated account, and a short-lived password-equivalent token (PET). I used that PET to ask `signin/v2` for the `com.apple.private.ids` delegate instead of trying the password again.
 
 The anisette values from earlier also travelled with that login. These are the interesting ones:
 
@@ -306,13 +308,13 @@ Content-Type: application/x-apple-plist
 </dict>
 ```
 
-There is one extra bit in there: `X-Mme-Nas-Qualify`. It contains short-lived native validation data, usually called NAC by the projects implementing it. The [pypush generator](https://github.com/JJTech0130/pypush/blob/6336bba82697b838497ffd774f23e5640c877a85/generatenac.py) builds it from an emulated Apple hardware profile, and Apple asks for a fresh one again during registration.
+There is one extra bit in there: `X-Mme-Nas-Qualify`. It contains short-lived native validation data. The open-source implementations call the blob NAC; the name is less useful than the fact that Apple expects it to match the emulated hardware profile and be fresh. The [pypush generator](https://github.com/JJTech0130/pypush/blob/6336bba82697b838497ffd774f23e5640c877a85/generatenac.py) builds it, and Apple asks for another one during registration.
 
 Apple returned zero for both the outer request and `com.apple.private.ids`, plus a profile ID and delegate token. Progress!
 
 ### Certificate request
 
-Next I had to exchange that delegate token for an IDS authentication certificate through `authenticateDS`. Annoyingly, every attempt returned HTTP `200` as Apple hid the real result inside the response plist.
+Next I had to exchange that delegate token for an IDS authentication certificate through `authenticateDS`. That meant sending a certificate signing request (CSR), basically a request for Apple to sign this client's public key. Annoyingly, every attempt returned HTTP `200` as Apple hid the real result inside the response plist.
 
 From there it was a lot of changing one thing, running it again, and still getting `6001`:
 
@@ -334,7 +336,7 @@ The error body wasn't exactly helpful either:
 </dict>
 ```
 
-What finally worked is pretty specific: a 2048-bit RSA PKCS#10 request, signed with SHA-1, with the uppercase SHA-1 of the IDS profile ID as its common name. Then I had to put the CSR in an **XML** plist as `Data` and gzip the whole thing:
+What finally worked is pretty specific: the CSR had to use PKCS#10, the standard certificate-request format, with a 2048-bit RSA key and a SHA-1 signature. Its common name had to be the uppercase SHA-1 of the IDS profile ID. Then I had to put it in an **XML** plist as `Data` and gzip the whole thing:
 
 ```python title="accepted authenticateDS body"
 body = plistlib.dumps({
@@ -409,7 +411,7 @@ service = {
 }
 ```
 
-The `client-data` was another rabbit hole. It advertised both the old IDS message identity and **NGM** v13, Apple's newer format built around a P-256 device key and signed prekey. It also included Key Transparency v5 metadata and the Find My capability flags. [rustpush's registration code](https://github.com/stek29/rustpush/blob/82dc6f8342176e4f9171b62354cbdd13eaa18b38/src/ids/user.rs#L1035-L1074) was the most readable reference I found for this.
+The `client-data` was another rabbit hole. It advertised both the old IDS message identity and **NGM** v13, Apple's newer device-to-device message format built around a P-256 device key and signed prekey. NGM is the envelope that will carry the location key later; it is not the encryption used for the location report itself. The registration also included Key Transparency v5 metadata and the Find My capability flags. [rustpush's registration code](https://github.com/stek29/rustpush/blob/82dc6f8342176e4f9171b62354cbdd13eaa18b38/src/ids/user.rs#L1035-L1074) was the most readable reference I found for this.
 
 Around that, the request needed the APNs token, some native device metadata, and another fresh validation blob. The encoding mattered again too: XML plist, gzip, then IDS signatures over the compressed bytes. The final request carried both the account certificate and the APNs push certificate:
 
