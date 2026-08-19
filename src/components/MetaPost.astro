@@ -2,6 +2,7 @@
 import { getEntries, type CollectionEntry } from "astro:content"
 import { SITE } from "@/consts"
 import { pageTitle, titleEmbedText, titleText } from "@/lib/content"
+import { createHash } from "node:crypto"
 
 type Props = {
   post: CollectionEntry<"blog">
@@ -19,6 +20,17 @@ const authorNames = authors.map((author) => author.data.name)
 const url = new URL(Astro.url.pathname, base)
 const canonical = new URL(canonicalPath ?? Astro.url.pathname, base)
 const ogImage = new URL(`/og/${post.id}.png`, base)
+const ogImageVersion = createHash("sha256")
+  .update(
+    JSON.stringify({
+      title: post.data.title,
+      date: post.data.date,
+      tags: post.data.tags,
+    }),
+  )
+  .digest("hex")
+  .slice(0, 12)
+ogImage.searchParams.set("v", ogImageVersion)
 ---
 
 <title>{pageTitle(title)}</title>
