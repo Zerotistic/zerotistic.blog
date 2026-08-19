@@ -2,6 +2,7 @@
 import ArrowLeft from "@/assets/icons/arrow-left.svg"
 import ArrowRight from "@/assets/icons/arrow-right.svg"
 import ScrollToTop from "@/components/ScrollToTop.astro"
+import { titleText } from "@/lib/content"
 import type { CollectionEntry } from "astro:content"
 
 type Post = CollectionEntry<"blog">
@@ -15,9 +16,9 @@ const { prev, next } = Astro.props
     href={prev && `/posts/${prev.id}`}
     data-icon-button
     data-dir="prev"
-    aria-label={prev && `Previous post: ${prev.data.title}`}
+    aria-label={prev && `Previous post: ${titleText(prev.data.title)}`}
     aria-hidden={!prev || undefined}
-    title={prev?.data.title}
+    title={prev && titleText(prev.data.title)}
   >
     <ArrowLeft />
   </a>
@@ -25,9 +26,9 @@ const { prev, next } = Astro.props
     href={next && `/posts/${next.id}`}
     data-icon-button
     data-dir="next"
-    aria-label={next && `Next post: ${next.data.title}`}
+    aria-label={next && `Next post: ${titleText(next.data.title)}`}
     aria-hidden={!next || undefined}
-    title={next?.data.title}
+    title={next && titleText(next.data.title)}
   >
     <ArrowRight />
   </a>

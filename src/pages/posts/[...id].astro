@@ -5,7 +5,13 @@ import ScrollToTop from "@/components/ScrollToTop.astro"
 import SeriesReader from "@/components/SeriesReader.astro"
 import TableOfContents from "@/components/TableOfContents.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getSubposts, pageTitle } from "@/lib/content"
+import {
+  getPosts,
+  getSubposts,
+  pageTitle,
+  titleHtml,
+  titleText,
+} from "@/lib/content"
 import { formatDate, isSubpost, readingTime, subpostSlug } from "@/lib/utils"
 import { Image } from "astro:assets"
 import { getEntries, render, type CollectionEntry } from "astro:content"
@@ -52,9 +58,15 @@ const hasToc =
 
 const crumbs: { label: string; href: string }[] = []
 if (chain.length > 1) {
-  crumbs.push({ label: parent.data.title, href: `/posts/${parent.id}` })
+  crumbs.push({
+    label: titleText(parent.data.title),
+    href: `/posts/${parent.id}`,
+  })
   if (isSubpost(post.id)) {
-    crumbs.push({ label: post.data.title, href: `/posts/${post.id}` })
+    crumbs.push({
+      label: titleText(post.data.title),
+      href: `/posts/${post.id}`,
+    })
   }
 }
 ---
@@ -82,7 +94,7 @@ if (chain.length > 1) {
         data-embedded={i > 0 || undefined}
       >
         <header>
-          <h1>{entry.data.title}</h1>
+          <h1 set:html={titleHtml(entry.data.title)} />
           <post-meta>
             {authors.length > 0 && (
               <post-authors>

@@ -1,5 +1,6 @@
 ---
 import { formatDate } from "@/lib/utils"
+import { titleHtml } from "@/lib/content"
 import type { CollectionEntry } from "astro:content"
 
 type Props = {
@@ -19,7 +20,7 @@ const { post, partCount, tags } = Astro.props
         {formatDate(post.data.date)}
       </time>
       <row-title>
-        <span>{post.data.title}</span>
+        <span set:html={titleHtml(post.data.title)} />
         {partCount > 0 && (
           <series-badge>series · {partCount} parts</series-badge>
         )}

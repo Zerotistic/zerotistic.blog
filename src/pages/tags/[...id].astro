@@ -1,7 +1,7 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getTags } from "@/lib/content"
+import { getTags, titleHtml } from "@/lib/content"
 import { formatDate } from "@/lib/utils"
 import type { CollectionEntry } from "astro:content"
 
@@ -43,7 +43,7 @@ const { tag, posts } = Astro.props
           <time datetime={post.data.date.toISOString()}>
             {formatDate(post.data.date)}
           </time>
-          <a href={`/posts/${post.id}`}>{post.data.title}</a>
+          <a href={`/posts/${post.id}`} set:html={titleHtml(post.data.title)} />
         </li>
       ))}
   </ol>

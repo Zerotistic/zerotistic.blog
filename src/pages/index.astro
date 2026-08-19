@@ -2,7 +2,7 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PostList from "@/components/PostList.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getSubposts } from "@/lib/content"
+import { getPosts, getSubposts, titleHtml } from "@/lib/content"
 import { formatDate, readingTime } from "@/lib/utils"
 
 const roles = [
@@ -78,7 +78,7 @@ const latestReadingTime = readingTime(
           </time>
           <span>{latestReadingTime}</span>
         </post-meta>
-        <h3><a href={`/posts/${latest.id}`}>{latest.data.title}</a></h3>
+        <h3><a href={`/posts/${latest.id}`} set:html={titleHtml(latest.data.title)} /></h3>
         <p>{latest.data.description}</p>
         <post-tags aria-label="Tags">
           {latestTags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}

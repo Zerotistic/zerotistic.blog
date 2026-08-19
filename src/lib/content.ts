@@ -2,7 +2,22 @@ import { SITE } from "@/consts"
 import { getCollection, type CollectionEntry } from "astro:content"
 import { isSubpost } from "@/lib/utils"
 
-export const pageTitle = (title: string) => `${title} | ${SITE.title}`
+const titleStrikethrough = /~~([^~\n]+)~~/g
+
+export const titleText = (title: string) =>
+  title.replace(titleStrikethrough, "$1")
+
+export const titleHtml = (title: string) =>
+  title
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;")
+    .replace(titleStrikethrough, "<del>$1</del>")
+
+export const pageTitle = (title: string) =>
+  `${titleText(title)} | ${SITE.title}`
 
 export async function getPosts(): Promise<CollectionEntry<"blog">[]> {
   const posts = await getCollection("blog", ({ data }) => !data.draft)
