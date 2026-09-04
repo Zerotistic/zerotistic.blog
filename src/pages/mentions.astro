@@ -1,0 +1,353 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import { mentionGroups } from "@/data/mentions"
+import Layout from "@/layouts/Layout.astro"
+
+const mentionCount = mentionGroups.reduce(
+  (count, group) => count + group.mentions.length,
+  0,
+)
+---
+
+<Layout>
+  <MetaPage
+    slot="head"
+    title="Mentions"
+    description="Selected press coverage, academic citations, and technical references to zerotistic's research."
+  />
+
+  <nav slot="toc" class="mention-nav" data-bar aria-label="Mention index">
+    <p>
+      <span><span aria-hidden="true">//</span> index</span>
+      <span class="index-total"
+        >{mentionCount.toString().padStart(2, "0")}</span
+      >
+    </p>
+    <ol>
+      {mentionGroups.map((group) => (
+          <li>
+            <a href={`#${group.id}`}>
+              <span>{group.title}</span>
+              <span class="index-count">{group.mentions.length.toString().padStart(2, "0")}</span>
+            </a>
+          </li>
+        ))}
+    </ol>
+  </nav>
+
+  <header class="page-heading">
+    <p class="eyebrow"><span aria-hidden="true">//</span> elsewhere</p>
+    <h1>mentions</h1>
+    <p>
+      Selected press coverage, academic citations, and technical references to
+      my research.
+    </p>
+  </header>
+
+  <div class="mention-groups">
+    {mentionGroups.map((group) => (
+        <section id={group.id} aria-labelledby={`${group.id}-heading`}>
+          <header class="group-heading">
+            <h2 id={`${group.id}-heading`}>{group.title}</h2>
+            <span>{group.mentions.length.toString().padStart(2, "0")}</span>
+          </header>
+
+          <ol class="mention-list">
+            {group.mentions.map((mention) => (
+                <li>
+                  <article>
+                    <div class="mention-meta">
+                      <span>{mention.kind}</span>
+                      <span>{mention.year}</span>
+                    </div>
+                    <div class="mention-body">
+                      <h3>
+                        <a
+                          href={mention.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {mention.name} <span aria-hidden="true">↗</span>
+                        </a>
+                      </h3>
+                      <p class="mention-context">{mention.context}</p>
+                      <p class="mention-description">{mention.description}</p>
+                      <p class="related-research">
+                        research:
+                        <a href={mention.research.href}>
+                          {mention.research.label} <span aria-hidden="true">→</span>
+                        </a>
+                      </p>
+                    </div>
+                  </article>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))}
+  </div>
+</Layout>
+
+<style>
+  .mention-nav {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+
+    > p,
+    a {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-2xs);
+    }
+
+    > p {
+      margin-block-end: var(--space-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+
+      span > span {
+        color: var(--accent);
+      }
+    }
+
+    .index-total,
+    .index-count {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted-foreground);
+    }
+
+    ol {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3xs);
+    }
+
+    a {
+      color: var(--muted-foreground);
+      text-decoration-line: none;
+
+      &:hover {
+        color: var(--foreground);
+      }
+    }
+
+    @media (width < 64rem) {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      > p {
+        flex: none;
+        display: block;
+        margin-block-end: 0;
+      }
+
+      .index-total,
+      .index-count {
+        display: none;
+      }
+
+      ol {
+        flex: none;
+        flex-direction: row;
+        gap: var(--space-s);
+      }
+
+      li,
+      a {
+        flex: none;
+      }
+
+      a {
+        display: block;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .page-heading {
+    margin-block-end: var(--space-xl);
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    .eyebrow {
+      margin-block-end: var(--space-2xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+
+      span {
+        color: var(--accent);
+      }
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: var(--step-3);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    > p:last-child {
+      max-inline-size: 38rem;
+      margin-block-start: var(--space-s);
+      color: var(--prose-foreground);
+    }
+  }
+
+  .mention-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+
+    > section {
+      scroll-margin-block-start: calc(
+        var(--bar-nav-height, 0px) +
+        var(--bar-toc-height, 0px) +
+        var(--space-s)
+      );
+    }
+  }
+
+  .group-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-block-end: var(--space-xs);
+
+    h2,
+    > span {
+      font-family: var(--font-mono);
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: var(--step-1);
+      font-weight: var(--font-weight-medium);
+      color: var(--foreground);
+    }
+
+    > span {
+      font-size: var(--step--1);
+      font-variant-numeric: tabular-nums;
+      color: var(--muted-foreground);
+    }
+  }
+
+  .mention-list {
+    border-block-start: 1px solid var(--border);
+
+    li {
+      border-block-end: 1px solid var(--border);
+    }
+
+    article {
+      display: grid;
+      grid-template-columns: minmax(7.5rem, 1fr) minmax(0, 4fr);
+      gap: var(--space-m);
+      padding-block: var(--space-s);
+      transition: padding-inline 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+      &:has(a:hover),
+      &:has(a:focus-visible) {
+        padding-inline: var(--space-2xs);
+      }
+    }
+  }
+
+  .mention-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+
+    span:first-child {
+      color: var(--foreground);
+    }
+  }
+
+  .mention-body {
+    min-inline-size: 0;
+
+    h3 {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+    }
+
+    h3 a {
+      color: var(--foreground);
+
+      span {
+        color: var(--accent);
+      }
+    }
+  }
+
+  .mention-context,
+  .related-research {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+  }
+
+  .mention-context {
+    margin-block-start: var(--space-3xs);
+  }
+
+  .mention-description {
+    max-inline-size: 38rem;
+    margin-block-start: var(--space-xs);
+    color: var(--prose-foreground);
+  }
+
+  .related-research {
+    margin-block-start: var(--space-xs);
+
+    a {
+      color: var(--muted-foreground);
+
+      &:hover {
+        color: var(--foreground);
+      }
+
+      span {
+        color: var(--accent);
+      }
+    }
+  }
+
+  @media (width < 34rem) {
+    .mention-list article {
+      grid-template-columns: 1fr;
+      gap: var(--space-xs);
+    }
+
+    .mention-meta {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mention-list article {
+      transition: none;
+    }
+  }
+</style>

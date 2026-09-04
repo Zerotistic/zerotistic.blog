@@ -22,5 +22,6 @@ export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
 export const NAVIGATION = [
   { href: "/posts", label: "posts" },
   { href: "/cves", label: "cves" },
+  { href: "/mentions", label: "mentions" },
   { href: "/tags", label: "tags" },
 ]

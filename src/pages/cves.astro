@@ -1,251 +1,15 @@
 ---
+import { cveUrl, duplicateProject, products } from "@/data/cves"
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
 
-type Severity = "critical" | "high" | "medium"
-
-type Finding = {
-  id: string
-  title: string
-  summary: string
-  published: string
-  score: string
-  cvss: "3.1" | "4.0"
-  severity: Severity
-  url?: string
-  advisory?: { label: string; href: string }
-}
-
-type Product = {
-  id: string
-  name: string
-  context: string
-  findings: Finding[]
-}
-
-const cveUrl = (id: string) => `https://www.cve.org/CVERecord?id=${id}`
-
-const products: Product[] = [
-  {
-    id: "anubis",
-    name: "Anubis",
-    context: "Web AI firewall",
-    findings: [
-      {
-        id: "CVE-2026-62314",
-        title: "Policy bypass via a client-controlled X-Original-URI header",
-        summary:
-          "A client-controlled header was trusted before the request path, allowing matching ALLOW rules to bypass the Anubis challenge.",
-        published: "2026-07-15",
-        score: "5.8",
-        cvss: "3.1",
-        severity: "medium",
-        url: cveUrl("CVE-2026-62314"),
-        advisory: {
-          label: "GitHub advisory",
-          href: "https://github.com/TecharoHQ/anubis/security/advisories/GHSA-6wcg-mqvh-fcvg",
-        },
-      },
-    ],
-  },
-  {
-    id: "chromadb",
-    name: "ChromaDB",
-    context: "AI-native database",
-    findings: [
-      {
-        id: "CVE-2026-45829",
-        title: "Pre-authentication remote code execution",
-        summary:
-          "An unauthenticated attacker could submit a malicious model repository with trust_remote_code enabled and execute code on the server.",
-        published: "2026-05-18",
-        score: "10.0",
-        cvss: "4.0",
-        severity: "critical",
-        url: cveUrl("CVE-2026-45829"),
-      },
-      {
-        id: "CVE-2026-45833",
-        title: "Authenticated remote code execution",
-        summary:
-          "A user with collection-update permission could load a malicious model repository with trust_remote_code and execute code on the server.",
-        published: "2026-06-12",
-        score: "9.4",
-        cvss: "4.0",
-        severity: "critical",
-        url: cveUrl("CVE-2026-45833"),
-      },
-      {
-        id: "CVE-2026-8828",
-        title: "Cross-tenant authorization bypass in ChromaDB Rust",
-        summary:
-          "Any authenticated user could read, write, update, or delete collections belonging to another tenant.",
-        published: "2026-06-12",
-        score: "8.8",
-        cvss: "4.0",
-        severity: "high",
-        url: cveUrl("CVE-2026-8828"),
-      },
-      {
-        id: "CVE-2026-45830",
-        title: "Cross-tenant authorization bypass in ChromaDB Python",
-        summary:
-          "Any authenticated user could read, write, update, or delete collections belonging to another tenant.",
-        published: "2026-06-12",
-        score: "8.8",
-        cvss: "4.0",
-        severity: "high",
-        url: cveUrl("CVE-2026-45830"),
-      },
-      {
-        id: "CVE-2026-45831",
-        title: "SimpleRBAC cross-tenant authorization bypass",
-        summary:
-          "The provider checked whether a user held a permission, but not which tenant, database, or collection that permission applied to.",
-        published: "2026-06-12",
-        score: "8.8",
-        cvss: "4.0",
-        severity: "high",
-        url: cveUrl("CVE-2026-45831"),
-      },
-      {
-        id: "CVE-2026-45832",
-        title: "Authorization bypass through V1 collection endpoints",
-        summary:
-          "The V1 endpoints passed no tenant or database to the authorization layer, allowing its controls to be bypassed.",
-        published: "2026-06-12",
-        score: "8.8",
-        cvss: "4.0",
-        severity: "high",
-        url: cveUrl("CVE-2026-45832"),
-      },
-    ],
-  },
-  {
-    id: "flair",
-    name: "Flair",
-    context: "NLP framework",
-    findings: [
-      {
-        id: "CVE-2026-3071",
-        title: "Arbitrary code execution through model deserialization",
-        summary:
-          "Loading a malicious language model could trigger unsafe deserialization and execute arbitrary code.",
-        published: "2026-02-26",
-        score: "8.4",
-        cvss: "3.1",
-        severity: "high",
-        url: cveUrl("CVE-2026-3071"),
-      },
-    ],
-  },
-  {
-    id: "misp",
-    name: "MISP",
-    context: "Threat intelligence platform",
-    findings: [
-      {
-        id: "CVE-2025-66386",
-        title: "Path traversal in the EventReport image viewer",
-        summary:
-          "A site administrator could traverse outside the intended path when viewing an EventReport picture.",
-        published: "2025-11-28",
-        score: "4.1",
-        cvss: "3.1",
-        severity: "medium",
-        url: cveUrl("CVE-2025-66386"),
-      },
-    ],
-  },
-  {
-    id: "keras",
-    name: "Keras",
-    context: "Deep-learning framework",
-    findings: [
-      {
-        id: "CVE-2025-49655",
-        title: "Safe-mode bypass through TorchModuleWrapper",
-        summary:
-          "A malicious Keras file could execute arbitrary code when loaded, despite safe mode being enabled.",
-        published: "2025-10-17",
-        score: "9.8",
-        cvss: "3.1",
-        severity: "critical",
-        url: cveUrl("CVE-2025-49655"),
-      },
-    ],
-  },
-  {
-    id: "backend-ai",
-    name: "Backend.AI",
-    context: "AI compute platform",
-    findings: [
-      {
-        id: "CVE-2025-49651",
-        title: "Missing authorization for interactive sessions",
-        summary:
-          "An attacker could take over active sessions and access, steal, or alter data available inside them.",
-        published: "2025-06-09",
-        score: "8.1",
-        cvss: "3.1",
-        severity: "high",
-        url: cveUrl("CVE-2025-49651"),
-      },
-      {
-        id: "CVE-2025-49652",
-        title: "Arbitrary account creation through missing access control",
-        summary:
-          "Unauthenticated users could create accounts and reach private data even when registration was disabled.",
-        published: "2025-06-09",
-        score: "9.8",
-        cvss: "3.1",
-        severity: "critical",
-        url: cveUrl("CVE-2025-49652"),
-      },
-      {
-        id: "CVE-2025-49653",
-        title: "Credential exposure leading to account takeover",
-        summary:
-          "Sensitive data exposed through active sessions could reveal management-platform credentials.",
-        published: "2025-06-09",
-        score: "8.0",
-        cvss: "3.1",
-        severity: "high",
-        url: cveUrl("CVE-2025-49653"),
-      },
-    ],
-  },
-  {
-    id: "style-dictionary",
-    name: "Style Dictionary",
-    context: "Design-token build system",
-    findings: [
-      {
-        id: "CVE-2026-XXXX",
-        title:
-          "Prototype Pollution via constructor.prototype Bypasses CVE-2026-54639 Patch",
-        summary:
-          "An attacker could exploit maliciously crafted token data to pollute object prototypes, potentially altering application behavior or data.",
-        published: "2026-08-06",
-        score: "8.4",
-        cvss: "3.1",
-        severity: "high",
-        advisory: {
-          label: "GitHub advisory",
-          href: "https://github.com/style-dictionary/style-dictionary/security/advisories/GHSA-xmr7-549p-98w3",
-        },
-      },
-    ],
-  },
-]
-
-const findingCount = products.reduce(
-  (count, product) => count + product.findings.length,
-  0,
-)
+const findingCount = products
+  .flatMap((product) => product.findings)
+  .filter((finding) => finding.published).length
 const criticalCount = products
   .flatMap((product) => product.findings)
   .filter((finding) => finding.severity === "critical").length
+const duplicateFinding = duplicateProject.findings[0]
 ---
 
 <Layout>
@@ -256,28 +20,53 @@ const criticalCount = products
   />
 
   <nav slot="toc" class="project-nav" data-bar aria-label="Project index">
-    <p class="index-label">
-      <span class="index-title">
-        <span aria-hidden="true">//</span>
-        projects
-      </span>
-      <span class="count-label">CVEs</span>
-    </p>
-    <ol>
-      {products.map((product, productIndex) => (
-          <li>
-            <a
-              href={`#${product.id}`}
-              aria-current={productIndex === 0 ? "location" : undefined}
+    <div class="project-board">
+      <p class="index-label">
+        <span class="index-title">
+          <span aria-hidden="true">//</span>
+          projects
+        </span>
+        <span class="count-label">CVEs</span>
+      </p>
+      <ol>
+        {products.map((product, productIndex) => (
+            <li>
+              <a
+                href={`#${product.id}`}
+                aria-current={productIndex === 0 ? "location" : undefined}
+              >
+                <span>{product.name}</span>
+                <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
+                  {product.findings.length.toString().padStart(2, "0")}
+                </span>
+              </a>
+            </li>
+          ))}
+      </ol>
+    </div>
+
+    <div class="project-board duplicate-nav-board">
+      <p class="index-label">
+        <span class="index-title">
+          <span aria-hidden="true">//</span>
+          duplicates
+        </span>
+        <span class="count-label">research notes</span>
+      </p>
+      <ol>
+        <li>
+          <a href={`#${duplicateProject.id}`}>
+            <span>{duplicateProject.name}</span>
+            <span
+              class="index-count"
+              aria-label={`${duplicateProject.findings.length} duplicate finding`}
             >
-              <span>{product.name}</span>
-              <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
-                {product.findings.length.toString().padStart(2, "0")}
-              </span>
-            </a>
-          </li>
-        ))}
-    </ol>
+              {duplicateProject.findings.length.toString().padStart(2, "0")}
+            </span>
+          </a>
+        </li>
+      </ol>
+    </div>
   </nav>
 
   <header class="page-heading">
@@ -328,18 +117,26 @@ const criticalCount = products
                   <article>
                     <div class="record-meta">
                       <code>{finding.id}</code>
-                      <span
-                        class="score"
-                        data-severity={finding.severity}
-                        title={`${finding.severity} severity`}
-                      >
-                        CVSS {finding.cvss} · {finding.score}
-                      </span>
+                      {finding.score && finding.cvss && finding.severity ? (
+                        <span
+                          class="score"
+                          data-severity={finding.severity}
+                          title={`${finding.severity} severity`}
+                        >
+                          CVSS {finding.cvss} · {finding.score}
+                        </span>
+                      ) : (
+                        <span class="score score-pending">CVSS pending</span>
+                      )}
                     </div>
                     <h3>{finding.title}</h3>
                     <p>{finding.summary}</p>
                     <footer class="record-footer">
-                      <time datetime={finding.published}>{finding.published}</time>
+                      {finding.published ? (
+                        <time datetime={finding.published}>{finding.published}</time>
+                      ) : (
+                        <span class="record-pending">publication pending</span>
+                      )}
                       <div class="record-links">
                         {finding.url ? (
                           <a
@@ -350,7 +147,9 @@ const criticalCount = products
                             CVE record <span aria-hidden="true">↗</span>
                           </a>
                         ) : (
-                          <span class="record-pending">ID pending</span>
+                          <span class="record-pending">
+                            {finding.id.includes("XXXX") ? "ID pending" : "CVE record pending"}
+                          </span>
                         )}
                         {finding.advisory && (
                           <a
@@ -369,36 +168,65 @@ const criticalCount = products
           </ol>
         </section>
       ))}
-  </div>
 
-  <aside class="duplicate-finding" aria-labelledby="redis-finding">
-    <p class="eyebrow"><span aria-hidden="true">//</span> duplicate finding</p>
-    <h2 id="redis-finding">Redis · CVE-2026-25243</h2>
-    <p>
-      I independently found the Redis Streams use-after-free behind this CVE,
-      but my report was marked as a duplicate. My exploit chain takes a
-      different route to remote code execution, so I documented it anyway.
-    </p>
-    <div class="duplicate-links">
-      <a href="/posts/redis-stream-pel-uaf">
-        Read the technical write-up <span aria-hidden="true">→</span>
-      </a>
-      <a
-        href={cveUrl("CVE-2026-25243")}
-        target="_blank"
-        rel="noopener noreferrer"
+    <div class="duplicate-board" aria-labelledby="duplicate-board-heading">
+      <header class="board-heading">
+        <h2 id="duplicate-board-heading">
+          <span aria-hidden="true">//</span>
+          duplicate findings
+        </h2>
+        <p>
+          Independently discovered vulnerabilities where another report arrived
+          first.
+        </p>
+      </header>
+
+      <section
+        id={duplicateProject.id}
+        class="product-group"
+        aria-labelledby={`${duplicateProject.id}-heading`}
+        style={`--group-index:${products.length}`}
       >
-        CVE record <span aria-hidden="true">↗</span>
-      </a>
-      <a
-        href="https://x.com/gegrgtezrze/status/2062320078280859820"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Original note <span aria-hidden="true">↗</span>
-      </a>
+        <header class="product-heading">
+          <h3 id={`${duplicateProject.id}-heading`}>{duplicateProject.name}</h3>
+          <p>{duplicateProject.context} · 1 finding</p>
+        </header>
+
+        <ol class="finding-list">
+          <li>
+            <article>
+              <div class="record-meta">
+                <code>{duplicateFinding.id}</code>
+              </div>
+              <h4>{duplicateFinding.title}</h4>
+              <p>{duplicateFinding.summary}</p>
+              <footer class="record-footer duplicate-footer">
+                <div class="record-links">
+                  <a href={duplicateFinding.writeup}>
+                    Technical write-up <span aria-hidden="true">→</span>
+                  </a>
+                  <a
+                    href={cveUrl(duplicateFinding.id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    CVE record <span aria-hidden="true">↗</span>
+                  </a>
+                  <a
+                    href={duplicateFinding.note}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Original note <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </footer>
+            </article>
+          </li>
+        </ol>
+      </section>
     </div>
-  </aside>
+  </div>
 
   <p class="score-note">
     Scores shown are CNA-provided base scores from the linked CVE records.
@@ -410,6 +238,12 @@ const criticalCount = products
     font-family: var(--font-mono);
     font-size: var(--step--1);
     letter-spacing: 0;
+
+    .project-board + .project-board {
+      margin-block-start: var(--space-m);
+      padding-block-start: var(--space-m);
+      border-block-start: 1px solid var(--border);
+    }
 
     .index-label {
       display: grid;
@@ -461,8 +295,30 @@ const criticalCount = products
     @media (width < 64rem) {
       display: flex;
       align-items: center;
-      gap: var(--space-s);
+      gap: var(--space-l);
       min-inline-size: 0;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .project-board {
+        display: flex;
+        flex: none;
+        align-items: center;
+        gap: var(--space-s);
+      }
+
+      .project-board + .project-board {
+        margin-block-start: 0;
+        padding-block-start: 0;
+        padding-inline-start: var(--space-l);
+        border-block-start: 0;
+        border-inline-start: 1px solid var(--border);
+      }
 
       .index-label {
         flex: none;
@@ -475,17 +331,9 @@ const criticalCount = products
       }
 
       ol {
-        min-inline-size: 0;
-        flex: 1;
+        flex: none;
         flex-direction: row;
         gap: var(--space-s);
-        overflow-x: auto;
-        overscroll-behavior-inline: contain;
-        scrollbar-width: none;
-
-        &::-webkit-scrollbar {
-          display: none;
-        }
       }
 
       li {
@@ -713,9 +561,14 @@ const criticalCount = products
       &[data-severity="medium"] {
         color: var(--muted-foreground);
       }
+
+      &.score-pending {
+        color: var(--muted-foreground);
+      }
     }
 
-    h3 {
+    h3,
+    h4 {
       margin-block-start: var(--space-2xs);
       font-size: var(--step-0);
       font-weight: var(--font-weight-medium);
@@ -733,6 +586,10 @@ const criticalCount = products
       gap: var(--space-s);
       margin-block-start: var(--space-xs);
       color: var(--muted-foreground);
+    }
+
+    .duplicate-footer {
+      justify-content: flex-end;
     }
 
     .record-links {
@@ -771,54 +628,37 @@ const criticalCount = products
     }
   }
 
-  .duplicate-finding {
-    position: relative;
-    margin-block-start: var(--space-xl);
-    padding: var(--space-m);
-    overflow: hidden;
-    background-color: color-mix(in oklab, var(--muted) 55%, transparent);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+  .duplicate-board {
+    padding-block-start: var(--space-l);
+    border-block-start: 1px solid var(--border);
 
-    &::before {
-      content: "";
-      position: absolute;
-      inset-block: 0;
-      inset-inline-start: 0;
-      inline-size: 0.2rem;
-      background-color: var(--accent);
+    .board-heading {
+      margin-block-end: var(--space-l);
+
+      h2 {
+        font-family: var(--font-mono);
+        font-size: var(--step-0);
+        font-weight: var(--font-weight-medium);
+        letter-spacing: 0;
+        color: var(--foreground);
+
+        span {
+          color: var(--accent);
+        }
+      }
+
+      p {
+        max-inline-size: 38rem;
+        margin-block-start: var(--space-3xs);
+        color: var(--muted-foreground);
+      }
     }
 
-    h2 {
-      margin-block-start: var(--space-2xs);
+    .product-heading h3 {
+      margin-block-start: 0;
       font-family: var(--font-mono);
       font-size: var(--step-1);
-      font-weight: var(--font-weight-medium);
       letter-spacing: 0;
-    }
-
-    > p:not(.eyebrow) {
-      max-inline-size: 37rem;
-      margin-block-start: var(--space-xs);
-      color: var(--prose-foreground);
-    }
-
-    .duplicate-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-s);
-      margin-block-start: var(--space-s);
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
-
-      a {
-        color: var(--foreground);
-      }
-
-      span {
-        color: var(--accent);
-      }
     }
   }
 
@@ -856,7 +696,6 @@ const criticalCount = products
   const projectNav = document.querySelector<HTMLElement>(".project-nav")
 
   if (projectNav) {
-    const projectList = projectNav.querySelector<HTMLOListElement>("ol")
     const mobile = matchMedia("(width < 64rem)")
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
     const links = new Map(
@@ -872,16 +711,16 @@ const criticalCount = products
       }
 
       const activeLink = links.get(id)
-      if (!mobile.matches || !projectList || !activeLink) return
+      if (!mobile.matches || !activeLink) return
 
-      const listBounds = projectList.getBoundingClientRect()
+      const listBounds = projectNav.getBoundingClientRect()
       const linkBounds = activeLink.getBoundingClientRect()
       if (
         linkBounds.left < listBounds.left ||
         linkBounds.right > listBounds.right
       ) {
-        projectList.scrollTo({
-          left: projectList.scrollLeft + linkBounds.left - listBounds.left - 12,
+        projectNav.scrollTo({
+          left: projectNav.scrollLeft + linkBounds.left - listBounds.left - 12,
           behavior: reducedMotion.matches ? "auto" : "smooth",
         })
       }
