@@ -1,0 +1,10 @@
+<script>
+  document.querySelectorAll<HTMLElement>(".siri-demo").forEach((demo) => {
+    const video = demo.querySelector("video")
+    if (!video) return
+    const hideToast = () => demo.setAttribute("data-started", "")
+    video.addEventListener("play", hideToast, { once: true })
+    video.addEventListener("seeking", hideToast, { once: true })
+    if (!video.paused || video.currentTime > 0) hideToast()
+  })
+</script>

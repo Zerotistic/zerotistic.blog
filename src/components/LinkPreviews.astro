@@ -1,0 +1,246 @@
+<dialog id="link-preview" aria-labelledby="link-preview-title">
+  <button class="preview-close" type="button" aria-label="Close link preview">×</button>
+  <img class="preview-image" alt="" hidden width="640" height="360" />
+  <div class="preview-copy">
+    <p class="preview-site"></p>
+    <h2 id="link-preview-title"></h2>
+    <p class="preview-description"></p>
+    <a class="preview-open" aria-label="Open previewed link"></a>
+  </div>
+</dialog>
+
+<script>
+  import type { LinkPreview } from "@/lib/link-previews"
+
+  const panel = document.querySelector<HTMLDialogElement>("#link-preview")!
+  const heading = panel.querySelector<HTMLElement>("h2")!
+  const description = panel.querySelector<HTMLElement>(".preview-description")!
+  const site = panel.querySelector<HTMLElement>(".preview-site")!
+  const image = panel.querySelector<HTMLImageElement>("img")!
+  const openLink = panel.querySelector<HTMLAnchorElement>(".preview-open")!
+  const touch = matchMedia("(hover: none), (pointer: coarse), (width < 40rem)")
+  let current: HTMLButtonElement | undefined
+  let hoverTimer: ReturnType<typeof setTimeout> | undefined
+  let closeTimer: ReturnType<typeof setTimeout> | undefined
+  let savedOverflow: string | undefined
+  let explicitOpen = false
+  let openedAt = 0
+
+  const cancelTimers = () => {
+    clearTimeout(hoverTimer)
+    clearTimeout(closeTimer)
+  }
+  const cleanup = () => {
+    current?.setAttribute("aria-expanded", "false")
+    if (savedOverflow !== undefined) {
+      document.documentElement.style.overflow = savedOverflow
+      savedOverflow = undefined
+    }
+    image.removeAttribute("src")
+  }
+  const hide = () => {
+    cancelTimers()
+    if (panel.open) panel.close()
+    cleanup()
+  }
+  panel.addEventListener("close", () => {
+    if (!panel.open) cleanup()
+  })
+  panel.querySelector("button")!.addEventListener("click", hide)
+  panel.addEventListener("click", (event) => {
+    if (event.target !== panel) return
+    const rect = panel.getBoundingClientRect()
+    if (event.clientY < rect.top || event.clientX < rect.left || event.clientX > rect.right) hide()
+  })
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && panel.open) {
+      event.preventDefault()
+      const returnFocus = panel.contains(document.activeElement)
+      hide()
+      if (returnFocus) current?.focus()
+    }
+  })
+  document.addEventListener("pointerdown", (event) => {
+    if (!touch.matches && panel.open && !panel.contains(event.target as Node) && event.target !== current) hide()
+  })
+  const scheduleClose = () => {
+    clearTimeout(hoverTimer)
+    if (!touch.matches && !panel.contains(document.activeElement)) closeTimer = setTimeout(hide, 180)
+  }
+  panel.addEventListener("pointerenter", cancelTimers)
+  panel.addEventListener("pointerleave", scheduleClose)
+  panel.addEventListener("focusout", () => {
+    setTimeout(() => {
+      if (panel.open && explicitOpen && !touch.matches && !panel.contains(document.activeElement) && document.activeElement !== current) hide()
+    }, 0)
+  })
+  addEventListener("scroll", () => {
+    if (panel.open && !touch.matches && performance.now() - openedAt > 150 && !panel.contains(document.activeElement)) hide()
+  }, { passive: true })
+  addEventListener("resize", hide)
+  touch.addEventListener("change", hide)
+
+  const show = (anchor: HTMLAnchorElement, button: HTMLButtonElement, data: LinkPreview, explicit: boolean) => {
+    hide()
+    current = button
+    explicitOpen = explicit
+    panel.dataset.hover = String(!explicit && !touch.matches)
+    openedAt = performance.now()
+    heading.textContent = data.title
+    description.textContent = data.description ?? ""
+    description.hidden = !data.description
+    const url = new URL(anchor.href)
+    site.textContent = url.host === location.host ? "zerotistic.blog" : url.hostname.replace(/^www\./, "")
+    openLink.href = anchor.href
+    openLink.setAttribute("aria-label", `Open ${data.title}`)
+    openLink.target = anchor.target
+    openLink.rel = "noopener noreferrer"
+    // Images are build assets or cached copies, never third-party hover requests.
+    image.hidden = !data.image
+    if (data.image) image.src = data.image
+    image.onerror = () => { image.hidden = true }
+    button.setAttribute("aria-expanded", "true")
+    if (touch.matches) {
+      panel.showModal()
+      savedOverflow = document.documentElement.style.overflow
+      document.documentElement.style.overflow = "hidden"
+    } else {
+      const focus = document.activeElement as HTMLElement | null
+      panel.show()
+      const rect = anchor.getBoundingClientRect()
+      const height = panel.getBoundingClientRect().height
+      const width = panel.getBoundingClientRect().width
+      panel.style.left = `${Math.max(12, Math.min(rect.left, innerWidth - width - 12))}px`
+      panel.style.top = `${Math.max(12, rect.bottom + height + 12 < innerHeight ? rect.bottom + 10 : rect.top - height - 10)}px`
+      if (!explicit) {
+        if (focus && focus !== document.body) focus.focus({ preventScroll: true })
+        else (document.activeElement as HTMLElement | null)?.blur()
+      }
+    }
+  }
+
+  openLink.addEventListener("click", hide)
+
+  document.querySelectorAll<HTMLElement>("article[data-link-previews]").forEach((article) => {
+    const previews: Record<string, LinkPreview> = JSON.parse(article.dataset.linkPreviews || "{}")
+    article.querySelectorAll<HTMLAnchorElement>("prose-content a[href]").forEach((anchor) => {
+      const href = anchor.getAttribute("href")!
+      if (href.startsWith("#") || anchor.closest(".footnotes, pre, code, h1, h2, h3, h4, h5, h6") || anchor.querySelector("img") || anchor.hasAttribute("data-footnote-ref")) return
+      const url = new URL(anchor.href)
+      if (!["http:", "https:"].includes(url.protocol)) return
+      url.hash = ""
+      url.pathname = url.pathname.replace(/\/$/, "") || "/"
+      const key = [location.origin, "https://zerotistic.blog"].includes(url.origin) ? url.pathname + url.search : url.href
+      const data = previews[key]
+      if (!data?.title) return
+      const button = document.createElement("button")
+      button.type = "button"
+      button.className = "link-preview-trigger"
+      button.setAttribute("aria-label", `Preview: ${anchor.textContent?.trim() || data.title}`)
+      button.setAttribute("aria-haspopup", "dialog")
+      button.setAttribute("aria-expanded", "false")
+      button.setAttribute("aria-controls", "link-preview")
+      button.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5 6h6M5 9h4"/></svg>'
+      anchor.after(button)
+      button.addEventListener("click", () => {
+        if (current === button && panel.open) hide()
+        else show(anchor, button, data, true)
+      })
+      for (const element of [anchor, button]) {
+        element.addEventListener("pointerenter", (event) => {
+          if (touch.matches || !(event instanceof PointerEvent) || event.pointerType !== "mouse") return
+          cancelTimers()
+          if (current === button && panel.open) return
+          hoverTimer = setTimeout(() => show(anchor, button, data, false), 500)
+        })
+        element.addEventListener("pointerleave", scheduleClose)
+      }
+    })
+  })
+</script>
+
+<style is:global>
+  .link-preview-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.15em;
+    width: 1.2em;
+    height: 1.2em;
+    margin-inline: 0.1em;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    font-size: inherit;
+
+    svg { width: 0.8em; height: 0.8em; fill: none; stroke: currentColor; stroke-width: 1.2; }
+    &:hover, &[aria-expanded="true"] { color: var(--foreground); background: var(--muted); }
+  }
+
+  #link-preview {
+    position: fixed;
+    z-index: 100;
+    inset: auto;
+    margin: 0;
+    padding: 0;
+    width: min(360px, calc(100vw - 24px));
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--background);
+    color: var(--foreground);
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+
+    .preview-close {
+      position: absolute;
+      z-index: 1;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 23px;
+      cursor: pointer;
+    }
+
+    .preview-image { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+    [hidden] { display: none; }
+    .preview-copy { padding: 20px; }
+    .preview-site { margin: 0 28px 8px 0; color: var(--muted-foreground); font-family: var(--font-mono); font-size: 11px; overflow-wrap: anywhere; }
+    h2 { margin: 0 0 10px; font-size: 18px; font-weight: 550; line-height: 1.3; }
+    .preview-description { margin: 0; font-size: 14px; color: var(--muted-foreground); }
+    .preview-open {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      cursor: pointer;
+    }
+    &[data-hover="true"] .preview-close { display: none; }
+    &[data-hover="true"] .preview-site { margin-inline-end: 0; }
+
+    &::backdrop { background: rgb(0 0 0 / 0.4); }
+  }
+
+  @media (hover: none), (pointer: coarse), (width < 40rem) {
+    .link-preview-trigger { width: 24px; height: 24px; }
+    #link-preview {
+      inset: auto 0 0 !important;
+      width: 100%;
+      max-height: 80dvh;
+      border-radius: 16px 16px 0 0;
+      padding-bottom: env(safe-area-inset-bottom);
+      .preview-copy { padding: 24px; }
+      .preview-close { width: 40px; height: 40px; }
+    }
+  }
+</style>

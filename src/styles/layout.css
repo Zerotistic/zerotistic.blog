@@ -62,4 +62,8 @@ html {
       --bar-toc-height: calc(1.5 * var(--step--1) + 2 * var(--space-2xs) + 2px);
     }
   }
+
+  @media (width < 30rem) {
+    --bar-nav-height: calc(3.5rem + 2 * var(--space-2xs) + 8px);
+  }
 }

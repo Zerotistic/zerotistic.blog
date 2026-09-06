@@ -1,0 +1,22 @@
+<script>
+  const clocks = document.querySelectorAll(".siri-phone-clock text")
+  if (clocks.length) {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const update = () => {
+      clearTimeout(timer)
+      if (document.hidden) return
+      const now = new Date()
+      const time = new Intl.DateTimeFormat(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      }).format(now)
+      for (const clock of clocks) clock.textContent = time
+      timer = setTimeout(update, 60_000 - (now.getTime() % 60_000))
+    }
+    document.addEventListener("visibilitychange", update)
+    window.addEventListener("pageshow", update)
+    window.addEventListener("pagehide", () => clearTimeout(timer))
+    update()
+  }
+</script>

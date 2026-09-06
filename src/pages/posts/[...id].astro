@@ -1,5 +1,7 @@
 ---
 import MetaPost from "@/components/MetaPost.astro"
+import LinkPreviews from "@/components/LinkPreviews.astro"
+import { postLinkPreviews } from "@/lib/link-previews"
 import PostActions from "@/components/PostActions.astro"
 import ScrollToTop from "@/components/ScrollToTop.astro"
 import SeriesReader from "@/components/SeriesReader.astro"
@@ -42,6 +44,7 @@ const rendered = await Promise.all(
     entry,
     ...(await render(entry)),
     authors: await getEntries(entry.data.authors),
+    linkPreviews: await postLinkPreviews(entry),
   })),
 )
 
@@ -86,15 +89,18 @@ if (chain.length > 1) {
     )}
   <PostActions slot="actions" prev={prev} next={next} />
   <ScrollToTop floating />
-  {rendered.map(({ entry, Content, authors }, i) => (
+  <LinkPreviews />
+  {rendered.map(({ entry, Content, authors, linkPreviews }, i) => (
       <article
         id={i === 0 ? undefined : subpostSlug(entry.id)}
         data-url={`/posts/${entry.id}`}
         data-title={pageTitle(entry.data.title)}
+        data-link-previews={JSON.stringify(linkPreviews)}
         data-embedded={i > 0 || undefined}
       >
         <header>
           <h1 set:html={titleHtml(entry.data.title)} />
+          <p>{entry.data.description}</p>
           <post-meta>
             {authors.length > 0 && (
               <post-authors>
@@ -119,6 +125,7 @@ if (chain.length > 1) {
               >{formatDate(entry.data.date)}</time
             >
             <reading-time>{readingTime(entry.body ?? "")}</reading-time>
+          </post-meta>
             {entry.data.tags && (
               <post-tags>
                 {entry.data.tags.map((tag) => (
@@ -126,8 +133,6 @@ if (chain.length > 1) {
                 ))}
               </post-tags>
             )}
-          </post-meta>
-          <p>{entry.data.description}</p>
           {entry.data.facts && (
             <dl class="fact-table">
               {entry.data.facts.event && (
@@ -177,11 +182,11 @@ if (chain.length > 1) {
   }
 
   header {
-    margin-block-end: var(--space-m);
+    margin-block-end: var(--space-xl);
 
     h1 {
-      font-size: var(--step-3);
-      line-height: calc(var(--leading-offset) + 1em);
+      font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem);
+      line-height: 1.18;
       font-weight: var(--font-weight-medium);
     }
 
@@ -191,8 +196,8 @@ if (chain.length > 1) {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(--space-3xs);
-      margin-block-start: var(--space-3xs);
+      gap: 0.4em 0.6em;
+      margin-block-start: var(--space-m);
       font-family: var(--font-mono);
       font-size: var(--step--1);
       letter-spacing: 0;
@@ -233,60 +238,65 @@ if (chain.length > 1) {
         margin-inline-end: var(--space-3xs);
       }
 
-      post-tags {
-        --underline: transparent;
-
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-3xs);
-
-        a {
-          color: var(--muted-foreground);
-
-          &:hover {
-            color: var(--foreground);
-          }
-        }
-      }
-
-      reading-time ~ post-tags::before {
-        content: "·";
-      }
-
       a {
         color: var(--foreground);
       }
     }
 
-    > p {
-      margin-block-start: var(--space-2xs);
+    > post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em 0.85em;
+      margin-block-start: var(--space-xs);
+      font-family: var(--font-mono);
       font-size: var(--step--1);
+      color: var(--muted-foreground);
+
+      a:hover {
+        color: var(--foreground);
+      }
+    }
+
+    > p {
+      margin-block-start: var(--space-s);
+      font-size: var(--step-0);
+      line-height: 1.6;
       color: var(--muted-foreground);
     }
 
     .fact-table {
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: var(--space-3xs) var(--space-m);
-      margin-block-start: var(--space-s);
-      padding: var(--space-xs) var(--space-s);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-m);
+      margin-block-start: var(--space-m);
+      padding-block-start: var(--space-m);
       font-size: var(--step--1);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      border-block-start: 1px solid var(--border);
+
+      @media (width < 40rem) {
+        grid-template-columns: 1fr;
+        gap: var(--space-s);
+      }
 
       .fact-row {
-        display: contents;
+        display: grid;
+        align-content: start;
+        gap: 0.45em;
+        min-width: 0;
       }
 
       dt {
         font-family: var(--font-mono);
-        letter-spacing: 0;
         color: var(--muted-foreground);
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
       }
 
       dd {
         color: var(--foreground);
         text-wrap: pretty;
+        overflow-wrap: anywhere;
       }
     }
   }

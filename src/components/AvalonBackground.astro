@@ -1,0 +1,46 @@
+<!-- Decorative landscape for wide desktop margins. -->
+<div class="avalon-background" aria-hidden="true"></div>
+
+<style is:global>
+  .avalon-background {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .avalon-background {
+      display: block;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("/static/avalon-landscape.webp");
+      background-size: cover;
+      background-position: center bottom;
+      opacity: 0.38;
+      mask-image: linear-gradient(
+        to right,
+        #000,
+        #000 calc(50% - 38rem),
+        transparent calc(50% - 25rem),
+        transparent calc(50% + 25rem),
+        #000 calc(50% + 38rem),
+        #000
+      );
+    }
+
+    :root[data-theme="dark"] .avalon-background {
+      background-image:
+        linear-gradient(to bottom, #111110 0%, rgb(17 17 16 / 0.85) 30%, transparent 65%),
+        url("/static/avalon-landscape-dusk.webp");
+      opacity: 0.65;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) .avalon-background {
+        background-image:
+          linear-gradient(to bottom, #111110 0%, rgb(17 17 16 / 0.85) 30%, transparent 65%),
+          url("/static/avalon-landscape-dusk.webp");
+        opacity: 0.65;
+      }
+    }
+  }
+</style>

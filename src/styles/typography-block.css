@@ -31,6 +31,8 @@ prose-content {
 
   /* Captions: the italic line immediately following an image. */
   p > img:only-child + em,
+  p > .image-enlarge:only-child + em,
+  p:has(> .image-enlarge:only-child) + p > em:only-child,
   p:has(> img:only-child) + p > em:only-child {
     display: block;
     margin-block-start: var(--space-2xs);
@@ -38,6 +40,81 @@ prose-content {
     font-style: normal;
     text-align: center;
     color: var(--muted-foreground);
+  }
+
+  .siri-phone-illustration {
+    position: relative;
+    width: min(100%, 560px);
+    margin: 0 auto 1em;
+
+    > p {
+      margin: 0;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .siri-phone-clock {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  }
+
+  .siri-phone-illustration img {
+    outline: none;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .siri-demo {
+    position: relative;
+    margin: 1.5em 0;
+    overflow: hidden;
+    border: 1px solid #383b42;
+    border-radius: 0;
+    background: #08090a;
+
+    video {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      border-radius: 0;
+      outline: none;
+      background: #08090a;
+    }
+
+    > p {
+      position: absolute;
+      inset: 8px 8px auto auto;
+      width: 46%;
+      max-width: 300px;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        border-radius: 0;
+        outline: none;
+      }
+    }
+
+    &[data-started] > p {
+      display: none;
+    }
   }
 
   figure.diagram {

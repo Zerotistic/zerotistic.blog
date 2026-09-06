@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "@/components/ThemeToggle.astro"
+import Artoria from "@/components/Artoria.astro"
 import { NAVIGATION, SITE } from "@/consts"
 import { normalizePath } from "@/lib/utils"
 
@@ -58,6 +59,7 @@ const section = NAVIGATION.find(
             ))}
       </ul>
     </nav>
+    <Artoria placement="sidebar" />
   </sidebar-inner>
   <sidebar-toggle>
     <ThemeToggle />
@@ -120,9 +122,19 @@ const section = NAVIGATION.find(
 
     @media (width < 64rem) {
       flex: 1;
+      min-width: 0;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
+    }
+
+    @media (width < 30rem) {
+      flex-wrap: wrap;
+      row-gap: 6px;
+
+      nav {
+        flex-basis: 100%;
+      }
     }
   }
 
@@ -187,12 +199,17 @@ const section = NAVIGATION.find(
 
   sidebar-toggle {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     margin-inline-start: -0.5rem;
 
     @media (width < 64rem) {
       margin-inline-start: 0;
       margin-inline-end: -0.5rem;
+    }
+
+    @media (width < 30rem) {
+      align-self: flex-start;
     }
   }
 

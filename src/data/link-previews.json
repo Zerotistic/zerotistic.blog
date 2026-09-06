@@ -1,0 +1,402 @@
+{
+  "https://api.binary.ninja/": {
+    "title": "Binary Ninja Python API Reference — Binary Ninja API Documentation v6.0.10601",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:16.418Z"
+  },
+  "https://binary.ninja/2023/09/15/3.5-expanded-universe.html": {
+    "title": "Binary Ninja - 3.5: Expanded Universe",
+    "description": "Binary Ninja is a modern reverse engineering platform with a scriptable and extensible decompiler.",
+    "fetchedAt": "2026-09-06T13:33:15.834Z",
+    "image": "/link-previews/60f26ba8bee92cd58e57.webp"
+  },
+  "https://binary.ninja/purchase/": {
+    "title": "Binary Ninja - Purchase",
+    "description": "Compare different editions and purchase",
+    "fetchedAt": "2026-09-06T13:33:14.457Z",
+    "image": "/link-previews/d0d8123b119ee1a6a28f.webp"
+  },
+  "https://blog.es3n1n.eu/": {
+    "title": "es3n1n's blog",
+    "description": "description? uhh it's a blog",
+    "fetchedAt": "2026-09-06T13:33:06.009Z"
+  },
+  "https://blog.trailofbits.com/2017/01/31/breaking-down-binary-ninjas-low-level-il/": {
+    "title": "Breaking Down Binary Ninja’s Low Level IL",
+    "description": "Hi, I’m Josh. I recently joined the team at Trail of Bits, and I’ve been an evangelist and plugin writer for the Binary Ninja reversing platform for a while now. I’ve developed plugins that make reversing easier and extended Binary Ninja’s architecture support to assist in playing the microcorruption CTF. One of my favorite features of […]",
+    "fetchedAt": "2026-09-06T13:33:16.976Z",
+    "image": "/link-previews/8b19cd40c33531494df2.webp"
+  },
+  "https://cloud.binary.ninja/": {
+    "title": "Binary Ninja Cloud",
+    "description": "Binary Ninja Cloud is a completely free, online, collaborative reverse engineering suite, which uses Binary Ninja for analysis.",
+    "fetchedAt": "2026-09-06T13:33:16.584Z",
+    "image": "/link-previews/4a1dbef7b200933c9954.webp"
+  },
+  "https://cwe.mitre.org/data/definitions/416.html": {
+    "title": "CWE - CWE-416: Use After Free (4.20)",
+    "description": "Common Weakness Enumeration (CWE) is a list of software weaknesses.",
+    "fetchedAt": "2026-09-06T13:33:06.065Z"
+  },
+  "https://docs.binary.ninja/dev/annotation.html": {
+    "title": "Applying Annotations - Binary Ninja User Documentation",
+    "description": "Documentation for the Binary Ninja reverse engineering platform",
+    "fetchedAt": "2026-09-06T13:33:17.670Z"
+  },
+  "https://docs.binary.ninja/dev/bnil-llil.html": {
+    "title": "Binary Ninja Intermediate Language: Low Level IL - Binary Ninja User Documentation",
+    "description": "Documentation for the Binary Ninja reverse engineering platform",
+    "fetchedAt": "2026-09-06T13:33:17.285Z"
+  },
+  "https://docs.binary.ninja/dev/bnil-mlil.html": {
+    "title": "Binary Ninja Intermediate Language: Medium Level IL - Binary Ninja User Documentation",
+    "description": "Documentation for the Binary Ninja reverse engineering platform",
+    "fetchedAt": "2026-09-06T13:33:17.619Z"
+  },
+  "https://dogbolt.org/?id=09dde774-c7e0-4fe2-9c28-1d5f5a8415d4": {
+    "title": "Decompiler Explorer",
+    "description": "Decompiler Explorer is an interactive online decompiler which shows equivalent C-like output of decompiled programs from many popular decompilers.",
+    "fetchedAt": "2026-09-06T13:33:12.581Z",
+    "image": "/link-previews/e47e517d2c7479e04b75.webp"
+  },
+  "https://dogbolt.org/?id=0ee7568b-fc4d-46c7-a914-194613527a8e": {
+    "title": "Decompiler Explorer",
+    "description": "Decompiler Explorer is an interactive online decompiler which shows equivalent C-like output of decompiled programs from many popular decompilers.",
+    "fetchedAt": "2026-09-06T13:33:12.635Z",
+    "image": "/link-previews/f8e1367bc62ec9a82d4e.webp"
+  },
+  "https://dogbolt.org/?id=902d28e4-e90a-4d1e-a7e6-f15ab6c6f32e": {
+    "title": "Decompiler Explorer",
+    "description": "Decompiler Explorer is an interactive online decompiler which shows equivalent C-like output of decompiled programs from many popular decompilers.",
+    "fetchedAt": "2026-09-06T13:33:12.546Z",
+    "image": "/link-previews/7566a3ce7aed341090f9.webp"
+  },
+  "https://eyalitkin.wordpress.com/2018/02/02/elf-caves-hiding-in-the-corner/": {
+    "title": "ELF caves: hiding in the corner",
+    "description": "During exploitation of ELF binaries, it is quite common that one needs to find a writable memory region: a writable “cave”. In this post I’ll present two generic techniques to fin…",
+    "fetchedAt": "2026-09-06T13:33:08.197Z"
+  },
+  "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/fs/binfmt_elf.c?id=dd3210c47e8d3ac6b4e9141fc68acc03b38c0ba3": {
+    "title": "binfmt_elf.c « fs - kernel/git/torvalds/linux.git - Linux kernel source tree",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:07.691Z"
+  },
+  "https://github.com/0xb0bb/0CD": {
+    "title": "GitHub - 0xb0bb/0CD: BinaryNinja plugin to introduce some quality of life utilities for obsessive compulsive CTF enthusiasts",
+    "description": "BinaryNinja plugin to introduce some quality of life utilities for obsessive compulsive CTF enthusiasts - 0xb0bb/0CD",
+    "fetchedAt": "2026-09-06T13:33:17.003Z"
+  },
+  "https://github.com/applidium/Cracking-Siri": {
+    "title": "GitHub - applidium/Cracking-Siri: Files we used to reverse-engineer Siri",
+    "description": "Files we used to reverse-engineer Siri. Contribute to applidium/Cracking-Siri development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:01.208Z",
+    "image": "/link-previews/c0fe6cd87bac962a1b40.webp"
+  },
+  "https://github.com/binsync/binsync": {
+    "title": "GitHub - binsync/binsync: A reversing plugin for cross-decompiler collaboration, built on git.",
+    "description": "A reversing plugin for cross-decompiler collaboration, built on git. - binsync/binsync",
+    "fetchedAt": "2026-09-06T13:33:16.552Z",
+    "image": "/link-previews/33072737ca8787463d8e.webp"
+  },
+  "https://github.com/blacktop/ipsw": {
+    "title": "GitHub - blacktop/ipsw: iOS/macOS Research Swiss Army Knife",
+    "description": "iOS/macOS Research Swiss Army Knife. Contribute to blacktop/ipsw development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:01.339Z",
+    "image": "/link-previews/fa2c7f9b4c08add1cb2d.webp"
+  },
+  "https://github.com/caprinux/rel-fuscate": {
+    "title": "GitHub - caprinux/rel-fuscate: A novel obfuscation technique for ELF programs by abusing symbol resolution metadata to break disassembly output",
+    "description": "A novel obfuscation technique for ELF programs by abusing symbol resolution metadata to break disassembly output - caprinux/rel-fuscate",
+    "fetchedAt": "2026-09-06T13:33:08.725Z",
+    "image": "/link-previews/d347a5c5f5eacc85953c.webp"
+  },
+  "https://github.com/gaasedelen/lighthouse": {
+    "title": "GitHub - gaasedelen/lighthouse: A Coverage Explorer for Reverse Engineers",
+    "description": "A Coverage Explorer for Reverse Engineers. Contribute to gaasedelen/lighthouse development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:15.617Z",
+    "image": "/link-previews/62c484699428e7db298a.webp"
+  },
+  "https://github.com/galenbwill/binaryninja-m68k": {
+    "title": "GitHub - galenbwill/binaryninja-m68k: Motorola 68k architecture support for binary ninja",
+    "description": "Motorola 68k architecture support for binary ninja - galenbwill/binaryninja-m68k",
+    "fetchedAt": "2026-09-06T13:33:14.653Z"
+  },
+  "https://github.com/getredash/redash/issues/5426": {
+    "title": "LDAP Injection · Issue #5426 · getredash/redash",
+    "description": "I've tried to contact the security team through security@redash.io but had no response. I'm attaching the CVE contents for a proper fix. Suggested description Redash 8.0.0 is affected by LDAP Injec...",
+    "fetchedAt": "2026-09-06T13:33:13.531Z",
+    "image": "/link-previews/f1755e0f6f0c21a44fad.webp"
+  },
+  "https://github.com/github/codeql/pull/5443/files": {
+    "title": "Python: Add LDAP Injection query by jorgectf · Pull Request #5443 · github/codeql",
+    "description": "Any suggestions/tricks to improve the query or workarounds (to learn), no matter how minimal they are, are massively appreciated.",
+    "fetchedAt": "2026-09-06T13:33:14.171Z",
+    "image": "/link-previews/f1fee6e396a2922d5c55.webp"
+  },
+  "https://github.com/hacksysteam/gdb-cross-compiler/releases": {
+    "title": "Releases · hacksysteam/gdb-cross-compiler",
+    "description": "Compiled GDB for various distributions and architectures - hacksysteam/gdb-cross-compiler",
+    "fetchedAt": "2026-09-06T13:33:02.079Z",
+    "image": "/link-previews/5186a41cc24480bc378a.webp"
+  },
+  "https://github.com/JJTech0130/pypush/blob/6336bba82697b838497ffd774f23e5640c877a85/apns.py": {
+    "title": "pypush/apns.py at 6336bba82697b838497ffd774f23e5640c877a85 · JJTech0130/pypush",
+    "description": "Python APNs and iMessage client. Contribute to JJTech0130/pypush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:07.266Z",
+    "image": "/link-previews/008829f5bf6a5a4801c7.webp"
+  },
+  "https://github.com/JJTech0130/pypush/blob/6336bba82697b838497ffd774f23e5640c877a85/generatenac.py": {
+    "title": "pypush/generatenac.py at 6336bba82697b838497ffd774f23e5640c877a85 · JJTech0130/pypush",
+    "description": "Python APNs and iMessage client. Contribute to JJTech0130/pypush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:06.740Z",
+    "image": "/link-previews/a70be45a59697c94fb38.webp"
+  },
+  "https://github.com/JJTech0130/pypush/blob/6336bba82697b838497ffd774f23e5640c877a85/ids/signing.py": {
+    "title": "pypush/ids/signing.py at 6336bba82697b838497ffd774f23e5640c877a85 · JJTech0130/pypush",
+    "description": "Python APNs and iMessage client. Contribute to JJTech0130/pypush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:07.243Z",
+    "image": "/link-previews/d77b5ce00e5f731febd8.webp"
+  },
+  "https://github.com/JJTech0130/pypush/tree/6336bba82697b838497ffd774f23e5640c877a85": {
+    "title": "GitHub - JJTech0130/pypush at 6336bba82697b838497ffd774f23e5640c877a85",
+    "description": "Python APNs and iMessage client. Contribute to JJTech0130/pypush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:06.584Z",
+    "image": "/link-previews/9b4162df1c14f249b610.webp"
+  },
+  "https://github.com/joshwatson/binaryninja-msp430": {
+    "title": "GitHub - joshwatson/binaryninja-msp430: msp430 Architecture plugin for Binary Ninja",
+    "description": "msp430 Architecture plugin for Binary Ninja. Contribute to joshwatson/binaryninja-msp430 development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:15.231Z",
+    "image": "/link-previews/a52a0128edcfa87cbfce.webp"
+  },
+  "https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/account.py": {
+    "title": "FindMy.py/findmy/reports/account.py at v0.10.1 · malmeloo/FindMy.py",
+    "description": "🍏 + 🎯 + 🐍 = Query Apple's FindMy Network with Python! - malmeloo/FindMy.py",
+    "fetchedAt": "2026-09-06T13:33:06.269Z"
+  },
+  "https://github.com/malmeloo/FindMy.py/blob/v0.10.1/findmy/reports/anisette.py": {
+    "title": "FindMy.py/findmy/reports/anisette.py at v0.10.1 · malmeloo/FindMy.py",
+    "description": "🍏 + 🎯 + 🐍 = Query Apple's FindMy Network with Python! - malmeloo/FindMy.py",
+    "fetchedAt": "2026-09-06T13:33:06.158Z"
+  },
+  "https://github.com/peding/relobfuscate": {
+    "title": "GitHub - peding/relobfuscate: ELF Binary Obfuscation Using Relocation",
+    "description": "ELF Binary Obfuscation Using Relocation. Contribute to peding/relobfuscate development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:09.824Z",
+    "image": "/link-previews/7c24ff143a88d7ab8879.webp"
+  },
+  "https://github.com/ptitSeb/box64/issues/3516": {
+    "title": "ELF loader SIGSEGV on 64KB page size systems: fread into read-only mapped page when LOAD segments share a host page · Issue #3516 · ptitSeb/box64",
+    "description": "Description On systems with 64KB page size (e.g., PPC64LE with Fedora, or ARM64 with 64KB page kernels), the ELF loader in src/elfs/elfloader.c crashes with SIGSEGV when loading x86-64 ELF binaries...",
+    "fetchedAt": "2026-09-06T13:33:10.250Z",
+    "image": "/link-previews/fc7fb770be9d3c001c79.webp"
+  },
+  "https://github.com/redis/redis/blob/unstable/src/rdb.c": {
+    "title": "redis/src/rdb.c at unstable · redis/redis",
+    "description": "For developers, who are building real-time data-driven applications, Redis is the preferred, fastest, and most feature-rich cache, data structure server, and document and vector query engine. - red...",
+    "fetchedAt": "2026-09-06T13:33:04.880Z",
+    "image": "/link-previews/4022d2a365420243679b.webp"
+  },
+  "https://github.com/redis/redis/blob/unstable/src/stream.h": {
+    "title": "redis/src/stream.h at unstable · redis/redis",
+    "description": "For developers, who are building real-time data-driven applications, Redis is the preferred, fastest, and most feature-rich cache, data structure server, and document and vector query engine. - red...",
+    "fetchedAt": "2026-09-06T13:33:05.407Z",
+    "image": "/link-previews/6961dc87dc40bcd159d9.webp"
+  },
+  "https://github.com/redis/redis/blob/unstable/src/t_stream.c": {
+    "title": "redis/src/t_stream.c at unstable · redis/redis",
+    "description": "For developers, who are building real-time data-driven applications, Redis is the preferred, fastest, and most feature-rich cache, data structure server, and document and vector query engine. - red...",
+    "fetchedAt": "2026-09-06T13:33:05.374Z",
+    "image": "/link-previews/d55233820ea9f4bf487b.webp"
+  },
+  "https://github.com/redis/redis/commit/cecdc9987": {
+    "title": "Optimize Redis XREADGROUP CLAIM (#14726) · redis/redis@cecdc99",
+    "description": "## Overview This PR optimizes Redis Streams consumer group performance by replacing the `pel_by_time` rax tree with a doubly-linked list, delivering significant performance improvements for NACK up...",
+    "fetchedAt": "2026-09-06T13:33:04.436Z",
+    "image": "/link-previews/521e026ed4c4098698c5.webp"
+  },
+  "https://github.com/redis/redis/pull/15081": {
+    "title": "Reject corrupt stream RDB with shared NACK across consumers by sggeorgiev · Pull Request #15081 · redis/redis",
+    "description": "Summary Detects and rejects corrupt stream RDB payloads where the same NACK (pending entry) is referenced by more than one consumer, which violates a stream data-structure. Changes rdbLoadObject (...",
+    "fetchedAt": "2026-09-06T13:33:03.229Z",
+    "image": "/link-previews/8bd10cae6b6f616ada21.webp"
+  },
+  "https://github.com/secretsquirrel/the-backdoor-factory": {
+    "title": "GitHub - secretsquirrel/the-backdoor-factory: Patch PE, ELF, Mach-O binaries with shellcode new version in development, available only to sponsors",
+    "description": "Patch PE, ELF, Mach-O binaries with shellcode new version in development, available only to sponsors - secretsquirrel/the-backdoor-factory",
+    "fetchedAt": "2026-09-06T13:33:08.743Z",
+    "image": "/link-previews/a9a7cb1504b8e9b7ee61.webp"
+  },
+  "https://github.com/stek29/rustpush/blob/82dc6f8342176e4f9171b62354cbdd13eaa18b38/src/findmy.rs": {
+    "title": "rustpush/src/findmy.rs at 82dc6f8342176e4f9171b62354cbdd13eaa18b38 · stek29/rustpush",
+    "description": "Contribute to stek29/rustpush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:07.672Z",
+    "image": "/link-previews/094ff6b2d6d5a4fc1fac.webp"
+  },
+  "https://github.com/stek29/rustpush/blob/82dc6f8342176e4f9171b62354cbdd13eaa18b38/src/ids/user.rs": {
+    "title": "rustpush/src/ids/user.rs at 82dc6f8342176e4f9171b62354cbdd13eaa18b38 · stek29/rustpush",
+    "description": "Contribute to stek29/rustpush development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:07.811Z",
+    "image": "/link-previews/d104c9586d071e0fed6f.webp"
+  },
+  "https://github.com/tizmd/binja-v850": {
+    "title": "GitHub - tizmd/binja-v850: Renesas V850/RH850 Architecture plugin for Binary Ninja",
+    "description": "Renesas V850/RH850 Architecture plugin for Binary Ninja - tizmd/binja-v850",
+    "fetchedAt": "2026-09-06T13:33:15.337Z",
+    "image": "/link-previews/0d1d10e938c816914e7f.webp"
+  },
+  "https://github.com/Trigleos/ELFREVGO": {
+    "title": "GitHub - Trigleos/ELFREVGO: Anti-analysis tool that obfuscates ELF files",
+    "description": "Anti-analysis tool that obfuscates ELF files. Contribute to Trigleos/ELFREVGO development by creating an account on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:09.273Z",
+    "image": "/link-previews/942baecd4fd69c038189.webp"
+  },
+  "https://github.com/Vector35/": {
+    "title": "VECTOR 35",
+    "description": "VECTOR 35 has 93 repositories available. Follow their code on GitHub.",
+    "fetchedAt": "2026-09-06T13:33:14.059Z",
+    "image": "/link-previews/5ad19b68cefc4c160437.webp"
+  },
+  "https://github.com/Vector35/community-plugins/": {
+    "title": "GitHub - Vector35/community-plugins: Repository for community provided Binary Ninja plugins",
+    "description": "Repository for community provided Binary Ninja plugins - Vector35/community-plugins",
+    "fetchedAt": "2026-09-06T13:33:14.328Z",
+    "image": "/link-previews/dfec06bc02104663adff.webp"
+  },
+  "https://github.com/whitequark/binja-m16c": {
+    "title": "GitHub - whitequark/binja-m16c: Binary Ninja plugin for the Renesas M16C architecture",
+    "description": "Binary Ninja plugin for the Renesas M16C architecture - whitequark/binja-m16c",
+    "fetchedAt": "2026-09-06T13:33:15.010Z",
+    "image": "/link-previews/eb5f4d939c832fe0bf87.webp"
+  },
+  "https://maikypedia.gitlab.io/posts/finding-vulns-with-mrva-codeql/": {
+    "title": "Finding Vulnerabilities with MRVA CodeQL",
+    "description": "Finding Vulnerabilities with MRVA CodeQL [*] INDEX: What is MRVA? MRVA vs CodeQL suites How to setup MRVA Download CodeQL extension in VSCode Configure our Github controller Code Search tools Fishing with MRVA 🎣 Server Side Template Injection (Ruby) Unsafe Deserialization (Python) 1- What is MRVA? Is known by everyone the power of CodeQL, analyzing a repository with a single click, but with MRVA ",
+    "fetchedAt": "2026-09-06T13:33:12.400Z"
+  },
+  "https://nvd.nist.gov/vuln/detail/CVE-2026-25243": {
+    "title": "NVD - Home",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:02.761Z"
+  },
+  "https://realworldctf.com/": {
+    "title": "Jeopardy Platform",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:02.040Z"
+  },
+  "https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/release-notes/redisce/redisos-8.6-release-notes/": {
+    "title": "Redis Open Source 8.6 release notes",
+    "description": "Redis Open Source 8.6 release notes.",
+    "fetchedAt": "2026-09-06T13:33:04.507Z"
+  },
+  "https://reviews.llvm.org/D64906": {
+    "title": "⚙ D64906 [ELF][PPC] Allow PT_LOAD to have overlapping p_offset ranges",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:11.453Z"
+  },
+  "https://support.apple.com/guide/security/find-my-security-sec6cbc80fd0/web": {
+    "title": "Find My security",
+    "description": "The Find My app for Apple devices is built on a foundation of advanced public key cryptography.",
+    "fetchedAt": "2026-09-06T13:33:08.216Z"
+  },
+  "https://teamt5.org/en/posts/teamt5-pwn2own-contest-experience-sharing-and-vulnerability-demonstration/": {
+    "title": "[TeamT5] Pwn2Own Contest Experience Sharing and Vulnerability Demonstration - TeamT5",
+    "description": "## What is Pwn2own Pwn2Own is a renowned hacking competition that focuses on discovering and exploiting vulnerabilities in various software and operating systems. The event provides a platform for cybersecurity researchers and ethical hackers to showcase their skills by attempting to compromise the security of popular software and devices. Organized by the Zero Day Initiative (ZDI), a program from",
+    "fetchedAt": "2026-09-06T13:33:01.918Z",
+    "image": "/link-previews/d8fdfd02b369768d2ed7.webp"
+  },
+  "https://vector35.com/": {
+    "title": "Vector 35 > home",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.464Z"
+  },
+  "https://www.apple.com/certificateauthority/": {
+    "title": "Apple PKI - Apple",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:06.776Z"
+  },
+  "https://www.hackcyom.com/": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:00.693Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.135Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-2": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.167Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-3": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.174Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-4": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.181Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-5": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.188Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-6": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.198Z"
+  },
+  "https://www.hackcyom.com/services/blog/code-of-the-week-7": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:13.206Z"
+  },
+  "https://www.hackcyom.com/services/blog/Rediscovering%20vulnerabilities%20with%20CodeQL%20MRVA": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:11.507Z"
+  },
+  "https://www.hackcyom.com/services/blog/rwctf-lets-party-in-the-house-wu": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:00.722Z"
+  },
+  "https://www.hackcyom.com/services/blog/vm-obfuscation-overview": {
+    "title": "Hackcyom",
+    "description": "",
+    "fetchedAt": "2026-09-06T13:33:00.690Z"
+  },
+  "https://www.lodsb.com/removing-control-flow-flattening-with-binary-ninja": {
+    "title": "Removing Control Flow Flattening with Binary Ninja",
+    "description": "If you've been reversing for a while then eventually you'll come up against a control flow graph that looks like this: This is a simple toy app hosted at https://github.com/samrussell/cff_playground if you feel like following along at home. The plug...",
+    "fetchedAt": "2026-09-06T13:33:17.957Z",
+    "image": "/link-previews/2e649c6cf6c6ba48d574.webp"
+  },
+  "https://www.youtube.com/watch?v=ZaOtY4i5w_U": {
+    "title": "Sources and Sinks - Code Review Basics",
+    "description": "A very basic concept of security code audits is the sources/sinks. Everybody develops an intuition for it, but I still wanted to talk about it, because it wo...",
+    "fetchedAt": "2026-09-06T13:33:13.616Z",
+    "image": "/link-previews/03e8e1f5b9760e99d8fe.webp"
+  },
+  "https://www.zeroday.cloud/blog/redis-cve-2026-25243-deep-dive": {
+    "title": "CVE-2026-25243: Two Redis RESTORE Bugs Leading to RCE | ZeroDay.cloud",
+    "description": "Two independent double-free bugs in Redis's RDB loading code — one in legacy zipmap conversion, one in stream consumer group deserialization — both leading to remote code execution via the RESTORE command.",
+    "fetchedAt": "2026-09-06T13:33:04.483Z",
+    "image": "/link-previews/b23f196e72b567b9dcda.webp"
+  },
+  "https://x.com/emil_lerner": {
+    "title": "Emil Lerner (@emil_lerner) on X",
+    "description": "Independent security researcher. CTO & co-founder of https://t.co/F296lUgKA8. Bushwhackers CTF team.",
+    "fetchedAt": "2026-09-06T13:33:03.875Z",
+    "image": "/link-previews/c1f98d762f077373b4a7.webp"
+  },
+  "https://xusheng.dev/posts/reversing/elf_format/readme/": {
+    "title": "Dealing with Manipulated ELF Binary and Manually Resolving Import Functions",
+    "description": "Unfortunately, this writeup is delayed for almost a week because I am super busy recently. Please take my apologies and I will try my best to keep the weekly challenge going, forever! The challenge can be downloaded at https://crackmes.one/crackme/5e727daa33c5d4439bb2decd. It is created by user BinaryNewbie, who is NOT a newbie for binary reversing. We will discuss an important topic in this write",
+    "fetchedAt": "2026-09-06T13:33:08.504Z"
+  }
+}

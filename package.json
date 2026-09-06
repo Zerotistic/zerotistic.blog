@@ -6,6 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "previews:update": "node scripts/update-link-previews.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
@@ -35,6 +36,7 @@
     "@biomejs/biome": "^2.5.1",
     "@types/hast": "^3.0.5",
     "@types/mdast": "^4.0.4",
+    "linkedom": "^0.18.13",
     "mdast-util-to-hast": "^13.2.1",
     "typescript": "^6.0.3"
   },

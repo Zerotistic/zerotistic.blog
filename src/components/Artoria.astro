@@ -1,0 +1,58 @@
+---
+type Props = { placement: "sidebar" | "footer" }
+const { placement } = Astro.props
+---
+
+<div class:list={["artoria", `artoria-${placement}`]}>
+  <img
+    src="/static/artoria-last-episode.webp"
+    width="360"
+    height="540"
+    alt="Artoria sitting quietly in her white Last Episode dress"
+    loading="lazy"
+    decoding="async"
+  />
+</div>
+
+<style>
+  .artoria img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border: 0;
+    background: transparent;
+  }
+
+  .artoria-sidebar {
+    width: min(100%, 148px);
+    margin-block-start: 28px;
+
+    img {
+      max-height: 30svh;
+      object-position: left bottom;
+    }
+  }
+
+  .artoria-footer {
+    display: none;
+  }
+
+  @media (width < 64rem) {
+    .artoria-sidebar {
+      display: none;
+    }
+
+    .artoria-footer {
+      display: block;
+      width: 112px;
+      margin: 0 auto 24px;
+    }
+  }
+
+  @media (width >= 64rem) and (height < 540px) {
+    .artoria-sidebar {
+      display: none;
+    }
+  }
+</style>

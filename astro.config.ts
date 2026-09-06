@@ -17,6 +17,7 @@ export default defineConfig({
   prefetch: { prefetchAll: true },
   // Old Jekyll/Chirpy URLs that must keep resolving.
   redirects: {
+    "/tags": "/posts",
     "/posts/binary-ninja-serie-announcement":
       "/posts/binary-ninja-zero-to-hero",
     "/posts/binary-ninja-zero-to-hero-1":

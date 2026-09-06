@@ -15,7 +15,7 @@ const { title, sections } = Astro.props
 ---
 
 <nav aria-label="Table of contents">
-  <toc-title aria-hidden="true"><span set:html={titleHtml(title)} /></toc-title>
+  <p class="toc-kicker">On this page</p>
   <label data-bar>
     <input type="checkbox" aria-label="Toggle table of contents">
     <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -59,6 +59,19 @@ const { title, sections } = Astro.props
 </nav>
 
 <style>
+  .toc-kicker {
+    margin-block: 0 var(--space-s);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+
+    @media (width < 64rem) {
+      display: none;
+    }
+  }
+
   nav {
     position: sticky;
     top: var(--page-offset-top);
@@ -75,27 +88,6 @@ const { title, sections } = Astro.props
       position: relative;
       top: auto;
       max-height: none;
-    }
-  }
-
-  toc-title {
-    display: grid;
-    grid-template-rows: 0fr;
-    flex-shrink: 0;
-    font-weight: var(--font-weight-medium);
-
-    > span {
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    &[data-visible] {
-      grid-template-rows: 1fr;
-      margin-block-end: var(--space-2xs);
-    }
-
-    @media (width < 64rem) {
-      display: none;
     }
   }
 
@@ -175,6 +167,11 @@ const { title, sections } = Astro.props
     overscroll-behavior: contain;
     scrollbar-width: none;
 
+    @media (width >= 64rem) {
+      border-inline-start: 1px solid var(--border);
+      padding-block: 2px;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -197,10 +194,33 @@ const { title, sections } = Astro.props
   ul {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3xs);
+    gap: 0.35rem;
 
     a {
       color: var(--muted-foreground);
+      display: block;
+      position: relative;
+      padding-block: 0.3rem;
+      line-height: 1.45;
+      text-decoration: none;
+
+      @media (width >= 64rem) {
+        padding-inline: 16px 6px;
+
+        &[aria-current="location"] {
+          font-weight: 550;
+
+          &::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0;
+            inset-block: 0.35rem;
+            width: 2px;
+            border-radius: 2px;
+            background: var(--accent);
+          }
+        }
+      }
 
       &:hover,
       &[data-active] {
@@ -305,10 +325,8 @@ const { title, sections } = Astro.props
     )
     const articles = document.querySelectorAll("main article")
     const list = nav.querySelector(":scope > ul")
-    const title = nav.querySelector("toc-title")
     const currentLabel = nav.querySelector("toc-current")
     const toggle = nav.querySelector<HTMLInputElement>("input")
-    const heading = document.querySelector("article > header h1")
     if (articles.length === 0 || !list || links.size === 0) return
 
     const fallback = currentLabel?.textContent ?? ""
@@ -375,10 +393,7 @@ const { title, sections } = Astro.props
 
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.target === heading) {
-          const past = !entry.isIntersecting
-          title?.toggleAttribute("data-visible", past)
-        } else if (entry.isIntersecting) visible.add(entry.target)
+        if (entry.isIntersecting) visible.add(entry.target)
         else visible.delete(entry.target)
       }
 
@@ -389,11 +404,24 @@ const { title, sections } = Astro.props
       }
 
       let firstActive: HTMLAnchorElement | undefined
+      // A sliver of the preceding section shouldn't own the current marker.
+      const visibleHeight = new Map<string, number>()
+      for (const block of visible) {
+        const id = sectionOf.get(block)
+        if (!id) continue
+        const rect = block.getBoundingClientRect()
+        const height = Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0))
+        visibleHeight.set(id, (visibleHeight.get(id) ?? 0) + height)
+      }
+      let largestHeight = -1
       for (const [id, link] of links) {
         const on = activeIds.has(id)
         link.toggleAttribute("data-active", on)
         link.removeAttribute("aria-current")
-        if (on) firstActive ??= link
+        if (on && (visibleHeight.get(id) ?? 0) > largestHeight) {
+          largestHeight = visibleHeight.get(id) ?? 0
+          firstActive = link
+        }
       }
       firstActive?.setAttribute("aria-current", "location")
 
@@ -422,10 +450,5 @@ const { title, sections } = Astro.props
     })
 
     for (const block of sectionOf.keys()) observer.observe(block)
-    if (heading) {
-      observer.observe(heading)
-    } else {
-      title?.toggleAttribute("data-visible", true)
-    }
   })()
 </script>

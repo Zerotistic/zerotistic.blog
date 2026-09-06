@@ -1,6 +1,11 @@
 import monoFont from "@/assets/fonts/IBMPlexMono-Medium.woff2?inline"
 import sansFont from "@/assets/fonts/IBMPlexSans-VariableFont_wdth,wght.woff2?inline"
 import sharp from "sharp"
+import { readFile } from "node:fs/promises"
+import { resolve } from "node:path"
+
+const landscape = readFile(resolve("public/static/avalon-landscape-dusk.webp"))
+  .then((data) => sharp(data).png().toBuffer())
 
 type OgImage = {
   title: string
@@ -143,6 +148,7 @@ function renderTitleLine(line: TitleCharacter[]) {
 }
 
 export async function generateOgImage({ title, description, meta }: OgImage) {
+  const backdrop = `data:image/png;base64,${(await landscape).toString("base64")}`
   const lines = wrapTitle(title)
   const titleStart = lines.length === 1 ? 260 : lines.length === 2 ? 225 : 190
   const titleMarkup = lines
@@ -168,13 +174,20 @@ export async function generateOgImage({ title, description, meta }: OgImage) {
         .mono { font-family: "Plex Mono", monospace; }
       </style>
       <rect width="1200" height="630" fill="#111110" />
-      <rect width="1200" height="8" fill="#8ea6c8" />
+      <image href="${backdrop}" x="0" y="0" width="1200" height="630" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
+      <defs>
+        <linearGradient id="reading-shade">
+          <stop offset="0" stop-color="#111110" stop-opacity="0.98" />
+          <stop offset="0.65" stop-color="#111110" stop-opacity="0.78" />
+          <stop offset="1" stop-color="#111110" stop-opacity="0.1" />
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="630" fill="url(#reading-shade)" />
 
       <text x="84" y="92" class="mono" fill="#eeeeec" font-size="28" font-weight="500">zerotistic</text>
       <rect x="252" y="67" width="15" height="28" fill="#8ea6c8" />
-      <text x="1116" y="92" class="mono" fill="#7c7b74" font-size="20" text-anchor="end">// research notes</text>
 
-      <text class="sans" fill="#eeeeec" font-size="58" font-weight="500">${titleMarkup}</text>
+      <text class="sans" fill="#eeeeec" font-size="56" font-weight="500">${titleMarkup}</text>
       ${
         description
           ? `<text x="84" y="${descriptionY}" class="sans" fill="#b5b3ad" font-size="28">${escapeXml(description)}</text>`

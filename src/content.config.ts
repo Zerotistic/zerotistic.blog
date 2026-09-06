@@ -32,6 +32,14 @@ const blog = defineCollection({
       authors: z.array(reference("authors")),
       image: image().optional(),
       draft: z.boolean().optional(),
+      linkPreviews: z.record(z.string(), z.union([
+        z.literal(false),
+        z.object({
+          title: z.string().optional(),
+          description: z.string().optional(),
+          image: image().optional(),
+        }),
+      ])).optional(),
       // Structured metadata rendered as a fact table on writeups.
       facts: z
         .object({

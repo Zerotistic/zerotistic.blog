@@ -16,6 +16,10 @@ import "@/styles/bar.css"
 import "@/styles/shape.css"
 
 import Footer from "@/components/Footer.astro"
+import AvalonBackground from "@/components/AvalonBackground.astro"
+import ImageViewer from "@/components/ImageViewer.astro"
+import SiriClock from "@/components/SiriClock.astro"
+import SiriDemo from "@/components/SiriDemo.astro"
 import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
 import { SITE } from "@/consts"
@@ -30,6 +34,7 @@ const { crumbs } = Astro.props
     <slot name="head" />
   </MetaHead>
   <body>
+    <AvalonBackground />
     <page-grid>
       <page-header>
         <page-nav>
@@ -46,6 +51,10 @@ const { crumbs } = Astro.props
         <page-footer><Footer /></page-footer>
       </page-content>
     </page-grid>
+
+    <ImageViewer />
+    <SiriClock />
+    <SiriDemo />
 
     <script is:inline>
       console.log(

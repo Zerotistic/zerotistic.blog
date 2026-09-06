@@ -1,9 +1,11 @@
 prose-content {
   a {
-    --underline: color-mix(in oklab, var(--foreground) 30%, transparent);
+    --underline: color-mix(in oklab, var(--foreground) 55%, transparent);
     color: var(--foreground);
+    text-underline-offset: 0.15em;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       --underline: var(--foreground);
     }
   }

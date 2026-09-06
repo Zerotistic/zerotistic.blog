@@ -12,6 +12,10 @@ facts:
   category: "protocol reverse engineering"
   target: "Apple Find My People / IDS"
   tools: [Python, FindMy.py, pypush, cryptography, decompilation]
+linkPreviews:
+  "https://theapplewiki.com/wiki/Grand_Slam_Authentication":
+    title: "GrandSlam authentication"
+    description: "The Apple Wiki's notes on Apple Account authentication. This is the account-login part of the Find My client, separate from fetching location reports."
 ---
 
 As it can often be, I was bored. I wanted to look into a complex system, and had no idea which. Me and a friend have been sharing our locations to each other's through Apple's "Find My". I asked if he was okay with me piping it into some dumb automations. He said yes, so the plan was to draw a few geofences around places he goes and make Discord announce whenever he arrived or left.

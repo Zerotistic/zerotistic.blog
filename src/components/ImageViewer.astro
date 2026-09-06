@@ -1,0 +1,107 @@
+<dialog class="image-viewer" aria-label="Enlarged image">
+  <button type="button" class="image-viewer-close" aria-label="Close enlarged image" autofocus>×</button>
+  <img alt="" />
+</dialog>
+
+<script>
+  const viewer = document.querySelector<HTMLDialogElement>(".image-viewer")!
+  const enlarged = viewer.querySelector("img")!
+  const close = viewer.querySelector("button")!
+  let previousOverflow = ""
+
+  close.addEventListener("click", () => viewer.close())
+  viewer.addEventListener("click", (event) => {
+    if (event.target === viewer) viewer.close()
+  })
+  viewer.addEventListener("close", () => {
+    document.documentElement.style.overflow = previousOverflow
+    enlarged.removeAttribute("src")
+  })
+
+  document.querySelectorAll<HTMLImageElement>("prose-content img").forEach((img) => {
+    // Keep links, diagrams, and decorative illustrations behaving as authored.
+    if (img.closest("a, button, .siri-demo, .siri-phone-illustration")) return
+    const source = decodeURIComponent(img.currentSrc || img.src)
+    if (/\.svg(?:[?&#]|$)/i.test(source)) return
+    const trigger = document.createElement("button")
+    trigger.type = "button"
+    trigger.className = "image-enlarge"
+    trigger.setAttribute("aria-label", `Enlarge image: ${img.alt || "article illustration"}`)
+    img.before(trigger)
+    trigger.append(img)
+    trigger.addEventListener("click", () => {
+      enlarged.src = img.currentSrc || img.src
+      enlarged.alt = img.alt
+      previousOverflow = document.documentElement.style.overflow
+      viewer.showModal()
+      document.documentElement.style.overflow = "hidden"
+    })
+  })
+</script>
+
+<style is:global>
+  .image-enlarge {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    margin-inline: auto;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+  }
+
+  .image-enlarge:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  prose-content .image-enlarge img {
+    display: block;
+  }
+
+  .image-viewer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 64px 20px 24px;
+    border: 0;
+    background: rgb(10 11 14 / 0.95);
+    color: white;
+    overflow: auto;
+  }
+
+  .image-viewer[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-viewer::backdrop {
+    background: rgb(0 0 0 / 0.7);
+  }
+
+  .image-viewer img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .image-viewer-close {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #646770;
+    border-radius: 50%;
+    background: #24262c;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+  }
+</style>

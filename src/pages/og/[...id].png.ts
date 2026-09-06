@@ -12,8 +12,7 @@ export async function getStaticPaths() {
 
 export const GET: APIRoute = async ({ props }) => {
   const { post } = props as Props
-  const tags = (post.data.tags ?? []).map((tag) => `#${tag}`).join("  ")
-  const meta = [formatDate(post.data.date), tags].filter(Boolean).join("  ·  ")
+  const meta = formatDate(post.data.date)
   const image = await generateOgImage({
     title: post.data.title,
     meta,
