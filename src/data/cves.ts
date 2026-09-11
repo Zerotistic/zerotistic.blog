@@ -77,9 +77,115 @@ const productData: Product[] = [
     findings: [
       {
         id: "CVE-2026-79721",
-        title: "Details pending coordinated disclosure",
+        title: "Arbitrary code execution through malicious model artifacts",
         summary:
-          "This CVE has been assigned; technical details and scoring will be added when its public record is available.",
+          "Loading a maliciously crafted model artifact could execute arbitrary code on an end user's system.",
+        published: "2026-09-08",
+        score: "8.6",
+        cvss: "4.0",
+        severity: "high",
+        url: cveUrl("CVE-2026-79721"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mlflow",
+        },
+      },
+    ],
+  },
+  {
+    id: "mistral-vibe",
+    name: "Mistral Vibe",
+    context: "AI coding agent",
+    findings: [
+      {
+        id: "CVE-2026-87983",
+        title: "Arbitrary file read through quoted absolute paths",
+        summary:
+          "Quoted absolute paths in allowlisted shell commands could bypass workspace restrictions and read files outside the active workspace without approval.",
+        published: "2026-09-11",
+        score: "9.2",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87983"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe",
+        },
+      },
+      {
+        id: "CVE-2026-87984",
+        title: "Arbitrary file write through shell redirection",
+        summary:
+          "Shell redirection destinations were omitted from permission checks, allowing files outside the active workspace to be created or overwritten without approval.",
+        published: "2026-09-11",
+        score: "9.3",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87984"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe2",
+        },
+      },
+      {
+        id: "CVE-2026-87985",
+        title: "Arbitrary code execution through ANSI-C quoting",
+        summary:
+          "ANSI-C quoted arguments were not properly inspected, allowing a crafted allowlisted command to bypass permission checks and execute arbitrary code without approval.",
+        published: "2026-09-11",
+        score: "10.0",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87985"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe3",
+        },
+      },
+      {
+        id: "CVE-2026-87986",
+        title: "Arbitrary code execution through unparsed shell constructs",
+        summary:
+          "Shell constructs the parser could not interpret were omitted from permission checks, allowing embedded commands to execute without approval.",
+        published: "2026-09-11",
+        score: "10.0",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87986"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe4",
+        },
+      },
+      {
+        id: "CVE-2026-87987",
+        title: "Arbitrary code execution through environment assignments",
+        summary:
+          "Environment variable assignments preceding allowlisted commands were excluded from inspection, enabling arbitrary code execution without approval.",
+        published: "2026-09-11",
+        score: "10.0",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87987"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe5",
+        },
+      },
+      {
+        id: "CVE-2026-87988",
+        title: "Arbitrary file access through unconditionally allowed commands",
+        summary:
+          "Commands classified as unconditionally allowed lacked path validation, enabling access to files outside the active workspace without approval.",
+        published: "2026-09-11",
+        score: "10.0",
+        cvss: "4.0",
+        severity: "critical",
+        url: cveUrl("CVE-2026-87988"),
+        advisory: {
+          label: "HiddenLayer advisory",
+          href: "https://www.hiddenlayer.com/sai-security-advisory/2026-09-mistral-vibe6",
+        },
       },
     ],
   },
