@@ -1,8 +1,8 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
+import PostRow from "@/components/PostRow.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getTags, titleHtml } from "@/lib/content"
-import { formatDate } from "@/lib/utils"
+import { getSubposts, getTags } from "@/lib/content"
 import type { CollectionEntry } from "astro:content"
 
 export async function getStaticPaths() {
@@ -16,6 +16,7 @@ export async function getStaticPaths() {
 type Props = { tag: string; posts: CollectionEntry<"blog">[] }
 
 const { tag, posts } = Astro.props
+const series = await getSubposts()
 ---
 
 <Layout
@@ -39,12 +40,11 @@ const { tag, posts } = Astro.props
   </page-heading>
   <ol>
     {posts.map((post) => (
-        <li>
-          <time datetime={post.data.date.toISOString()}>
-            {formatDate(post.data.date)}
-          </time>
-          <a href={`/posts/${post.id}`} set:html={titleHtml(post.data.title)} />
-        </li>
+        <PostRow
+          post={post}
+          partCount={(series.get(post.id) ?? []).length}
+          tags={[]}
+        />
       ))}
   </ol>
 </Layout>
@@ -76,35 +76,7 @@ const { tag, posts } = Astro.props
   }
 
   ol {
-    display: flex;
-    flex-direction: column;
+    display: block;
     list-style: none;
-  }
-
-  li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    gap: var(--space-2xs) var(--space-s);
-    padding-block: var(--space-2xs);
-    border-block-start: 1px solid var(--border);
-
-    &:last-child {
-      border-block-end: 1px solid var(--border);
-    }
-
-    time {
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      font-variant-numeric: tabular-nums;
-      color: var(--muted-foreground);
-      white-space: nowrap;
-    }
-
-    a {
-      font-size: var(--step-0);
-      font-weight: var(--font-weight-medium);
-      text-underline-offset: 0.2em;
-    }
   }
 </style>

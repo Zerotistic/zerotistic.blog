@@ -1,0 +1,543 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import WorkCheer from "@/components/WorkCheer.astro"
+import WorkPhase from "@/components/WorkPhase.astro"
+import { education, work } from "@/data/work"
+import Layout from "@/layouts/Layout.astro"
+import { formatWorkDate, workDuration } from "@/lib/work"
+---
+
+<Layout showArtoria={false} wide>
+  <MetaPage
+    slot="head"
+    title="Work"
+    description="Experience and education. HiddenLayer, Hackcyom, Deloitte, and École 2600."
+  />
+
+  <header class="page-heading">
+    <h1>work</h1>
+    <p>Experience &amp; education.</p>
+  </header>
+
+  <div class="work-history">
+    <ol class="timeline" role="list" aria-label="Work experience, newest first">
+      {work.map((entry) => {
+        const current = !entry.end
+        const duration = workDuration(entry.start, entry.end)
+        const [fullTime, apprenticeship] = entry.phases ?? []
+        return (
+          <li class:list={["timeline-entry", { current, "has-phases": !!entry.phases }]}>
+            <div class="entry-dates">
+              <p class="date-range">
+                <time datetime={entry.start}>{formatWorkDate(entry.start)}</time>
+                <span class="date-end">
+                  <span aria-hidden="true">—</span>{" "}
+                  {entry.end ? (
+                    <time datetime={entry.end}>{formatWorkDate(entry.end)}</time>
+                  ) : (
+                    <span>Present</span>
+                  )}
+                </span>
+              </p>
+              {duration && (
+                <p class="duration" data-ongoing-since={current ? entry.start : undefined}>
+                  {duration}
+                </p>
+              )}
+            </div>
+
+            <div class:list={["entry-logo", `entry-logo-${entry.id}`]} aria-hidden="true">
+              <img src={entry.logo} width="48" height="48" alt="" decoding="async" />
+            </div>
+
+            <article
+              class="entry-content"
+              aria-labelledby={`${entry.id}-heading`}
+              aria-describedby={entry.kind === "Apprenticeship" ? "education-connection" : undefined}
+            >
+              <div class="entry-summary">
+                <div class="entry-heading">
+                  <h2 id={`${entry.id}-heading`}>{entry.organization}</h2>
+                  {current && <span class="current-label">Current</span>}
+                </div>
+                <p class="entry-role">{entry.role}</p>
+                <div class="entry-meta">
+                  {entry.kind !== "Work" && <p class="entry-kind">{entry.kind}</p>}
+                  {entry.kind !== "Work" && entry.location && <span aria-hidden="true">·</span>}
+                  {entry.location && <p class="entry-location">{entry.location}</p>}
+                </div>
+                {current && <WorkCheer />}
+                {fullTime && <div class="full-time-phase"><WorkPhase phase={fullTime} /></div>}
+              </div>
+              {apprenticeship && (
+                <div class="apprenticeship-phase" aria-describedby="education-connection">
+                  <WorkPhase phase={apprenticeship} />
+                </div>
+              )}
+            </article>
+          </li>
+        )
+      })}
+    </ol>
+
+    <aside class="education" aria-labelledby="ecole-2600-heading">
+      <div class="education-bracket" aria-hidden="true"></div>
+      <div class="education-details">
+        <p class="education-label">Alongside work</p>
+        <div class="entry-logo entry-logo-ecole-2600" aria-hidden="true">
+          <img src={education.logo} width="48" height="48" alt="" decoding="async" />
+        </div>
+        <h2 id="ecole-2600-heading">{education.organization}</h2>
+        <p class="education-dates">
+          <time datetime={education.start}>{formatWorkDate(education.start)}</time>
+          {" — "}{education.approximateEnd && "around "}
+          <time datetime={education.end}>{formatWorkDate(education.end!)}</time>
+        </p>
+        <p class="education-role">{education.role}</p>
+        <p class="education-connection" id="education-connection">Studied while apprenticing at Deloitte, then Hackcyom.</p>
+        <p class="education-note">{education.note}</p>
+      </div>
+    </aside>
+  </div>
+</Layout>
+
+<script>
+  import { workDuration } from "@/lib/work"
+
+  const updateDuration = () => {
+    document.querySelectorAll<HTMLElement>("[data-ongoing-since]").forEach((element) => {
+      const duration = workDuration(element.dataset.ongoingSince!)
+      if (duration) element.textContent = duration
+    })
+  }
+
+  updateDuration()
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) updateDuration()
+  })
+</script>
+
+<style>
+  .page-heading {
+    margin-block-end: var(--space-2xl);
+
+    @media (width >= 64rem) {
+      margin-block-start: -0.2em;
+    }
+
+    h1 {
+      font-family: var(--font-mono);
+      font-size: var(--step-3);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0;
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    p {
+      margin-block-start: var(--space-2xs);
+      color: var(--muted-foreground);
+    }
+  }
+
+  .work-history {
+    --date-column: 8.5rem;
+    --rail-column: 4.25rem;
+    --rail-position: calc(var(--date-column) + var(--rail-column) / 2);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.5rem clamp(13rem, 20vw, 16rem);
+    /* Share the two apprenticeship rows, not the whole Hackcyom tenure. */
+    grid-template-rows: [current] auto [hackcyom] auto [apprenticeship] auto [deloitte] auto [end];
+  }
+
+  .timeline {
+    display: grid;
+    grid-column: 1;
+    grid-row: current / end;
+    grid-template-rows: subgrid;
+    min-inline-size: 0;
+    list-style: none;
+  }
+
+  .timeline-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--date-column) var(--rail-column) minmax(0, 1fr);
+    grid-template-rows: subgrid;
+    padding-block-end: var(--space-xl);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: var(--rail-position);
+      inset-block: 3.5rem 0.5rem;
+      inline-size: 1px;
+      background: var(--border);
+    }
+
+    &.current::before {
+      background: linear-gradient(var(--accent), var(--border));
+    }
+
+    &.has-phases {
+      grid-row: span 2;
+    }
+
+    &:last-child {
+      padding-block-end: 0;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  .entry-content {
+    grid-column: 3;
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-rows: subgrid;
+    min-inline-size: 0;
+  }
+
+  .entry-summary {
+    position: relative;
+    padding-block-end: var(--space-m);
+  }
+
+  .current .entry-summary {
+    border-block-end: 1px solid var(--border);
+  }
+
+  .entry-logo {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    align-self: start;
+    inline-size: 3rem;
+    block-size: 3rem;
+    overflow: hidden;
+    padding: 0.375rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: #fff;
+
+    img {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .entry-logo-hiddenlayer {
+    background: #07151e;
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+    box-shadow: 0 0 0 3px var(--accent-muted);
+  }
+
+  .entry-logo-ecole-2600 {
+    padding: 0.5rem;
+  }
+
+  .entry-dates {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    padding-block-start: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+
+  .date-range {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    color: var(--prose-foreground);
+  }
+
+  .date-end { white-space: nowrap; }
+
+  .duration {
+    margin-block-start: var(--space-xs);
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .entry-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25em 0.5em;
+    margin-block-start: var(--space-xs);
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
+  }
+
+  .current-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--accent-muted);
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--accent) 6%, transparent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0;
+  }
+
+  h2 {
+    font-size: var(--step-2);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .entry-role {
+    margin-block-start: var(--space-3xs);
+    color: var(--prose-foreground);
+    line-height: 1.55;
+  }
+
+  .full-time-phase { margin-block-start: var(--space-m); }
+
+  .apprenticeship-phase {
+    padding-block-start: var(--space-s);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .education {
+    grid-column: 2 / -1;
+    grid-row: apprenticeship / end;
+    display: grid;
+    grid-template-columns: subgrid;
+    min-inline-size: 0;
+  }
+
+  .education-bracket {
+    grid-column: 1;
+    justify-self: center;
+    inline-size: 1.125rem;
+    border-block: 1px solid;
+    border-inline-end: 1px solid;
+    border-color: color-mix(in oklab, var(--accent) 65%, var(--border));
+  }
+
+  .education-details {
+    grid-column: 2;
+    align-self: center;
+    min-inline-size: 0;
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: var(--space-xs);
+
+    > p {
+      grid-column: 1 / -1;
+    }
+
+    .entry-logo {
+      grid-column: 1;
+      grid-row: 2;
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      border-radius: 0.5rem;
+      padding: 0.375rem;
+    }
+
+    h2 {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: center;
+      font-size: var(--step-1);
+    }
+  }
+
+  .education-label {
+    margin-block-end: var(--space-s);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .education-dates {
+    margin-block-start: var(--space-s);
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  .education-role {
+    margin-block-start: var(--space-xs);
+    font-size: var(--step--1);
+    color: var(--prose-foreground);
+  }
+
+  .education-connection,
+  .education-note {
+    margin-block-start: var(--space-xs);
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  .education-connection {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (width >= 40rem) {
+    .current .entry-summary {
+      padding-inline-end: 11rem;
+      min-block-size: 10rem;
+    }
+  }
+
+  @media (40rem <= width < 80rem) {
+    .work-history {
+      --date-column: 7rem;
+      --rail-column: 3.5rem;
+    }
+
+    .current .entry-summary {
+      padding-inline-end: 8.5rem;
+      min-block-size: 9rem;
+    }
+  }
+
+  @media (width < 64rem) {
+    .work-history {
+      --date-column: 0rem;
+      --rail-column: 3.25rem;
+      --rail-position: 1.125rem;
+    }
+
+    .timeline-entry {
+      grid-template-columns: var(--rail-column) minmax(0, 1fr);
+
+      &::before { inset-block-start: 2.75rem; }
+    }
+
+    .entry-content {
+      grid-column: 2;
+    }
+
+    .entry-dates {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: start;
+    }
+
+    .entry-summary {
+      padding-block-start: 3.5rem;
+    }
+
+    .entry-logo {
+      grid-column: 1;
+      justify-self: start;
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      padding: 0.25rem;
+      border-radius: 0.5rem;
+    }
+
+    .date-range {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.4em;
+    }
+
+    .duration { margin-block-start: var(--space-3xs); }
+  }
+
+  @media (width < 48rem) {
+    .work-history {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: [current] auto [hackcyom] auto [apprenticeship] auto [deloitte] auto [end] auto [education-end];
+    }
+
+    .education {
+      grid-column: 1;
+      grid-row: end / education-end;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .education-bracket {
+      display: none;
+    }
+
+    .education-details {
+      grid-column: 1;
+      grid-template-columns: var(--rail-column) minmax(0, 1fr);
+      column-gap: 0;
+
+      > p {
+        grid-column: 2;
+      }
+
+      .education-label {
+        display: none;
+      }
+
+      .entry-logo {
+        grid-column: 1;
+        grid-row: 1 / 3;
+        justify-self: start;
+      }
+
+      h2 {
+        grid-row: 2;
+        margin-block-start: var(--space-xs);
+        font-size: var(--step-2);
+      }
+
+      .education-dates {
+        grid-row: 1;
+        margin-block-start: 0;
+        padding-block-start: 0.15rem;
+        font-family: var(--font-mono);
+        font-size: var(--step--1);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0;
+      }
+
+      .education-role {
+        grid-row: 3;
+        margin-block-start: var(--space-3xs);
+        font-size: var(--step-0);
+      }
+
+      .education-note {
+        grid-row: 4;
+        font-size: var(--step--1);
+      }
+    }
+
+    .timeline-entry:last-child {
+      padding-block-end: var(--space-l);
+
+      &::before {
+        display: block;
+      }
+
+      .entry-summary {
+        border-block-end: 1px solid var(--border);
+      }
+    }
+  }
+
+  @media (width < 40rem) {
+    .page-heading { margin-block-end: var(--space-xl); }
+    .timeline-entry { padding-block-end: var(--space-l); }
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+import { titleHtml } from "@/lib/content"
+import type { CollectionEntry } from "astro:content"
+
+type Props = {
+  prev?: CollectionEntry<"blog">
+  next?: CollectionEntry<"blog">
+}
+
+const { prev, next } = Astro.props
+---
+
+{(prev || next) && (
+  <nav class="post-navigation" aria-label="More posts">
+    {prev && (
+      <a href={`/posts/${prev.id}`} rel="prev" class="older">
+        <span class="direction"><span aria-hidden="true">←</span> Older post</span>
+        <span class="post-title" set:html={titleHtml(prev.data.title)} />
+      </a>
+    )}
+    {next && (
+      <a href={`/posts/${next.id}`} rel="next" class="newer">
+        <span class="direction">Newer post <span aria-hidden="true">→</span></span>
+        <span class="post-title" set:html={titleHtml(next.data.title)} />
+      </a>
+    )}
+  </nav>
+)}
+
+<style>
+  .post-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-l);
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid var(--border);
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    min-block-size: 2.75rem;
+    text-decoration: none;
+
+    &:is(:hover, :focus-visible) .post-title {
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-underline-offset: 0.2em;
+    }
+  }
+
+  .newer {
+    grid-column: 2;
+    text-align: end;
+  }
+
+  .direction {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
+
+    span {
+      color: var(--accent);
+    }
+  }
+
+  .post-title {
+    color: var(--foreground);
+    overflow-wrap: anywhere;
+  }
+
+  @media (width < 40rem) {
+    .post-navigation {
+      grid-template-columns: 1fr;
+      gap: var(--space-m);
+    }
+
+    .newer {
+      grid-column: 1;
+      text-align: start;
+    }
+
+    a + a {
+      padding-block-start: var(--space-m);
+      border-block-start: 1px solid var(--border);
+    }
+  }
+</style>

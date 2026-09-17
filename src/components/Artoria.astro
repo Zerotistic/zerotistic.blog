@@ -1,14 +1,17 @@
 ---
+import { artoriaForPath } from "@/lib/artoria"
+
 type Props = { placement: "sidebar" | "footer" }
 const { placement } = Astro.props
+const pose = artoriaForPath(Astro.url.pathname)
 ---
 
-<div class:list={["artoria", `artoria-${placement}`]}>
+<div class:list={["artoria", `artoria-${placement}`]} data-pose={pose.name}>
   <img
-    src="/static/artoria-last-episode.webp"
+    src={pose.src}
     width="360"
     height="540"
-    alt="Artoria sitting quietly in her white Last Episode dress"
+    alt={pose.alt}
     loading="lazy"
     decoding="async"
   />

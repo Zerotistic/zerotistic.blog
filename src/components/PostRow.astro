@@ -46,7 +46,8 @@ const { post, partCount, tags } = Astro.props
   article {
     position: relative;
     display: grid;
-    grid-template-columns: auto 1fr;
+    /* Reserve the same width for dates with one- and two-digit days. */
+    grid-template-columns: 7.25rem minmax(0, 1fr);
     align-items: baseline;
     gap: var(--space-2xs) var(--space-s);
     padding-block: var(--space-s);
@@ -63,6 +64,17 @@ const { post, partCount, tags } = Astro.props
       content: "";
       position: absolute;
       inset: 0;
+    }
+
+    @media (any-pointer: coarse) {
+      &:focus-visible:active,
+      &[data-pressed] {
+        background-color: transparent;
+
+        &::after {
+          background-color: var(--accent-muted);
+        }
+      }
     }
 
     row-marker {

@@ -1,0 +1,124 @@
+<script>
+  // Keep Expressive Code's source-aware copy behavior and success feedback.
+  for (const pre of document.querySelectorAll<HTMLElement>("prose-content .expressive-code pre")) {
+    const frame = pre.closest<HTMLElement>(".frame")
+    if (!frame || pre.parentElement?.classList.contains("code-scroll")) continue
+    const scroll = document.createElement("div")
+    scroll.className = "code-scroll"
+    pre.before(scroll)
+    scroll.append(pre)
+
+    const button = frame.querySelector<HTMLButtonElement>(".copy button")
+    if (button) {
+      button.type = "button"
+      button.setAttribute("aria-label", "Copy code")
+      button.dataset.copied = "Copied"
+    }
+
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth, scrollHeight, clientHeight } = pre
+      scroll.toggleAttribute("data-overflow-start", scrollLeft > 1)
+      scroll.toggleAttribute("data-overflow-end", scrollWidth - clientWidth - scrollLeft > 1)
+      const overflowing = scrollWidth > clientWidth + 1 || scrollHeight > clientHeight + 1
+      // Only add an extra keyboard stop when there is something to scroll.
+      pre.tabIndex = overflowing ? 0 : -1
+      if (overflowing) pre.setAttribute("aria-label", "Scrollable code block")
+      else pre.removeAttribute("aria-label")
+    }
+
+    pre.addEventListener("scroll", update, { passive: true })
+    frame.addEventListener("toggle", update, true)
+    const observer = new ResizeObserver(update)
+    observer.observe(pre)
+    const code = pre.querySelector("code")
+    if (code) observer.observe(code)
+    // content-visibility may defer layout until the block approaches the viewport.
+    frame.parentElement?.addEventListener("contentvisibilityautostatechange", update)
+    document.fonts.ready.then(update)
+    update()
+  }
+</script>
+
+<style is:global>
+  prose-content .expressive-code {
+    .code-scroll {
+      position: relative;
+      display: block;
+      min-inline-size: 0;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block: 1px;
+        inline-size: 1.25rem;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      &::before {
+        inset-inline-start: 1px;
+        background: linear-gradient(to right, var(--background), transparent);
+      }
+
+      &::after {
+        inset-inline-end: 1px;
+        background: linear-gradient(to left, var(--background), transparent);
+      }
+
+      &[data-overflow-start]::before,
+      &[data-overflow-end]::after {
+        opacity: 1;
+      }
+    }
+
+    .copy button {
+      background: var(--background);
+
+      &::after {
+        margin: 0;
+        mask-size: 1rem;
+        mask-position: center;
+        -webkit-mask-size: 1rem;
+        -webkit-mask-position: center;
+        background-color: var(--muted-foreground);
+      }
+
+      &:focus-visible {
+        opacity: 1;
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+    }
+
+    .frame:focus-within .copy button {
+      opacity: 1;
+    }
+
+    .copy .feedback {
+      --tooltip-bg: var(--foreground);
+      color: var(--background);
+      font-family: var(--font-mono);
+    }
+
+    @media (any-pointer: coarse), (hover: none) {
+      .copy button {
+        inline-size: 2.75rem;
+        block-size: 2.75rem;
+        opacity: 0.85;
+      }
+
+      .ec-line:first-child .code {
+        padding-inline-end: calc(2.75rem + var(--ec-codePadInl));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .copy button,
+      .copy .feedback {
+        transition: none;
+      }
+    }
+  }
+</style>

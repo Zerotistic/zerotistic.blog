@@ -1,6 +1,5 @@
 import type { SvgComponent } from "astro/types"
 import GitHub from "@/assets/icons/github.svg"
-import RSS from "@/assets/icons/rss.svg"
 import Twitter from "@/assets/icons/twitter.svg"
 
 export const SITE = {
@@ -16,11 +15,11 @@ export const SITE = {
 export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
   { href: "https://github.com/Zerotistic", label: "GitHub", icon: GitHub },
   { href: "https://x.com/gegrgtezrze", label: "X", icon: Twitter },
-  { href: "/rss.xml", label: "RSS", icon: RSS },
 ]
 
 export const NAVIGATION = [
   { href: "/posts", label: "posts" },
+  { href: "/work", label: "work" },
   { href: "/cves", label: "cves" },
   { href: "/mentions", label: "mentions" },
 ]

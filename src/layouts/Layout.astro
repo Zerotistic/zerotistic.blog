@@ -14,6 +14,7 @@ import "@/styles/layout.css"
 import "@/styles/icon-button.css"
 import "@/styles/bar.css"
 import "@/styles/shape.css"
+import "@/styles/interaction.css"
 
 import Footer from "@/components/Footer.astro"
 import AvalonBackground from "@/components/AvalonBackground.astro"
@@ -22,11 +23,12 @@ import SiriClock from "@/components/SiriClock.astro"
 import SiriDemo from "@/components/SiriDemo.astro"
 import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
+import TouchFeedback from "@/components/TouchFeedback.astro"
 import { SITE } from "@/consts"
 
-type Props = { crumbs?: { label: string; href: string }[] }
+type Props = { crumbs?: { label: string; href: string }[]; showArtoria?: boolean; wide?: boolean; reading?: boolean }
 
-const { crumbs } = Astro.props
+const { crumbs, showArtoria = true, wide = false, reading = false } = Astro.props
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
@@ -34,11 +36,12 @@ const { crumbs } = Astro.props
     <slot name="head" />
   </MetaHead>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <AvalonBackground />
-    <page-grid>
+    <page-grid class:list={{ reading }}>
       <page-header>
         <page-nav>
-          <Sidebar crumbs={crumbs}
+          <Sidebar crumbs={crumbs} showArtoria={showArtoria}
             ><slot name="actions" slot="actions" /></Sidebar
           >
         </page-nav>
@@ -46,15 +49,16 @@ const { crumbs } = Astro.props
             <page-toc><slot name="toc" /></page-toc>
           )}
       </page-header>
-      <page-content>
-        <main><slot /></main>
-        <page-footer><Footer /></page-footer>
+      <page-content class:list={{ wide }}>
+        <main id="main-content" tabindex="-1"><slot /></main>
+        <page-footer><Footer showArtoria={showArtoria} /></page-footer>
       </page-content>
     </page-grid>
 
     <ImageViewer />
     <SiriClock />
     <SiriDemo />
+    <TouchFeedback />
 
     <script is:inline>
       console.log(
@@ -67,6 +71,24 @@ const { crumbs } = Astro.props
 </html>
 
 <style>
+  .skip-link {
+    position: fixed;
+    inset-block-start: var(--space-xs);
+    inset-inline-start: var(--space-xs);
+    z-index: 100;
+    padding: var(--space-xs) var(--space-s);
+    background: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--accent);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    transform: translateY(calc(-100% - var(--space-l)));
+
+    &:focus {
+      transform: none;
+    }
+  }
+
   page-grid {
     position: relative;
     isolation: isolate;
@@ -145,12 +167,51 @@ const { crumbs } = Astro.props
       margin-block-start: var(--space-xl);
     }
 
+    @media (width >= 64rem) {
+      &.wide {
+        grid-column: 3 / -1;
+      }
+    }
+
     @media (width < 64rem) {
       grid-column: 1 / -1;
       grid-row: auto;
       inline-size: 100%;
       max-inline-size: var(--measure);
       margin-inline: auto;
+    }
+  }
+
+  @media (width < 64rem) {
+    page-grid.reading {
+      row-gap: 0;
+
+      &:has(page-toc) {
+        grid-template-rows: auto auto 1fr;
+      }
+
+      /* The contents bar sticks to the whole page, not a short header. */
+      page-header {
+        display: contents;
+      }
+
+      page-nav,
+      page-toc {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        margin-inline: calc(-1 * var(--grid-gutter));
+      }
+
+      page-toc {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        z-index: 10;
+      }
+
+      page-content {
+        margin-block-start: var(--grid-gutter);
+      }
     }
   }
 </style>

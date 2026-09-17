@@ -4,9 +4,9 @@ import Artoria from "@/components/Artoria.astro"
 import { NAVIGATION, SITE } from "@/consts"
 import { normalizePath } from "@/lib/utils"
 
-type Props = { crumbs?: { label: string; href: string }[] }
+type Props = { crumbs?: { label: string; href: string }[]; showArtoria?: boolean }
 
-const { crumbs = [] } = Astro.props
+const { crumbs = [], showArtoria = true } = Astro.props
 const pathname = normalizePath(Astro.url.pathname) || "/"
 const section = NAVIGATION.find(
   ({ href }) => pathname === href || pathname.startsWith(`${href}/`),
@@ -24,7 +24,13 @@ const section = NAVIGATION.find(
             <li>
               <a
                 href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
+                aria-current={
+                  pathname === item.href
+                    ? "page"
+                    : item === section
+                      ? "location"
+                      : undefined
+                }
               >
                 {item.label}
               </a>
@@ -59,7 +65,7 @@ const section = NAVIGATION.find(
             ))}
       </ul>
     </nav>
-    <Artoria placement="sidebar" />
+    {showArtoria && <Artoria placement="sidebar" />}
   </sidebar-inner>
   <sidebar-toggle>
     <ThemeToggle />
@@ -151,11 +157,11 @@ const section = NAVIGATION.find(
       color: var(--muted-foreground);
 
       &:hover,
-      &[aria-current="page"] {
+      &[aria-current] {
         color: var(--foreground);
       }
 
-      &[aria-current="page"] {
+      &[aria-current] {
         text-decoration-color: var(--accent);
       }
     }
@@ -178,8 +184,19 @@ const section = NAVIGATION.find(
 
     @media (width < 64rem) {
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: center;
-      gap: var(--space-s);
+      gap: max(0px, calc(var(--space-s) - 1rem));
+      row-gap: 0;
+      margin-inline: -0.5rem;
+
+      a {
+        display: flex;
+        align-items: center;
+        min-inline-size: 2.75rem;
+        min-block-size: 2.75rem;
+        padding-inline: 0.5rem;
+      }
 
       ul {
         display: none;
@@ -187,7 +204,7 @@ const section = NAVIGATION.find(
     }
 
     @media (width < 23rem) {
-      gap: var(--space-2xs);
+      gap: 0;
     }
   }
 

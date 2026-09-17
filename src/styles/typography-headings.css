@@ -27,7 +27,7 @@ prose-content {
       }
     }
 
-    &:is(:hover, :target) [data-heading-anchor] {
+    &:is(:hover, :target, :focus-within) [data-heading-anchor] {
       opacity: 1;
     }
 

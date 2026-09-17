@@ -1,0 +1,72 @@
+<figure class="work-cheer">
+  <img
+    src="/static/work/artoria-pointing.webp"
+    width="480"
+    height="461"
+    alt="Artoria excitedly pointing toward HiddenLayer"
+    decoding="async"
+  />
+  <figcaption>I work here!</figcaption>
+</figure>
+
+<style>
+  .work-cheer {
+    position: absolute;
+    inset-block-start: -1.25rem;
+    inset-inline-end: 0;
+    inline-size: 10rem;
+    pointer-events: none;
+
+    img {
+      display: block;
+      inline-size: 100%;
+      block-size: auto;
+    }
+
+    figcaption {
+      position: absolute;
+      inset-block-end: calc(100% + 0.35rem);
+      inset-inline-end: -0.25rem;
+      padding: 0.5em 0.75em;
+      border: 1px solid var(--border);
+      border-radius: 0.75rem 0.75rem 0.25rem 0.75rem;
+      background: var(--sand-2);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.4;
+      white-space: nowrap;
+      rotate: 4deg;
+    }
+  }
+
+  @media (40rem <= width < 80rem) {
+    .work-cheer {
+      inline-size: 8rem;
+    }
+  }
+
+  @media (40rem <= width < 64rem) {
+    .work-cheer {
+      inset-block-start: 2.25rem;
+    }
+  }
+
+  @media (width < 40rem) {
+    .work-cheer {
+      position: relative;
+      inset: auto;
+      inline-size: 6.5rem;
+      margin-block-start: var(--space-s);
+      margin-inline-start: auto;
+
+      figcaption {
+        inset-block-end: auto;
+        inset-block-start: 1.25rem;
+        inset-inline-end: calc(100% + 0.25rem);
+        font-size: 0.75rem;
+        rotate: -4deg;
+      }
+    }
+  }
+</style>

@@ -22,7 +22,6 @@ export function headingAnchors() {
             dataHeadingAnchor: "",
             href: `#${id}`,
             ariaLabel: "Link to this section",
-            tabIndex: -1,
           }),
         )
       },

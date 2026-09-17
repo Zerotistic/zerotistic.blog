@@ -3,6 +3,8 @@ import MetaPost from "@/components/MetaPost.astro"
 import LinkPreviews from "@/components/LinkPreviews.astro"
 import { postLinkPreviews } from "@/lib/link-previews"
 import PostActions from "@/components/PostActions.astro"
+import PostNavigation from "@/components/PostNavigation.astro"
+import CodeTools from "@/components/CodeTools.astro"
 import ScrollToTop from "@/components/ScrollToTop.astro"
 import SeriesReader from "@/components/SeriesReader.astro"
 import TableOfContents from "@/components/TableOfContents.astro"
@@ -74,7 +76,7 @@ if (chain.length > 1) {
 }
 ---
 
-<Layout crumbs={crumbs}>
+<Layout crumbs={crumbs} reading>
   <MetaPost
     slot="head"
     post={post}
@@ -90,6 +92,7 @@ if (chain.length > 1) {
   <PostActions slot="actions" prev={prev} next={next} />
   <ScrollToTop floating />
   <LinkPreviews />
+  <CodeTools />
   {rendered.map(({ entry, Content, authors, linkPreviews }, i) => (
       <article
         id={i === 0 ? undefined : subpostSlug(entry.id)}
@@ -166,6 +169,7 @@ if (chain.length > 1) {
         </prose-content>
       </article>
     ))}
+  <PostNavigation prev={prev} next={next} />
   {chain.length > 1 && <SeriesReader />}
 </Layout>
 
@@ -275,7 +279,13 @@ if (chain.length > 1) {
 
       @media (width < 40rem) {
         grid-template-columns: 1fr;
-        gap: var(--space-s);
+        gap: var(--space-2xs);
+
+        .fact-row {
+          grid-template-columns: 5rem minmax(0, 1fr);
+          align-items: baseline;
+          gap: var(--space-s);
+        }
       }
 
       .fact-row {

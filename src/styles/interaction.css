@@ -1,0 +1,11 @@
+@media (any-pointer: coarse) {
+  :is(
+      a[href],
+      button:enabled,
+      summary,
+      label:has(> input[type="checkbox"])
+    ):is([data-pressed], :where(:focus-visible:active)) {
+    background-color: var(--accent-muted);
+    transition: none;
+  }
+}

@@ -1,6 +1,8 @@
 ---
 import { cveUrl, duplicateProject, products } from "@/data/cves"
 import MetaPage from "@/components/MetaPage.astro"
+import ScrollEdges from "@/components/ScrollEdges.astro"
+import CveReference from "@/components/CveReference.astro"
 import Layout from "@/layouts/Layout.astro"
 
 const findingCount = products
@@ -10,6 +12,8 @@ const criticalCount = products
   .flatMap((product) => product.findings)
   .filter((finding) => finding.severity === "critical").length
 const duplicateFinding = duplicateProject.findings[0]
+const findingAnchor = (id: string, product: string) =>
+  id.includes("XXXX") ? `${product}-pending` : id.toLowerCase()
 ---
 
 <Layout>
@@ -19,55 +23,57 @@ const duplicateFinding = duplicateProject.findings[0]
     description="A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling."
   />
 
-  <nav slot="toc" class="project-nav" data-bar aria-label="Project index">
-    <div class="project-board">
-      <p class="index-label">
-        <span class="index-title">
-          <span aria-hidden="true">//</span>
-          projects
-        </span>
-        <span class="count-label">CVEs</span>
-      </p>
-      <ol>
-        {products.map((product, productIndex) => (
-            <li>
-              <a
-                href={`#${product.id}`}
-                aria-current={productIndex === 0 ? "location" : undefined}
-              >
-                <span>{product.name}</span>
-                <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
-                  {product.findings.length.toString().padStart(2, "0")}
-                </span>
-              </a>
-            </li>
-          ))}
-      </ol>
-    </div>
+  <ScrollEdges slot="toc">
+    <nav class="project-nav" data-bar aria-label="Project index">
+      <div class="project-board">
+        <p class="index-label">
+          <span class="index-title">
+            <span aria-hidden="true">//</span>
+            projects
+          </span>
+          <span class="count-label">CVEs</span>
+        </p>
+        <ol>
+          {products.map((product, productIndex) => (
+              <li>
+                <a
+                  href={`#${product.id}`}
+                  aria-current={productIndex === 0 ? "location" : undefined}
+                >
+                  <span>{product.name}</span>
+                  <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
+                    {product.findings.length.toString().padStart(2, "0")}
+                  </span>
+                </a>
+              </li>
+            ))}
+        </ol>
+      </div>
 
-    <div class="project-board duplicate-nav-board">
-      <p class="index-label">
-        <span class="index-title">
-          <span aria-hidden="true">//</span>
-          duplicates
-        </span>
-        <span class="count-label">research notes</span>
-      </p>
-      <ol>
-        <li>
-          <a href={`#${duplicateProject.id}`}>
-            <span>{duplicateProject.name}</span>
-            <span
-              class="index-count"
-              aria-label={`${duplicateProject.findings.length} duplicate finding`}
-            >
-              {duplicateProject.findings.length.toString().padStart(2, "0")}
-            </span>
-          </a>
-        </li>
-      </ol>
-    </div>
-  </nav>
+      <div class="project-board duplicate-nav-board">
+        <p class="index-label">
+          <span class="index-title">
+            <span aria-hidden="true">//</span>
+            duplicates
+          </span>
+          <span class="count-label">research notes</span>
+        </p>
+        <ol>
+          <li>
+            <a href={`#${duplicateProject.id}`}>
+              <span>{duplicateProject.name}</span>
+              <span
+                class="index-count"
+                aria-label={`${duplicateProject.findings.length} duplicate finding`}
+              >
+                {duplicateProject.findings.length.toString().padStart(2, "0")}
+              </span>
+            </a>
+          </li>
+        </ol>
+      </div>
+    </nav>
+  </ScrollEdges>
 
   <header class="page-heading">
     <p class="eyebrow">
@@ -114,9 +120,9 @@ const duplicateFinding = duplicateProject.findings[0]
           <ol class="finding-list">
             {product.findings.map((finding) => (
                 <li>
-                  <article>
+                  <article id={findingAnchor(finding.id, product.id)}>
                     <div class="record-meta">
-                      <code>{finding.id}</code>
+                      <CveReference id={finding.id} anchor={findingAnchor(finding.id, product.id)} />
                       {finding.score && finding.cvss && finding.severity ? (
                         <span
                           class="score"
@@ -194,9 +200,9 @@ const duplicateFinding = duplicateProject.findings[0]
 
         <ol class="finding-list">
           <li>
-            <article>
+            <article id={duplicateFinding.id.toLowerCase()}>
               <div class="record-meta">
-                <code>{duplicateFinding.id}</code>
+                <CveReference id={duplicateFinding.id} />
               </div>
               <h4>{duplicateFinding.title}</h4>
               <p>{duplicateFinding.summary}</p>
@@ -451,13 +457,13 @@ const duplicateFinding = duplicateProject.findings[0]
   }
 
   .product-group {
-    scroll-margin-block-start: calc(
-      var(--bar-nav-height, 0px) +
-      var(--bar-toc-height, 0px) +
-      var(--space-s)
-    );
+    scroll-margin-block-start: var(--space-s);
     animation: group-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(var(--group-index) * 55ms);
+
+    @media (width < 64rem) {
+      scroll-margin-block-start: 0;
+    }
   }
 
   .product-heading {
@@ -501,12 +507,30 @@ const duplicateFinding = duplicateProject.findings[0]
     }
 
     article {
+      --record-inset: var(--space-xs);
+      /* Extend the highlight into the gutter without moving the text. */
+      margin-inline: calc(-1 * var(--record-inset));
+      padding-inline: var(--record-inset);
       padding-block: var(--space-s);
-      transition: padding-inline 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      scroll-margin-block-start: var(--space-s);
+      transition: background-color 0.15s ease;
 
       &:has(a:hover),
       &:has(a:focus-visible) {
-        padding-inline: var(--space-2xs);
+        background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+      }
+
+      &:target {
+        background-color: color-mix(in oklab, var(--accent) 10%, transparent);
+        box-shadow: -3px 0 0 var(--accent);
+      }
+
+      @media (width < 64rem) {
+        scroll-margin-block-start: 0;
+      }
+
+      @media (width < 40rem) {
+        --record-inset: var(--space-2xs);
       }
     }
 

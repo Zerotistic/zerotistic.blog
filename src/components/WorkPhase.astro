@@ -1,0 +1,32 @@
+---
+import type { WorkEntry } from "@/data/work"
+import { formatWorkDate } from "@/lib/work"
+
+type Props = { phase: NonNullable<WorkEntry["phases"]>[number] }
+const { phase } = Astro.props
+---
+
+<div class="phase">
+  <p class="phase-label">{phase.label}</p>
+  <p class="phase-dates">
+    {phase.approximateStart && "Around "}
+    <time datetime={phase.start}>{formatWorkDate(phase.start)}</time>
+    {" — "}
+    {phase.approximateEnd && "around "}
+    <time datetime={phase.end}>{formatWorkDate(phase.end)}</time>
+  </p>
+</div>
+
+<style>
+  .phase-label {
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    color: var(--prose-foreground);
+  }
+
+  .phase-dates {
+    margin-block-start: var(--space-3xs);
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+</style>

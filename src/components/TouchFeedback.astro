@@ -1,0 +1,30 @@
+<script>
+  let pressed: HTMLElement | undefined
+  let pointerId: number | undefined
+
+  const clear = (event?: Event) => {
+    if (event instanceof PointerEvent && event.pointerId !== pointerId) return
+    pressed?.removeAttribute("data-pressed")
+    pressed = undefined
+    pointerId = undefined
+  }
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary) return
+    clear()
+    if (event.pointerType === "mouse" || !(event.target instanceof Element)) return
+    const target = event.target.closest<HTMLElement>(
+      'a[href], button:enabled, summary, label:has(> input[type="checkbox"])',
+    )
+    if (!target || target.getAttribute("aria-disabled") === "true") return
+    pressed = target
+    pointerId = event.pointerId
+    target.setAttribute("data-pressed", "")
+  }, { passive: true })
+
+  document.addEventListener("pointerup", clear, { passive: true })
+  document.addEventListener("pointercancel", clear, { passive: true })
+  document.addEventListener("scroll", clear, { capture: true, passive: true })
+  addEventListener("blur", clear)
+  addEventListener("pagehide", clear)
+</script>

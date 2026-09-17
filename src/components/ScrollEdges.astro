@@ -1,0 +1,81 @@
+<scroll-edges><slot /></scroll-edges>
+
+<style>
+  scroll-edges {
+    display: block;
+
+    @media (width < 64rem) {
+      position: relative;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        inline-size: 1.5rem;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+
+      &::before {
+        inset-inline-start: 0;
+        background: linear-gradient(to right, var(--background), transparent);
+      }
+
+      &::after {
+        inset-inline-end: 0;
+        background: linear-gradient(to left, var(--background), transparent);
+      }
+
+      &[data-overflow-start]::before,
+      &[data-overflow-end]::after {
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &::before,
+      &::after {
+        transition: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  class ScrollEdges extends HTMLElement {
+    scroller?: HTMLElement
+    observer?: ResizeObserver
+
+    update = () => {
+      if (!this.scroller) return
+      const { scrollLeft, scrollWidth, clientWidth } = this.scroller
+      this.toggleAttribute("data-overflow-start", scrollLeft > 1)
+      this.toggleAttribute(
+        "data-overflow-end",
+        scrollWidth - clientWidth - scrollLeft > 1,
+      )
+    }
+
+    connectedCallback() {
+      const scroller = this.firstElementChild
+      if (!(scroller instanceof HTMLElement)) return
+      this.scroller = scroller
+      scroller.addEventListener("scroll", this.update, { passive: true })
+      this.observer = new ResizeObserver(this.update)
+      this.observer.observe(scroller)
+      for (const child of scroller.children) this.observer.observe(child)
+      this.update()
+    }
+
+    disconnectedCallback() {
+      this.scroller?.removeEventListener("scroll", this.update)
+      this.observer?.disconnect()
+    }
+  }
+
+  if (!customElements.get("scroll-edges"))
+    customElements.define("scroll-edges", ScrollEdges)
+</script>

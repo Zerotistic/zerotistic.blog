@@ -1,5 +1,6 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
+import ScrollEdges from "@/components/ScrollEdges.astro"
 import { mentionGroups } from "@/data/mentions"
 import Layout from "@/layouts/Layout.astro"
 
@@ -16,24 +17,26 @@ const mentionCount = mentionGroups.reduce(
     description="Selected press coverage, academic citations, and technical references to zerotistic's research."
   />
 
-  <nav slot="toc" class="mention-nav" data-bar aria-label="Mention index">
-    <p>
-      <span><span aria-hidden="true">//</span> index</span>
-      <span class="index-total"
-        >{mentionCount.toString().padStart(2, "0")}</span
-      >
-    </p>
-    <ol>
-      {mentionGroups.map((group) => (
-          <li>
-            <a href={`#${group.id}`}>
-              <span>{group.title}</span>
-              <span class="index-count">{group.mentions.length.toString().padStart(2, "0")}</span>
-            </a>
-          </li>
-        ))}
-    </ol>
-  </nav>
+  <ScrollEdges slot="toc">
+    <nav class="mention-nav" data-bar aria-label="Mention index">
+      <p>
+        <span><span aria-hidden="true">//</span> index</span>
+        <span class="index-total"
+          >{mentionCount.toString().padStart(2, "0")}</span
+        >
+      </p>
+      <ol>
+        {mentionGroups.map((group) => (
+            <li>
+              <a href={`#${group.id}`}>
+                <span>{group.title}</span>
+                <span class="index-count">{group.mentions.length.toString().padStart(2, "0")}</span>
+              </a>
+            </li>
+          ))}
+      </ol>
+    </nav>
+  </ScrollEdges>
 
   <header class="page-heading">
     <p class="eyebrow"><span aria-hidden="true">//</span> elsewhere</p>
@@ -212,11 +215,11 @@ const mentionCount = mentionGroups.reduce(
     gap: var(--space-xl);
 
     > section {
-      scroll-margin-block-start: calc(
-        var(--bar-nav-height, 0px) +
-        var(--bar-toc-height, 0px) +
-        var(--space-s)
-      );
+      scroll-margin-block-start: var(--space-s);
+
+      @media (width < 64rem) {
+        scroll-margin-block-start: 0;
+      }
     }
   }
 

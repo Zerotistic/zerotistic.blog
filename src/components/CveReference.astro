@@ -1,0 +1,103 @@
+---
+type Props = { id: string; anchor?: string }
+const { id, anchor = id.toLowerCase() } = Astro.props
+const publishedId = /^CVE-\d{4}-\d+$/.test(id)
+---
+
+<span class="cve-reference">
+  <a href={`#${anchor}`} title={`Link to ${id}`}>
+    <code>{id}</code><span class="hash" aria-hidden="true">#</span>
+  </a>
+  {publishedId && (
+    <span class="copy-id">
+      <button type="button" data-icon-button data-copy-id={id} aria-label={`Copy ${id} ID`} title="Copy CVE ID" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <rect x="8" y="8" width="12" height="12" rx="2" />
+          <path d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4" />
+        </svg>
+      </button>
+      <span class="copy-status" role="status" aria-live="polite" aria-atomic="true"></span>
+    </span>
+  )}
+</span>
+
+<style>
+  .cve-reference {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    min-inline-size: 0;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 1ch;
+    min-block-size: 2rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--foreground);
+  }
+
+  code {
+    font: inherit;
+    letter-spacing: 0;
+  }
+
+  .hash,
+  button {
+    color: var(--muted-foreground);
+  }
+
+  .copy-id {
+    position: relative;
+    display: inline-flex;
+  }
+
+  button[hidden] {
+    display: none;
+  }
+
+  .copy-status:not(:empty) {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    z-index: 2;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--foreground);
+    font: 0.75rem var(--font-mono);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  @media (any-pointer: coarse) {
+    a,
+    button {
+      min-block-size: 2.75rem;
+    }
+
+    button {
+      min-inline-size: 2.75rem;
+    }
+  }
+</style>
+
+<script>
+  import { copyText } from "@/lib/clipboard"
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-id]")) {
+    const status = button.parentElement?.querySelector<HTMLElement>(".copy-status")
+    if (!status) continue
+    button.hidden = false
+    let timer: ReturnType<typeof setTimeout>
+    button.addEventListener("click", async () => {
+      clearTimeout(timer)
+      status.textContent = ""
+      const copied = await copyText(button.dataset.copyId!)
+      status.textContent = copied ? "Copied" : "Couldn’t copy"
+      timer = setTimeout(() => { status.textContent = "" }, 2000)
+    })
+  }
+</script>

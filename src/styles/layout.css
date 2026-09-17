@@ -50,7 +50,7 @@ html {
   scrollbar-gutter: stable;
 
   @media (width < 64rem) {
-    --bar-nav-height: calc(2rem + 2 * var(--space-2xs) + 2px);
+    --bar-nav-height: calc(2.75rem + 2 * var(--space-2xs) + 2px);
     --bar-toc-height: 0px;
     scroll-padding-block-start: calc(
       var(--bar-nav-height) +
@@ -64,6 +64,18 @@ html {
   }
 
   @media (width < 30rem) {
-    --bar-nav-height: calc(3.5rem + 2 * var(--space-2xs) + 8px);
+    --bar-nav-height: calc(
+      1.5 * var(--step-0) + 2.75rem + 2 * var(--space-2xs) + 8px
+    );
+  }
+
+  @media (width < 64rem) {
+    &:has(page-grid.reading) {
+      --bar-nav-height: 0px;
+    }
+
+    &:has(page-grid.reading page-toc) {
+      --bar-toc-height: max(2.75rem, calc(1.5 * var(--step--1) + 2 * var(--space-2xs) + 2px));
+    }
   }
 }

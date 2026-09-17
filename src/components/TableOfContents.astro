@@ -96,6 +96,7 @@ const { title, sections } = Astro.props
 
     @media (width < 64rem) {
       display: flex;
+      min-block-size: 2.75rem;
       align-items: center;
       gap: var(--space-2xs);
       cursor: pointer;
@@ -385,6 +386,32 @@ const { title, sections } = Astro.props
     toggle?.addEventListener("change", () => {
       if (toggle.checked) center()
     })
+
+    document.addEventListener("pointerdown", (event) => {
+      if (
+        mobile.matches &&
+        toggle?.checked &&
+        !event.composedPath().includes(nav)
+      ) {
+        toggle.checked = false
+      }
+    })
+    document.addEventListener("keydown", (event) => {
+      if (
+        event.key !== "Escape" ||
+        event.defaultPrevented ||
+        !mobile.matches ||
+        !toggle?.checked
+      )
+        return
+      event.preventDefault()
+      toggle.checked = false
+      toggle.focus({ preventScroll: true })
+    })
+    mobile.addEventListener("change", () => {
+      if (!mobile.matches && toggle) toggle.checked = false
+    })
+
     list.addEventListener("click", (event) => {
       if (toggle && (event.target as Element).closest?.("a")) {
         toggle.checked = false
