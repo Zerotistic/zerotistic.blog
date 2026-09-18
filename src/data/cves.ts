@@ -131,6 +131,90 @@ const productData: Product[] = [
           href: "https://github.com/payloadcms/payload/security/advisories/GHSA-vc4h-q48j-5hcx",
         },
       },
+      {
+        id: "GHSA-97rh-rhh2-7vjv",
+        title: "Remote code execution through first registration",
+        summary:
+          "The initial account-registration flow could allow remote code execution on affected Payload CMS deployments.",
+        published: "2026-09-18",
+        score: "8.1",
+        cvss: "3.1",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-97rh-rhh2-7vjv",
+        },
+      },
+      {
+        id: "GHSA-9qpg-3cf8-w33x",
+        title: "Stored cross-site scripting through XML uploads",
+        summary:
+          "Uploaded XML files could execute JavaScript in the application's origin when opened, exposing users to stored cross-site scripting.",
+        published: "2026-09-18",
+        score: "8.6",
+        cvss: "4.0",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-9qpg-3cf8-w33x",
+        },
+      },
+      {
+        id: "GHSA-2pwp-2369-8fg3",
+        title: "Sanitization bypass for uploaded SVG files",
+        summary:
+          "An SVG upload could bypass sanitization and execute JavaScript when the stored file was opened.",
+        published: "2026-09-18",
+        score: "8.7",
+        cvss: "3.1",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-2pwp-2369-8fg3",
+        },
+      },
+      {
+        id: "GHSA-238x-w2j9-gwwr",
+        title: "API-key disclosure through document reads",
+        summary:
+          "Ordinary document reads could expose API keys that should remain restricted.",
+        published: "2026-09-18",
+        score: "7.7",
+        cvss: "4.0",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-238x-w2j9-gwwr",
+        },
+      },
+      {
+        id: "GHSA-xgv3-crq2-6f69",
+        title: "Restricted-field disclosure during token refresh",
+        summary:
+          "Token-refresh and password-reset responses could expose protected user fields despite field-level read restrictions.",
+        published: "2026-09-18",
+        score: "7.1",
+        cvss: "4.0",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-xgv3-crq2-6f69",
+        },
+      },
+      {
+        id: "GHSA-p223-2wr2-j562",
+        title: "Arbitrary file deletion through upload metadata",
+        summary:
+          "Insufficient validation of upload metadata could allow file cleanup to remove files outside the upload directory.",
+        published: "2026-09-18",
+        score: "8.1",
+        cvss: "3.1",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-p223-2wr2-j562",
+        },
+      },
     ],
   },
   {
