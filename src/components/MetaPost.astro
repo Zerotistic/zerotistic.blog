@@ -1,7 +1,9 @@
 ---
 import { getEntries, type CollectionEntry } from "astro:content"
+import DiscordEmbed from "@/components/DiscordEmbed.astro"
 import { SITE } from "@/consts"
 import { pageTitle, titleEmbedText, titleText } from "@/lib/content"
+import { formatDate, readingTime } from "@/lib/utils"
 import { createHash } from "node:crypto"
 
 type Props = {
@@ -58,3 +60,14 @@ ogImage.searchParams.set("v", ogImageVersion)
 
 <meta property="article:published_time" content={date.toISOString()}>
 {authorNames.map((name) => <meta property="article:author" content={name} />)}
+
+<DiscordEmbed
+  title={title}
+  description={description}
+  url={url}
+  details={[
+    ...authorNames,
+    formatDate(date),
+    readingTime(post.body ?? ""),
+  ].join(" · ")}
+/>

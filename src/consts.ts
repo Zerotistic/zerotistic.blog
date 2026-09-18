@@ -4,6 +4,7 @@ import Twitter from "@/assets/icons/twitter.svg"
 
 export const SITE = {
   title: "zerotistic",
+  tagline: "Reverse engineering, pwn, automation and dumb ideas.",
   description:
     "Reverse engineering, pwn, automation and dumb ideas. Vulnerability research, Binary Ninja and CTF writeups.",
   locale: "en-US",

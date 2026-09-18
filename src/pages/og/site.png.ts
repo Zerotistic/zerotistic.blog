@@ -5,7 +5,7 @@ import type { APIRoute } from "astro"
 export const GET: APIRoute = async () => {
   const image = await generateOgImage({
     title: SITE.title,
-    description: "Reverse engineering, pwn, automation and dumb ideas.",
+    description: SITE.tagline,
     meta: "vulnerability research · reverse engineering",
   })
   return new Response(image, {

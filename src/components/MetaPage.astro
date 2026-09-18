@@ -1,4 +1,6 @@
 ---
+import { getEntry } from "astro:content"
+import DiscordEmbed from "@/components/DiscordEmbed.astro"
 import { SITE } from "@/consts"
 import { pageTitle } from "@/lib/content"
 
@@ -15,6 +17,8 @@ const ogTitle = title ?? SITE.title
 const fullTitle = title ? pageTitle(title) : SITE.title
 const canonical = new URL(Astro.url.pathname, base)
 const ogImage = new URL(SITE.defaultPageImage, base)
+const isHome = Astro.url.pathname === "/" && !noindex
+const author = isHome ? await getEntry("authors", "zerotistic") : undefined
 ---
 
 <title>{fullTitle}</title>
@@ -39,3 +43,16 @@ const ogImage = new URL(SITE.defaultPageImage, base)
 <meta name="twitter:description" content={description}>
 <meta name="twitter:image" content={ogImage}>
 <meta name="twitter:image:alt" content={ogTitle}>
+
+{isHome && (
+  <DiscordEmbed
+    title={SITE.title}
+    description={SITE.tagline}
+    url={canonical}
+    avatar={author && {
+      url: new URL(author.data.avatar, base),
+      description: `${author.data.name}'s avatar`,
+    }}
+    link={{ url: new URL("/cves", base), label: "Published CVEs" }}
+  />
+)}

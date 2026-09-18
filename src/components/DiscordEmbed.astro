@@ -1,0 +1,14 @@
+---
+import { discordEmbed, type DiscordEmbedOptions } from "@/lib/discord-embed"
+
+type Props = DiscordEmbedOptions
+
+const payload = discordEmbed(Astro.props)
+---
+
+<script
+  is:inline
+  id="discord:component-embed"
+  type="application/json"
+  set:html={payload}
+/>
