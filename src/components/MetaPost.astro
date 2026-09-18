@@ -65,6 +65,7 @@ ogImage.searchParams.set("v", ogImageVersion)
   title={title}
   description={description}
   url={url}
+  image={{ url: ogImage, description: cleanTitle }}
   details={[
     ...authorNames,
     formatDate(date),

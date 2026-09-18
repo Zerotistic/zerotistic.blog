@@ -49,10 +49,11 @@ const author = isHome ? await getEntry("authors", "zerotistic") : undefined
     title={SITE.title}
     description={SITE.tagline}
     url={canonical}
+    image={{ url: ogImage, description: ogTitle }}
     avatar={author && {
       url: new URL(author.data.avatar, base),
       description: `${author.data.name}'s avatar`,
     }}
-    link={{ url: new URL("/cves", base), label: "Published CVEs" }}
+    link={{ url: new URL("/cves", base), label: "Explore my research" }}
   />
 )}

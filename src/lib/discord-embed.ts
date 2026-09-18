@@ -4,6 +4,7 @@ export type DiscordEmbedOptions = {
   url: URL
   details?: string
   avatar?: { url: URL; description: string }
+  image?: { url: URL; description: string }
   link?: { url: URL; label: string }
 }
 
@@ -26,6 +27,7 @@ export function discordEmbed({
   url,
   details,
   avatar,
+  image,
   link,
 }: DiscordEmbedOptions) {
   const href = url.href.replaceAll("(", "%28").replaceAll(")", "%29")
@@ -54,6 +56,19 @@ export function discordEmbed({
               },
             ]
           : text),
+        ...(image
+          ? [
+              {
+                type: 12,
+                items: [
+                  {
+                    media: { url: image.url.href },
+                    description: image.description,
+                  },
+                ],
+              },
+            ]
+          : []),
         ...(details
           ? [{ type: 10, content: `-# ${escapeMarkdown(details)}` }]
           : []),
