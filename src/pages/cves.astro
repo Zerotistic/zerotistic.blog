@@ -1,8 +1,7 @@
 ---
 import { cveUrl, duplicateProject, products } from "@/data/cves"
 import MetaPage from "@/components/MetaPage.astro"
-import ScrollEdges from "@/components/ScrollEdges.astro"
-import CveReference from "@/components/CveReference.astro"
+import CveFinding from "@/components/CveFinding.astro"
 import Layout from "@/layouts/Layout.astro"
 
 const findingCount = products
@@ -16,64 +15,84 @@ const findingAnchor = (id: string, product: string) =>
   id.includes("XXXX") ? `${product}-pending` : id.toLowerCase()
 ---
 
-<Layout>
+<Layout reading narrowToc>
   <MetaPage
     slot="head"
     title="CVEs"
     description="A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling."
   />
 
-  <ScrollEdges slot="toc">
+  <div slot="toc" class="project-navigation">
+    <div class="project-picker" data-bar hidden>
+      <label for="project-picker">Project</label>
+      <div class="select-wrap">
+        <select id="project-picker" aria-label="Jump to project">
+          <optgroup label="Published findings">
+            {products.map((product) => (
+              <option value={product.id}>{product.name} · {product.findings.length}</option>
+            ))}
+          </optgroup>
+          <optgroup label="Duplicate findings">
+            <option value={duplicateProject.id}>
+              {duplicateProject.name}
+              · 1
+            </option>
+          </optgroup>
+        </select>
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </div>
+    </div>
+
     <nav class="project-nav" data-bar aria-label="Project index">
       <div class="project-board">
         <p class="index-label">
-          <span class="index-title">
-            <span aria-hidden="true">//</span>
-            projects
-          </span>
+          <span
+            ><span class="index-mark" aria-hidden="true">//</span>
+            projects</span
+          >
           <span class="count-label">findings</span>
         </p>
         <ol>
           {products.map((product, productIndex) => (
-              <li>
-                <a
-                  href={`#${product.id}`}
-                  aria-current={productIndex === 0 ? "location" : undefined}
-                >
-                  <span>{product.name}</span>
-                  <span class="index-count" aria-label={`${product.findings.length} findings`}>
-                    {product.findings.length.toString().padStart(2, "0")}
-                  </span>
-                </a>
-              </li>
-            ))}
+            <li>
+              <a href={`#${product.id}`} aria-current={productIndex === 0 ? "location" : undefined}>
+                <span>{product.name}</span>
+                <span class="index-count" aria-label={`${product.findings.length} findings`}>
+                  {product.findings.length.toString().padStart(2, "0")}
+                </span>
+              </a>
+            </li>
+          ))}
         </ol>
       </div>
-
       <div class="project-board duplicate-nav-board">
         <p class="index-label">
-          <span class="index-title">
-            <span aria-hidden="true">//</span>
-            duplicates
-          </span>
-          <span class="count-label">research notes</span>
+          <span
+            ><span class="index-mark" aria-hidden="true">//</span>
+            duplicates</span
+          >
         </p>
         <ol>
           <li>
             <a href={`#${duplicateProject.id}`}>
               <span>{duplicateProject.name}</span>
-              <span
-                class="index-count"
-                aria-label={`${duplicateProject.findings.length} duplicate finding`}
+              <span class="index-count" aria-label="1 duplicate finding"
+                >01</span
               >
-                {duplicateProject.findings.length.toString().padStart(2, "0")}
-              </span>
             </a>
           </li>
         </ol>
       </div>
     </nav>
-  </ScrollEdges>
+  </div>
 
   <header class="page-heading">
     <p class="eyebrow">
@@ -89,7 +108,7 @@ const findingAnchor = (id: string, product: string) =>
 
   <dl class="stats" aria-label="CVE summary">
     <div>
-      <dt>published findings</dt>
+      <dt>published</dt>
       <dd>{findingCount.toString().padStart(2, "0")}</dd>
     </div>
     <div>
@@ -103,81 +122,19 @@ const findingAnchor = (id: string, product: string) =>
   </dl>
 
   <div class="product-index" aria-label="Vulnerabilities grouped by product">
-    {products.map((product, productIndex) => (
-        <section
-          id={product.id}
-          class="product-group"
-          aria-labelledby={`${product.id}-heading`}
-          style={`--group-index:${productIndex}`}
-        >
-          <header class="product-heading">
-            <h2 id={`${product.id}-heading`}>{product.name}</h2>
-            <p>
-              {product.context} · {product.findings.length} {product.findings.length === 1 ? "finding" : "findings"}
-            </p>
-          </header>
-
-          <ol class="finding-list">
-            {product.findings.map((finding) => (
-                <li>
-                  <article id={findingAnchor(finding.id, product.id)}>
-                    <div class="record-meta">
-                      <CveReference id={finding.id} anchor={findingAnchor(finding.id, product.id)} />
-                      {finding.score && finding.cvss && finding.severity ? (
-                        <span
-                          class="score"
-                          data-severity={finding.severity}
-                          title={`${finding.severity} severity`}
-                        >
-                          CVSS {finding.cvss} · {finding.score}
-                        </span>
-                      ) : (
-                        <span class="score score-pending">CVSS pending</span>
-                      )}
-                    </div>
-                    <h3>{finding.title}</h3>
-                    <p>{finding.summary}</p>
-                    <footer class="record-footer">
-                      {finding.published ? (
-                        <time datetime={finding.published}>{finding.published}</time>
-                      ) : (
-                        <span class="record-pending">publication pending</span>
-                      )}
-                      <div class="record-links">
-                        {finding.url ? (
-                          <a
-                            href={finding.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            CVE record <span aria-hidden="true">↗</span>
-                          </a>
-                        ) : (
-                          <span class="record-pending">
-                            {finding.id.includes("XXXX")
-                              ? "ID pending"
-                              : finding.id.startsWith("GHSA-")
-                                ? "CVE ID not assigned"
-                                : "CVE record pending"}
-                          </span>
-                        )}
-                        {finding.advisory && (
-                          <a
-                            href={finding.advisory.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {finding.advisory.label} <span aria-hidden="true">↗</span>
-                          </a>
-                        )}
-                      </div>
-                    </footer>
-                  </article>
-                </li>
-              ))}
-          </ol>
-        </section>
-      ))}
+    {products.map((product) => (
+      <section id={product.id} class="product-group" aria-labelledby={`${product.id}-heading`}>
+        <header class="product-heading">
+          <h2 id={`${product.id}-heading`}>{product.name}<span class="product-count" aria-label={`${product.findings.length} findings`}>{product.findings.length.toString().padStart(2, "0")}</span></h2>
+          <p>{product.context}</p>
+        </header>
+        <ol class="finding-list" role="list">
+          {product.findings.map((finding) => (
+            <li><CveFinding finding={finding} anchor={findingAnchor(finding.id, product.id)} /></li>
+          ))}
+        </ol>
+      </section>
+    ))}
 
     <div class="duplicate-board" aria-labelledby="duplicate-board-heading">
       <header class="board-heading">
@@ -190,48 +147,26 @@ const findingAnchor = (id: string, product: string) =>
           first.
         </p>
       </header>
-
       <section
         id={duplicateProject.id}
         class="product-group"
         aria-labelledby={`${duplicateProject.id}-heading`}
-        style={`--group-index:${products.length}`}
       >
         <header class="product-heading">
-          <h3 id={`${duplicateProject.id}-heading`}>{duplicateProject.name}</h3>
-          <p>{duplicateProject.context} · 1 finding</p>
+          <h3 id={`${duplicateProject.id}-heading`}>
+            {duplicateProject.name}
+            <span class="product-count" aria-label="1 finding">01</span>
+          </h3>
+          <p>{duplicateProject.context}</p>
         </header>
-
-        <ol class="finding-list">
+        <ol class="finding-list" role="list">
           <li>
-            <article id={duplicateFinding.id.toLowerCase()}>
-              <div class="record-meta">
-                <CveReference id={duplicateFinding.id} />
-              </div>
-              <h4>{duplicateFinding.title}</h4>
-              <p>{duplicateFinding.summary}</p>
-              <footer class="record-footer duplicate-footer">
-                <div class="record-links">
-                  <a href={duplicateFinding.writeup}>
-                    Technical write-up <span aria-hidden="true">→</span>
-                  </a>
-                  <a
-                    href={cveUrl(duplicateFinding.id)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    CVE record <span aria-hidden="true">↗</span>
-                  </a>
-                  <a
-                    href={duplicateFinding.note}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Original note <span aria-hidden="true">↗</span>
-                  </a>
-                </div>
-              </footer>
-            </article>
+            <CveFinding
+              finding={{ ...duplicateFinding, url: cveUrl(duplicateFinding.id) }}
+              heading="h4"
+              writeup={duplicateFinding.writeup}
+              note={duplicateFinding.note}
+            />
           </li>
         </ol>
       </section>
@@ -245,10 +180,20 @@ const findingAnchor = (id: string, product: string) =>
 </Layout>
 
 <style>
-  .project-nav {
+  .project-navigation {
     font-family: var(--font-mono);
     font-size: var(--step--1);
     letter-spacing: 0;
+    max-block-size: 100%;
+    overflow-y: auto;
+  }
+
+  .project-picker {
+    display: none;
+  }
+
+  .project-nav {
+    padding-inline-start: var(--space-2xs);
 
     .project-board + .project-board {
       margin-block-start: var(--space-m);
@@ -257,20 +202,20 @@ const findingAnchor = (id: string, product: string) =>
     }
 
     .index-label {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--space-2xs);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-3xs);
       margin-block-end: var(--space-xs);
       font-weight: var(--font-weight-medium);
-      color: var(--foreground);
+    }
 
-      .index-title > span {
-        color: var(--accent);
-      }
+    .index-mark {
+      color: var(--accent);
     }
 
     .count-label {
-      font-size: 0.8em;
+      font-size: 0.6875rem;
       font-weight: var(--font-weight-normal);
       text-transform: uppercase;
       color: var(--muted-foreground);
@@ -285,93 +230,46 @@ const findingAnchor = (id: string, product: string) =>
     a {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
       gap: var(--space-2xs);
+      margin-inline-start: calc(-1 * var(--space-2xs));
+      padding: var(--space-3xs) var(--space-2xs);
+      border-inline-start: 2px solid transparent;
       color: var(--muted-foreground);
-      text-decoration-line: none;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: background-color 0.15s ease;
 
-      &:hover,
+      &:hover {
+        color: var(--foreground);
+        background-color: color-mix(in oklab, var(--muted) 45%, transparent);
+      }
+
       &[aria-current] {
+        border-inline-start-color: var(--accent);
+        background-color: color-mix(in oklab, var(--accent) 9%, transparent);
         color: var(--foreground);
       }
     }
 
     .index-count {
       font-variant-numeric: tabular-nums;
-    }
-
-    .index-count {
-      opacity: 0.55;
-    }
-
-    @media (width < 64rem) {
-      display: flex;
-      align-items: center;
-      gap: var(--space-l);
-      min-inline-size: 0;
-      overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      scrollbar-width: none;
-
-      &::-webkit-scrollbar {
-        display: none;
-      }
-
-      .project-board {
-        display: flex;
-        flex: none;
-        align-items: center;
-        gap: var(--space-s);
-      }
-
-      .project-board + .project-board {
-        margin-block-start: 0;
-        padding-block-start: 0;
-        padding-inline-start: var(--space-l);
-        border-block-start: 0;
-        border-inline-start: 1px solid var(--border);
-      }
-
-      .index-label {
-        flex: none;
-        display: block;
-        margin-block-end: 0;
-      }
-
-      .count-label {
-        display: none;
-      }
-
-      ol {
-        flex: none;
-        flex-direction: row;
-        gap: var(--space-s);
-      }
-
-      li {
-        flex: none;
-      }
-
-      a {
-        display: inline-flex;
-        gap: var(--space-3xs);
-        white-space: nowrap;
-      }
-
-      .index-count {
-        display: none;
-      }
+      color: var(--muted-foreground);
     }
   }
 
   .page-heading {
-    margin-block-end: var(--space-l);
-
-    @media (width >= 64rem) {
-      margin-block-start: -0.2em;
-    }
+    margin-block-end: var(--space-s);
 
     .eyebrow {
-      margin-block-end: var(--space-2xs);
+      margin-block-end: var(--space-3xs);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--muted-foreground);
+
+      span {
+        color: var(--accent);
+      }
     }
 
     h1 {
@@ -379,13 +277,11 @@ const findingAnchor = (id: string, product: string) =>
       font-size: var(--step-3);
       font-weight: var(--font-weight-medium);
       letter-spacing: 0;
-      line-height: calc(var(--leading-offset) + 1em);
+      line-height: 1.2;
     }
 
     .intro {
-      max-inline-size: 38rem;
-      margin-block-start: var(--space-s);
-      font-size: var(--step-0);
+      margin-block-start: var(--space-2xs);
       color: var(--prose-foreground);
     }
 
@@ -393,82 +289,63 @@ const findingAnchor = (id: string, product: string) =>
       display: flex;
       align-items: baseline;
       gap: var(--space-2xs);
-      margin-block-start: var(--space-s);
+      margin-block-start: var(--space-2xs);
       font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
+      font-size: 0.8125rem;
       color: var(--muted-foreground);
 
       &::before {
         content: "";
         flex: none;
-        inline-size: 0.42rem;
-        block-size: 0.42rem;
+        inline-size: 0.3rem;
+        block-size: 0.3rem;
         border-radius: var(--radius-full);
         background-color: var(--accent);
       }
     }
   }
 
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: 0;
-    color: var(--muted-foreground);
-
-    span {
-      color: var(--accent);
-    }
-  }
-
   .stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-block-end: var(--space-xl);
+    display: flex;
+    align-items: center;
+    margin-block-end: var(--space-l);
+    padding-block: var(--space-xs);
     border-block: 1px solid var(--border);
 
     div {
       display: flex;
-      flex-direction: column-reverse;
-      gap: var(--space-3xs);
-      padding-block: var(--space-s);
+      align-items: baseline;
+      gap: var(--space-2xs);
 
       & + div {
-        padding-inline-start: var(--space-s);
+        margin-inline-start: var(--space-m);
+        padding-inline-start: var(--space-m);
         border-inline-start: 1px solid var(--border);
       }
     }
 
     dt {
       font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
+      font-size: 0.8125rem;
       color: var(--muted-foreground);
     }
 
     dd {
+      order: -1;
       font-family: var(--font-mono);
-      font-size: var(--step-2);
+      font-size: var(--step-1);
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0;
-      color: var(--foreground);
     }
   }
 
   .product-index {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: var(--space-l);
   }
 
   .product-group {
     scroll-margin-block-start: var(--space-s);
-    animation: group-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: calc(var(--group-index) * 55ms);
-
-    @media (width < 64rem) {
-      scroll-margin-block-start: 0;
-    }
   }
 
   .product-heading {
@@ -478,29 +355,29 @@ const findingAnchor = (id: string, product: string) =>
     gap: var(--space-s);
     margin-block-end: var(--space-xs);
 
-    h2 {
+    h2,
+    h3 {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2xs);
       font-family: var(--font-mono);
       font-size: var(--step-1);
       font-weight: var(--font-weight-medium);
       letter-spacing: 0;
     }
 
-    p {
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
-      text-align: end;
+    .product-count {
+      font-size: 0.75rem;
+      font-weight: var(--font-weight-normal);
+      font-variant-numeric: tabular-nums;
       color: var(--muted-foreground);
     }
 
-    @media (width < 34rem) {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: var(--space-3xs);
-
-      p {
-        text-align: start;
-      }
+    p {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--muted-foreground);
+      text-align: end;
     }
   }
 
@@ -510,166 +387,17 @@ const findingAnchor = (id: string, product: string) =>
     li {
       border-block-end: 1px solid var(--border);
     }
-
-    article {
-      --record-inset: var(--space-xs);
-      /* Extend the highlight into the gutter without moving the text. */
-      margin-inline: calc(-1 * var(--record-inset));
-      padding-inline: var(--record-inset);
-      padding-block: var(--space-s);
-      scroll-margin-block-start: var(--space-s);
-      transition: background-color 0.15s ease;
-
-      &:has(a:hover),
-      &:has(a:focus-visible) {
-        background-color: color-mix(in oklab, var(--muted) 50%, transparent);
-      }
-
-      &:target {
-        background-color: color-mix(in oklab, var(--accent) 10%, transparent);
-        box-shadow: -3px 0 0 var(--accent);
-      }
-
-      @media (width < 64rem) {
-        scroll-margin-block-start: 0;
-      }
-
-      @media (width < 40rem) {
-        --record-inset: var(--space-2xs);
-      }
-    }
-
-    .record-meta,
-    .record-footer,
-    .record-links {
-      display: flex;
-      align-items: center;
-    }
-
-    .record-meta {
-      justify-content: space-between;
-      gap: var(--space-s);
-    }
-
-    code,
-    .score,
-    time,
-    .record-links {
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0;
-    }
-
-    code {
-      color: var(--foreground);
-    }
-
-    .score {
-      white-space: nowrap;
-
-      &::before {
-        content: "";
-        display: inline-block;
-        inline-size: 0.42rem;
-        block-size: 0.42rem;
-        margin-inline-end: var(--space-3xs);
-        border-radius: var(--radius-full);
-        background-color: currentColor;
-        vertical-align: 0.08em;
-      }
-
-      &[data-severity="critical"] {
-        color: var(--destructive);
-      }
-
-      &[data-severity="high"] {
-        color: color-mix(in oklab, var(--destructive) 62%, var(--foreground));
-      }
-
-      &[data-severity="medium"] {
-        color: var(--muted-foreground);
-      }
-
-      &.score-pending {
-        color: var(--muted-foreground);
-      }
-    }
-
-    h3,
-    h4 {
-      margin-block-start: var(--space-2xs);
-      font-size: var(--step-0);
-      font-weight: var(--font-weight-medium);
-      color: var(--foreground);
-    }
-
-    article > p {
-      max-inline-size: 38rem;
-      margin-block-start: var(--space-3xs);
-      color: var(--prose-foreground);
-    }
-
-    .record-footer {
-      justify-content: space-between;
-      gap: var(--space-s);
-      margin-block-start: var(--space-xs);
-      color: var(--muted-foreground);
-    }
-
-    .duplicate-footer {
-      justify-content: flex-end;
-    }
-
-    .record-links {
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: var(--space-s);
-
-      a {
-        color: var(--muted-foreground);
-
-        &:hover {
-          color: var(--foreground);
-        }
-
-        span {
-          color: var(--accent);
-        }
-      }
-
-      .record-pending {
-        color: var(--muted-foreground);
-      }
-    }
-
-    @media (width < 32rem) {
-      .record-meta,
-      .record-footer {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: var(--space-2xs);
-      }
-
-      .record-links {
-        justify-content: flex-start;
-      }
-    }
   }
 
   .duplicate-board {
-    padding-block-start: var(--space-l);
+    padding-block-start: var(--space-s);
     border-block-start: 1px solid var(--border);
 
     .board-heading {
-      margin-block-end: var(--space-l);
+      margin-block-end: var(--space-m);
 
       h2 {
-        font-family: var(--font-mono);
-        font-size: var(--step-0);
-        font-weight: var(--font-weight-medium);
-        letter-spacing: 0;
-        color: var(--foreground);
+        font: var(--font-weight-medium) var(--step--1) var(--font-mono);
 
         span {
           color: var(--accent);
@@ -677,99 +405,201 @@ const findingAnchor = (id: string, product: string) =>
       }
 
       p {
-        max-inline-size: 38rem;
+        max-inline-size: 65ch;
         margin-block-start: var(--space-3xs);
         color: var(--muted-foreground);
       }
-    }
-
-    .product-heading h3 {
-      margin-block-start: 0;
-      font-family: var(--font-mono);
-      font-size: var(--step-1);
-      letter-spacing: 0;
     }
   }
 
   .score-note {
     margin-block-start: var(--space-s);
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: 0;
+    font: 0.8125rem / 1.5 var(--font-mono);
     color: var(--muted-foreground);
   }
 
-  @keyframes group-in {
-    from {
-      opacity: 0;
-      translate: 0 0.5rem;
+  @media (width < 64rem) {
+    :global(html:has(.project-navigation)) {
+      --bar-toc-height: calc(2.75rem + 2px);
     }
-    to {
-      opacity: 1;
-      translate: 0 0;
+
+    .project-navigation {
+      overflow: visible;
+    }
+
+    .project-picker {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+      padding-block: 0;
+      font-size: 0.8125rem;
+
+      label {
+        flex: none;
+        color: var(--muted-foreground);
+      }
+
+      .select-wrap {
+        position: relative;
+        flex: 1;
+        min-inline-size: 0;
+      }
+
+      select {
+        display: block;
+        inline-size: 100%;
+        min-block-size: 2.75rem;
+        padding-inline: var(--space-2xs) var(--space-m);
+        cursor: pointer;
+        appearance: none;
+        background-color: var(--background);
+        color: var(--foreground);
+      }
+
+      svg {
+        position: absolute;
+        inset-inline-end: var(--space-3xs);
+        inset-block-start: 50%;
+        translate: 0 -50%;
+        inline-size: 1rem;
+        block-size: 1rem;
+        color: var(--accent);
+        pointer-events: none;
+      }
+    }
+
+    .project-navigation:has(.project-picker:not([hidden])) .project-nav {
+      display: none;
+    }
+
+    /* Keep anchor navigation available when JavaScript is disabled. */
+    .project-nav,
+    .project-nav .project-board,
+    .project-nav ol {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: var(--space-s);
+    }
+
+    .project-nav {
+      overflow-x: auto;
+
+      .project-board {
+        flex: none;
+      }
+
+      .project-board + .project-board {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .index-label {
+        margin: 0;
+      }
+
+      .count-label,
+      .index-count {
+        display: none;
+      }
+
+      a {
+        min-block-size: 2.75rem;
+        align-items: center;
+        white-space: nowrap;
+      }
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .product-group {
-      animation: none;
+  @media (width < 40rem) {
+    .stats {
+      justify-content: space-between;
+
+      div {
+        gap: var(--space-3xs);
+
+        & + div {
+          margin-inline-start: var(--space-2xs);
+          padding-inline-start: var(--space-2xs);
+        }
+      }
+
+      dt {
+        font-size: 0.75rem;
+      }
     }
 
-    .finding-list article {
-      transition: none;
+    .product-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--space-3xs);
+
+      p {
+        text-align: start;
+      }
     }
   }
 </style>
 
 <script>
   const projectNav = document.querySelector<HTMLElement>(".project-nav")
+  const picker = document.querySelector<HTMLSelectElement>("#project-picker")
+  const pickerBar = document.querySelector<HTMLElement>(".project-picker")
 
-  if (projectNav) {
+  if (projectNav && picker && pickerBar) {
+    pickerBar.hidden = false
     const mobile = matchMedia("(width < 64rem)")
-    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
-    const links = new Map(
-      [...projectNav.querySelectorAll<HTMLAnchorElement>("a[href^='#']")].map(
-        (link) => [decodeURIComponent(link.hash.slice(1)), link],
-      ),
-    )
+    const links = [
+      ...projectNav.querySelectorAll<HTMLAnchorElement>("a[href^='#']"),
+    ]
+    const sections = links.flatMap((link) => {
+      const section = document.getElementById(link.hash.slice(1))
+      return section ? [{ link, section }] : []
+    })
 
-    const setActive = (id: string) => {
-      for (const [projectId, link] of links) {
-        if (projectId === id) link.setAttribute("aria-current", "location")
+    const updateActiveProject = () => {
+      const offset =
+        (mobile.matches ? pickerBar.getBoundingClientRect().height : 0) + 32
+      let active = sections[0]
+      for (const entry of sections) {
+        if (entry.section.getBoundingClientRect().top <= offset) active = entry
+      }
+      if (scrollY + innerHeight >= document.documentElement.scrollHeight - 2) {
+        active = sections.at(-1) ?? active
+      }
+      if (!active) return
+      for (const { link } of sections) {
+        if (link === active.link) link.setAttribute("aria-current", "location")
         else link.removeAttribute("aria-current")
       }
+      picker.value = active.section.id
+    }
 
-      const activeLink = links.get(id)
-      if (!mobile.matches || !activeLink) return
+    let scheduled = false
+    const scheduleUpdate = () => {
+      if (scheduled) return
+      scheduled = true
+      requestAnimationFrame(() => {
+        scheduled = false
+        updateActiveProject()
+      })
+    }
 
-      const listBounds = projectNav.getBoundingClientRect()
-      const linkBounds = activeLink.getBoundingClientRect()
-      if (
-        linkBounds.left < listBounds.left ||
-        linkBounds.right > listBounds.right
-      ) {
-        projectNav.scrollTo({
-          left: projectNav.scrollLeft + linkBounds.left - listBounds.left - 12,
-          behavior: reducedMotion.matches ? "auto" : "smooth",
-        })
+    picker.addEventListener("change", () => {
+      const id = picker.value
+      if (location.hash === `#${id}`) {
+        document.getElementById(id)?.scrollIntoView({ block: "start" })
+      } else {
+        location.hash = id
       }
-    }
+    })
 
-    const hashId = decodeURIComponent(location.hash.slice(1))
-    if (links.has(hashId)) setActive(hashId)
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id)
-        }
-      },
-      { rootMargin: "-15% 0px -70% 0px" },
-    )
-
-    for (const id of links.keys()) {
-      const section = document.getElementById(id)
-      if (section) observer.observe(section)
-    }
+    addEventListener("scroll", scheduleUpdate, { passive: true })
+    addEventListener("resize", scheduleUpdate)
+    addEventListener("hashchange", scheduleUpdate)
+    document.addEventListener("toggle", scheduleUpdate, true)
+    document.fonts.ready.then(scheduleUpdate)
+    scheduleUpdate()
   }
 </script>

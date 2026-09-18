@@ -1,0 +1,403 @@
+import { motionRunning, observeMotion } from "./ambient-motion"
+
+type Pose =
+  | "reading"
+  | "lean"
+  | "discover"
+  | "show"
+  | "proud"
+  | "turn"
+  | "curious"
+type Scene = "idle" | "discovery" | "turn" | "peek" | "grip" | "visit"
+type Point = [number, number]
+const clamp = (x: number) => Math.max(0, Math.min(1, x))
+const ease = (x: number) => {
+  const t = clamp(x)
+  return t * t * (3 - 2 * t)
+}
+const curve = (a: Point, b: Point, c: Point, d: Point, t: number): Point => {
+  const u = 1 - t
+  return [0, 1].map(
+    (i) =>
+      u ** 3 * a[i] +
+      3 * u ** 2 * t * b[i] +
+      3 * u * t ** 2 * c[i] +
+      t ** 3 * d[i],
+  ) as Point
+}
+
+export function initMentionCompanion(element: HTMLElement) {
+  const button = element.querySelector<HTMLButtonElement>("button")!
+  const bubble = element.querySelector<HTMLElement>("figcaption")!
+  const delight = element.querySelector<HTMLElement>(".newspaper-delight")!
+  const visitor = element.querySelector<HTMLElement>(".newspaper-visitor")!
+  const lowering = element.querySelector<SVGGElement>(".news-lowering")!
+  const leftFoot = element.querySelector<SVGGElement>(".foot-left")!
+  const rightFoot = element.querySelector<SVGGElement>(".foot-right")!
+  const leaf = element.querySelector<SVGGElement>(".news-leaf")!
+  const hand = element.querySelector<SVGGElement>(".news-hand")!
+  const parts = new Map(
+    Array.from(
+      element.querySelectorAll<SVGGElement>(".newspaper-pose"),
+      (node) => [
+        node.dataset.name as Pose,
+        {
+          head: node.querySelector<SVGGElement>(".news-head")!,
+          paper: node.querySelector<SVGGElement>(".news-paper")!,
+        },
+      ],
+    ),
+  )
+  const timers = new Set<number>()
+  let ready = false,
+    visible = false,
+    active = false,
+    welcomed = false
+  let pose: Pose = "reading",
+    scene: Scene = "idle"
+  let raf = 0,
+    idleTimer = 0,
+    idleIndex = 0
+  let queuedDiscovery = false,
+    pendingVisit = false
+
+  const later = (callback: () => void, delay: number) => {
+    const timer = window.setTimeout(() => {
+      timers.delete(timer)
+      if (active) callback()
+    }, delay)
+    timers.add(timer)
+    return timer
+  }
+  const setPose = (next: Pose) => {
+    if (pose === next) return
+    const previous = parts.get(pose)!
+    previous.head.style.removeProperty("transform")
+    previous.paper.style.removeProperty("transform")
+    pose = next
+    element.dataset.pose = next
+    element.removeAttribute("data-blinking")
+  }
+  const rig = (head = 0, paper = 0) => {
+    const current = parts.get(pose)!
+    current.head.style.transform = `rotate(${head}deg)`
+    current.paper.style.transform = `rotate(${paper}deg)`
+  }
+  const blink = () => {
+    if (pose !== "reading" || scene !== "idle") return
+    element.setAttribute("data-blinking", "")
+    later(() => element.removeAttribute("data-blinking"), 120)
+  }
+  const scheduleBlink = () =>
+    later(
+      () => {
+        blink()
+        scheduleBlink()
+      },
+      3400 + Math.random() * 3200,
+    )
+
+  const clearScene = () => {
+    cancelAnimationFrame(raf)
+    raf = 0
+    scene = "idle"
+    element.dataset.scene = scene
+    for (const name of [
+      "data-blinking",
+      "data-lowering",
+      "data-visiting",
+      "data-perched",
+    ])
+      element.removeAttribute(name)
+    element.style.removeProperty("--paper-reveal")
+    for (const part of parts.values()) {
+      part.head.style.removeProperty("transform")
+      part.paper.style.removeProperty("transform")
+    }
+    for (const node of [
+      lowering,
+      leftFoot,
+      rightFoot,
+      leaf,
+      hand,
+      bubble,
+      delight,
+      visitor,
+    ])
+      node.removeAttribute("style")
+    setPose("reading")
+  }
+  const scheduleIdle = () => {
+    clearTimeout(idleTimer)
+    timers.delete(idleTimer)
+    idleTimer = later(
+      () => {
+        if (scene === "idle") idle()
+        else scheduleIdle()
+      },
+      8500 + Math.random() * 5500,
+    )
+  }
+  const finish = () => {
+    clearScene()
+    if (queuedDiscovery) {
+      queuedDiscovery = false
+      later(() => discover(), 450)
+    } else if (pendingVisit) {
+      pendingVisit = false
+      later(visit, 600)
+    }
+    scheduleIdle()
+  }
+  const play = (
+    name: Scene,
+    duration: number,
+    draw: (elapsed: number) => void,
+  ) => {
+    clearScene()
+    clearTimeout(idleTimer)
+    timers.delete(idleTimer)
+    scene = name
+    element.dataset.scene = name
+    const started = performance.now()
+    const frame = (now: number) => {
+      if (!active) return
+      const elapsed = now - started
+      if (elapsed >= duration) {
+        finish()
+        return
+      }
+      draw(elapsed)
+      raf = requestAnimationFrame(frame)
+    }
+    draw(0)
+    raf = requestAnimationFrame(frame)
+  }
+
+  function discover(manual = false) {
+    if (!active) return
+    if (manual) document.dispatchEvent(new Event("avalon-visitor-started"))
+    if (scene === "discovery") {
+      if (manual) queuedDiscovery = true
+      return
+    }
+    if (manual) pendingVisit = false
+    play("discovery", 5600, (t) => {
+      if (t < 750) {
+        setPose("reading")
+        rig(
+          -0.7 * Math.sin((t / 750) * Math.PI),
+          0.4 * Math.sin((t / 750) * Math.PI),
+        )
+      } else if (t < 1400) {
+        setPose("lean")
+        rig(-1.3 * Math.sin(((t - 750) / 650) * Math.PI), 0.5)
+      } else if (t < 1890) {
+        setPose("discover")
+        const u = ease((t - 1400) / 490)
+        element.setAttribute("data-lowering", "")
+        // The paper folds a little as she lowers it; her body never changes scale.
+        lowering.style.transform = `translateY(${u * 49}px) scaleY(${1 - u * 0.17}) rotate(${-u * 0.5}deg)`
+        const reveal = ease((u - 0.7) / 0.3)
+        lowering.style.opacity = `${1 - reveal}`
+        element.style.setProperty("--paper-reveal", `${reveal}`)
+        rig(-0.7 * Math.sin(u * Math.PI))
+      } else if (t < 3490) {
+        element.removeAttribute("data-lowering")
+        setPose("show")
+        const u = t - 1890
+        const first = Math.sin(clamp((u - 180) / 510) * Math.PI)
+        const second = Math.sin(clamp((u - 830) / 460) * Math.PI)
+        const kick = first + second * 0.72
+        hand.style.transform = `rotate(${-kick * 2.5}deg)`
+        leftFoot.style.transform = `translateY(${-kick * 4}px) rotate(${kick * 12}deg)`
+        rightFoot.style.transform = `translateY(${-kick * 3}px) rotate(${-kick * 10}deg)`
+        rig(
+          -0.7 * Math.sin((u / 700) * Math.PI),
+          -1.2 * Math.sin(clamp(u / 320) * Math.PI),
+        )
+      } else if (t < 4470) {
+        setPose("proud")
+        leftFoot.style.removeProperty("transform")
+        rightFoot.style.removeProperty("transform")
+        rig(0.65 * Math.sin(((t - 3490) / 980) * Math.PI), 0.25)
+      } else if (t < 4810) {
+        setPose("turn")
+        const u = (t - 4470) / 340
+        rig(0.2, -1.7 * Math.sin(u * Math.PI))
+        leaf.style.transform = `rotate(${-2 * Math.sin(u * Math.PI)}deg) scaleX(${0.88 + 0.12 * Math.sin(u * Math.PI)})`
+      } else {
+        setPose("reading")
+        rig(
+          0.6 * Math.sin(((t - 4810) / 790) * Math.PI),
+          0.35 * Math.sin(((t - 4810) / 790) * Math.PI),
+        )
+      }
+      const speech = ease((t - 2010) / 260) * (1 - ease((t - 4210) / 280))
+      bubble.style.opacity = `${speech}`
+      bubble.style.transform = `translateY(${(1 - speech) * 5}px) rotate(${-3 + speech * 4}deg)`
+      delight.style.opacity = `${Math.sin(clamp((t - 2100) / 900) * Math.PI) * 0.75}`
+    })
+  }
+
+  function idle() {
+    const kind = (["turn", "peek", "grip"] as const)[idleIndex++ % 3]
+    const duration = kind === "turn" ? 1600 : 2100
+    play(kind, duration, (t) => {
+      const wave = Math.sin((t / duration) * Math.PI)
+      if (kind === "turn") {
+        setPose(t > 520 && t < 950 ? "turn" : "reading")
+        rig(0.5 * wave, -1.5 * wave)
+        const turn = Math.sin(clamp((t - 520) / 430) * Math.PI)
+        leaf.style.transform = `rotate(${-2 * turn}deg) scaleX(${0.88 + 0.12 * turn})`
+      } else if (kind === "peek") {
+        setPose(t > 600 && t < 1500 ? "curious" : "reading")
+        rig(-0.8 * wave, 0.35 * wave)
+      } else {
+        setPose("reading")
+        rig(0.3 * wave, -0.7 * Math.sin((t / duration) * Math.PI * 2))
+      }
+    })
+  }
+
+  function visit() {
+    if (!active || scene === "visit") return
+    if (scene === "discovery") {
+      pendingVisit = true
+      return
+    }
+    const scale = element.clientWidth / 360
+    const bw = visitor.offsetWidth,
+      bh = visitor.offsetHeight
+    const perch: Point = [278 * scale - bw / 2, 140 * scale - (bh * 23) / 32]
+    const start: Point = [perch[0] - 55, perch[1] - 48]
+    const end: Point = [perch[0] - 35, perch[1] - 65]
+    play("visit", 10300, (t) => {
+      element.setAttribute("data-visiting", "")
+      setPose(t >= 1800 && t < 9100 ? "curious" : "reading")
+      let point: Point,
+        opacity = 1,
+        paper = 0
+      if (t < 3000) {
+        const u = ease(t / 3000)
+        point = curve(
+          start,
+          [perch[0] + 20, start[1] - 25],
+          [perch[0] + 35, perch[1] - 8],
+          perch,
+          u,
+        )
+        opacity = ease(t / 550)
+      } else if (t < 6500) {
+        element.setAttribute("data-perched", "")
+        paper = 1.7 * Math.sin(((t - 3000) / 3500) * Math.PI)
+        const angle = (paper * Math.PI) / 180
+        // Follow the actual paper corner while she carefully tilts it.
+        const dx = 278 - 184,
+          dy = 140 - 300
+        point = [
+          (184 + dx * Math.cos(angle) - dy * Math.sin(angle)) * scale - bw / 2,
+          (300 + dx * Math.sin(angle) + dy * Math.cos(angle)) * scale -
+            (bh * 23) / 32,
+        ]
+      } else {
+        element.removeAttribute("data-perched")
+        const u = ease((t - 6500) / 3400)
+        point = curve(
+          perch,
+          [perch[0] - 35, perch[1] - 15],
+          [perch[0] + 15, end[1] - 40],
+          end,
+          u,
+        )
+        opacity = 1 - ease((t - 8800) / 1000)
+      }
+      rig(
+        t > 2600 && t < 7000
+          ? -0.6 * Math.sin(((t - 2600) / 4400) * Math.PI)
+          : 0,
+        paper,
+      )
+      visitor.style.opacity = `${opacity}`
+      visitor.style.transform = `translate(${point[0]}px, ${point[1]}px) rotate(${t < 3000 || t > 6500 ? Math.sin(t / 280) * 9 : 0}deg)`
+    })
+  }
+
+  const reset = () => {
+    for (const timer of timers) clearTimeout(timer)
+    timers.clear()
+    queuedDiscovery = false
+    pendingVisit = false
+    clearScene()
+  }
+  const update = () => {
+    const next = ready && visible && motionRunning()
+    button.disabled = !next
+    if (active === next) return
+    active = next
+    element.toggleAttribute("data-awake", active)
+    if (active) {
+      scheduleBlink()
+      scheduleIdle()
+      if (!welcomed) {
+        welcomed = true
+        later(() => {
+          if (scene === "idle") discover()
+          else if (scene !== "discovery") queuedDiscovery = true
+        }, 1100)
+      }
+    } else reset()
+  }
+  new IntersectionObserver(
+    ([entry]) => {
+      visible = entry.isIntersecting && entry.intersectionRatio >= 0.5
+      update()
+    },
+    { threshold: [0, 0.5] },
+  ).observe(element)
+  observeMotion(update)
+  Promise.all(
+    [
+      "reading",
+      "seated-base",
+      "foot-left",
+      "foot-right",
+      "lean",
+      "discover",
+      "show",
+      "proud",
+      "turn",
+      "blink",
+      "curious",
+    ].map((name) => {
+      const image = new Image()
+      image.src = `/static/mentions/newspaper/${name}.webp`
+      return image.decode()
+    }),
+  )
+    .then(() => {
+      ready = true
+      update()
+    })
+    .catch(() => {
+      /* Keep the static reading pose if any frame fails to load. */
+    })
+  button.addEventListener("click", () => discover(true))
+  document.addEventListener("avalon-visit", (event) => {
+    if (!active) return
+    event.preventDefault()
+    visit()
+  })
+  let width = 0
+  new ResizeObserver(([entry]) => {
+    const next = entry.contentRect.width
+    if (width && Math.abs(width - next) > 0.5) {
+      reset()
+      if (active) {
+        scheduleBlink()
+        scheduleIdle()
+      }
+    }
+    width = next
+  }).observe(element)
+}

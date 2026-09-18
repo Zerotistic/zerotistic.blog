@@ -1,0 +1,354 @@
+---
+const poses = [
+  { name: "crouch" },
+  {
+    name: "takeoff",
+    arm: {
+      pivot: [207, 250],
+      tip: [94, 163],
+      knuckle: [118, 176],
+      clip: "M0 135H165V180L183 190L194 199L199 213L207 226L222 235L194 263H0Z",
+    },
+  },
+  {
+    name: "air",
+    arm: {
+      pivot: [207, 237],
+      tip: [103, 144],
+      knuckle: [127, 159],
+      clip: "M0 100H173V174L186 184L193 196L199 205L205 213L222 220L223 221L194 250H0Z",
+    },
+  },
+  {
+    name: "land",
+    arm: {
+      pivot: [213, 312],
+      tip: [98, 243],
+      knuckle: [122, 257],
+      clip: "M0 215H170V261L192 268L201 282L209 294L226 299L199 326H0Z",
+    },
+  },
+  { name: "curious" },
+]
+---
+
+<figure class="work-jumping" data-pose="proud">
+  <span class="jump-shadow" aria-hidden="true"></span>
+  <button
+    class="jump-button"
+    type="button"
+    aria-label="Celebrate with Artoria"
+    title="Celebrate with Artoria"
+    disabled
+  >
+    <svg
+      class="jump-art"
+      viewBox="0 0 480 640"
+      width="480"
+      height="640"
+      role="img"
+      aria-labelledby="jump-artoria-title"
+    >
+      <title id="jump-artoria-title">
+        A little Artoria happily jumping and pointing toward HiddenLayer
+      </title>
+      <defs>
+        {poses.map(({ name, arm }) => arm && <>
+          <clipPath id={`jump-${name}-arm`}>
+            <path d={arm.clip} />
+          </clipPath>
+          <mask id={`jump-${name}-body`} maskUnits="userSpaceOnUse" x="0" y="0" width="480" height="640">
+            <rect width="480" height="640" fill="white" />
+            <path d={arm.clip} fill="black" />
+            <circle cx={arm.pivot[0]} cy={arm.pivot[1]} r="18" fill="white" filter="url(#jump-eye-feather)" />
+          </mask>
+        </>)}
+        <clipPath id="jump-upper"><path d="M0 0H480V348H0Z" /></clipPath>
+        <clipPath id="jump-lower"><path d="M0 337H480V640H0Z" /></clipPath>
+        <filter id="jump-eye-feather">
+          <feGaussianBlur stdDeviation="0.8" />
+        </filter>
+        <mask
+          id="jump-eyes"
+          maskUnits="userSpaceOnUse"
+          x="239"
+          y="177"
+          width="83"
+          height="43"
+        >
+          <ellipse
+            cx="257"
+            cy="201"
+            rx="12"
+            ry="14"
+            fill="white"
+            filter="url(#jump-eye-feather)"
+          />
+          <ellipse
+            cx="299"
+            cy="198"
+            rx="17"
+            ry="14"
+            fill="white"
+            filter="url(#jump-eye-feather)"
+          />
+        </mask>
+      </defs>
+      <g class="jump-pose pose-proud">
+        <image
+          href="/static/work/jumping/proud.webp"
+          width="480"
+          height="640"
+          clip-path="url(#jump-lower)"
+        />
+        <g class="jump-upper-body">
+          <image
+            href="/static/work/jumping/proud.webp"
+            width="480"
+            height="640"
+            clip-path="url(#jump-upper)"
+          />
+          <image
+            class="jump-blink"
+            href="/static/work/jumping/blink.webp"
+            width="480"
+            height="640"
+            mask="url(#jump-eyes)"
+          />
+        </g>
+      </g>
+      {poses.map(({ name, arm }) => <g class:list={["jump-pose", `pose-${name}`]}>
+        {arm && <g data-pointing-arm={name} data-pivot={arm.pivot.join(",")} data-tip={arm.tip.join(",")} data-knuckle={arm.knuckle.join(",")}>
+          <image href={`/static/work/jumping/${name}.webp`} width="480" height="640" clip-path={`url(#jump-${name}-arm)`} />
+        </g>}
+        <image href={`/static/work/jumping/${name}.webp`} width="480" height="640" mask={arm ? `url(#jump-${name}-body)` : undefined} />
+      </g>)}
+    </svg>
+  </button>
+  <figcaption>I work there!</figcaption>
+  <span class="jump-delight" aria-hidden="true"
+    ><svg viewBox="0 0 50 45">
+      <path d="m8 29-5-1M18 14l-4-6m18 2 1-7" />
+    </svg></span
+  >
+  <span class="jump-visitor" aria-hidden="true">
+    <svg viewBox="0 0 40 32" class="butterfly">
+      <g class="wing">
+        <path
+          d="M20 16C13 0 3 0 3 9c0 7 8 11 17 8C9 14 5 21 10 27c4 5 10-3 10-11Z"
+        />
+        <path class="wing-vein" d="M20 16 7 7m13 10-9 6" />
+        <ellipse class="wing-spot" cx="8" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <g class="wing">
+        <path
+          d="M20 16C27 0 37 0 37 9c0 7-8 11-17 8 11-3 15 4 10 10-4 5-10-3-10-11Z"
+        />
+        <path class="wing-vein" d="m20 16 13-9m-13 10 9 6" />
+        <ellipse class="wing-spot" cx="32" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <path class="butterfly-body" d="M20 10v13m0-12-3-5m3 5 3-5" />
+    </svg>
+  </span>
+</figure>
+
+<script>
+  import { initJumpingCompanion } from "@/lib/work-jumping-companion"
+  document
+    .querySelectorAll<HTMLElement>(".work-jumping")
+    .forEach(initJumpingCompanion)
+</script>
+
+<style>
+  .work-jumping {
+    position: absolute;
+    inset-block-start: -2.5rem;
+    inset-inline-end: 0.35rem;
+    inline-size: min(var(--cheer-size, 10rem), 8.5rem);
+    isolation: isolate;
+  }
+  .jump-button {
+    display: block;
+    inline-size: 100%;
+    border-radius: 35%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .jump-button:disabled {
+    cursor: default;
+  }
+  .jump-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .jump-art {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: visible;
+    transform-origin: 62.5% 93.75%;
+  }
+  .jump-pose {
+    visibility: hidden;
+  }
+  [data-pose="proud"] .pose-proud,
+  [data-pose="crouch"] .pose-crouch,
+  [data-pose="takeoff"] .pose-takeoff,
+  [data-pose="air"] .pose-air,
+  [data-pose="land"] .pose-land,
+  [data-pose="curious"] .pose-curious {
+    visibility: visible;
+  }
+  .jump-upper-body {
+    transform-origin: 300px 345px;
+  }
+  .jump-blink {
+    opacity: 0;
+  }
+  [data-blinking] .jump-blink {
+    opacity: 1;
+  }
+  [data-awake][data-pose="proud"]:not([data-celebrating]):not([data-visiting])
+    .jump-upper-body {
+    animation: eager-breath 5.6s ease-in-out infinite;
+  }
+  .jump-shadow {
+    position: absolute;
+    inset-inline-start: 42%;
+    inset-block-start: 93%;
+    inline-size: 41%;
+    block-size: 5px;
+    background: radial-gradient(
+      ellipse,
+      light-dark(rgb(88 65 43 / 0.2), rgb(161 180 179 / 0.18)),
+      transparent 70%
+    );
+    transform-origin: center;
+  }
+  figcaption {
+    position: absolute;
+    inset-inline-end: -0.25rem;
+    inset-block-end: calc(100% - 0.7rem);
+    padding: 0.48em 0.7em;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem 0.75rem 0.25rem 0.75rem;
+    background: var(--sand-2);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    transform: rotate(3deg);
+    transform-origin: 75% 100%;
+    pointer-events: none;
+  }
+  .jump-delight {
+    position: absolute;
+    inset-inline-end: 3%;
+    inset-block-start: 16%;
+    inline-size: 28px;
+    opacity: 0;
+    pointer-events: none;
+    svg {
+      display: block;
+      width: 100%;
+      overflow: visible;
+    }
+    path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.7;
+      stroke-linecap: round;
+    }
+  }
+  .jump-visitor {
+    position: absolute;
+    inset: 0 auto auto 0;
+    inline-size: 21px;
+    block-size: 16.8px;
+    opacity: 0;
+    pointer-events: none;
+    color: light-dark(#b8a168, #c5d1bc);
+  }
+  .butterfly {
+    display: block;
+    inline-size: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+  }
+  .wing {
+    fill: currentColor;
+    stroke: light-dark(#887346, #a1af96);
+    stroke-width: 0.6;
+    transform-origin: 20px 16px;
+  }
+  [data-visiting] .wing {
+    animation: flutter 0.19s ease-in-out infinite alternate;
+  }
+  [data-perched] .wing {
+    animation-duration: 1.4s;
+  }
+  .wing-vein,
+  .butterfly-body {
+    fill: none;
+    stroke: light-dark(#746340, #8a9883);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+  .wing-vein {
+    opacity: 0.35;
+  }
+  .wing-spot {
+    fill: light-dark(#ebe1b8, #e3e9d9);
+    stroke: none;
+  }
+  @keyframes eager-breath {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    45% {
+      transform: rotate(-0.65deg);
+    }
+  }
+  @keyframes flutter {
+    from {
+      transform: scaleX(0.25);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @media (width < 64rem) {
+    .work-jumping {
+      inset-block-start: 0.8rem;
+    }
+  }
+  @media (width < 40rem) {
+    .work-jumping {
+      inset-block-start: 1.25rem;
+      inset-inline-end: 0;
+      inline-size: calc(var(--cheer-size) + 1rem);
+    }
+    figcaption {
+      inset-block-end: auto;
+      inset-block-start: calc(100% - 0.05rem);
+      inset-inline-end: 0;
+      font-size: 0.6875rem;
+      border-radius: 0.75rem 0.25rem 0.75rem 0.75rem;
+    }
+    .jump-visitor {
+      inline-size: 17px;
+      block-size: 13.6px;
+    }
+    .jump-delight {
+      inline-size: 22px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .jump-upper-body,
+    .wing {
+      animation: none !important;
+    }
+  }
+</style>

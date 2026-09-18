@@ -1,6 +1,6 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
-import WorkCheer from "@/components/WorkCheer.astro"
+import WorkJumpingCheer from "@/components/WorkJumpingCheer.astro"
 import WorkPhase from "@/components/WorkPhase.astro"
 import { education, work } from "@/data/work"
 import Layout from "@/layouts/Layout.astro"
@@ -58,15 +58,15 @@ import { formatWorkDate, workDuration } from "@/lib/work"
               <div class="entry-summary">
                 <div class="entry-heading">
                   <h2 id={`${entry.id}-heading`}>{entry.organization}</h2>
-                  {current && <span class="current-label">Current</span>}
                 </div>
                 <p class="entry-role">{entry.role}</p>
                 <div class="entry-meta">
+                  {current && <span class="current-label">Current</span>}
                   {entry.kind !== "Work" && <p class="entry-kind">{entry.kind}</p>}
                   {entry.kind !== "Work" && entry.location && <span aria-hidden="true">·</span>}
                   {entry.location && <p class="entry-location">{entry.location}</p>}
                 </div>
-                {current && <WorkCheer />}
+                {current && <WorkJumpingCheer />}
                 {fullTime && <div class="full-time-phase"><WorkPhase phase={fullTime} /></div>}
               </div>
               {apprenticeship && (
@@ -85,16 +85,26 @@ import { formatWorkDate, workDuration } from "@/lib/work"
       <div class="education-details">
         <p class="education-label">Alongside work</p>
         <div class="entry-logo entry-logo-ecole-2600" aria-hidden="true">
-          <img src={education.logo} width="48" height="48" alt="" decoding="async" />
+          <img
+            src={education.logo}
+            width="48"
+            height="48"
+            alt=""
+            decoding="async"
+          >
         </div>
         <h2 id="ecole-2600-heading">{education.organization}</h2>
         <p class="education-dates">
-          <time datetime={education.start}>{formatWorkDate(education.start)}</time>
+          <time datetime={education.start}
+            >{formatWorkDate(education.start)}</time
+          >
           {" — "}{education.approximateEnd && "around "}
           <time datetime={education.end}>{formatWorkDate(education.end!)}</time>
         </p>
         <p class="education-role">{education.role}</p>
-        <p class="education-connection" id="education-connection">Studied while apprenticing at Deloitte, then Hackcyom.</p>
+        <p class="education-connection" id="education-connection">
+          Studied while apprenticing at Deloitte, then Hackcyom.
+        </p>
         <p class="education-note">{education.note}</p>
       </div>
     </aside>
@@ -105,10 +115,12 @@ import { formatWorkDate, workDuration } from "@/lib/work"
   import { workDuration } from "@/lib/work"
 
   const updateDuration = () => {
-    document.querySelectorAll<HTMLElement>("[data-ongoing-since]").forEach((element) => {
-      const duration = workDuration(element.dataset.ongoingSince!)
-      if (duration) element.textContent = duration
-    })
+    document
+      .querySelectorAll<HTMLElement>("[data-ongoing-since]")
+      .forEach((element) => {
+        const duration = workDuration(element.dataset.ongoingSince!)
+        if (duration) element.textContent = duration
+      })
   }
 
   updateDuration()
@@ -205,6 +217,9 @@ import { formatWorkDate, workDuration } from "@/lib/work"
   }
 
   .current .entry-summary {
+    --cheer-size: 10rem;
+    padding-inline-end: calc(var(--cheer-size) + 1rem);
+    min-block-size: calc(var(--cheer-size) + 0.5rem);
     border-block-end: 1px solid var(--border);
   }
 
@@ -256,7 +271,9 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     color: var(--prose-foreground);
   }
 
-  .date-end { white-space: nowrap; }
+  .date-end {
+    white-space: nowrap;
+  }
 
   .duration {
     margin-block-start: var(--space-xs);
@@ -306,11 +323,37 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     line-height: 1.55;
   }
 
-  .full-time-phase { margin-block-start: var(--space-m); }
+  .has-phases .entry-summary {
+    padding-block-end: 0;
+  }
+
+  .full-time-phase {
+    position: relative;
+    margin-block-start: var(--space-m);
+    padding-block-end: var(--space-s);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0.25rem;
+      inset-block: 0.6rem 0;
+      inline-size: 1px;
+      background: var(--border);
+    }
+  }
 
   .apprenticeship-phase {
-    padding-block-start: var(--space-s);
-    border-block-start: 1px solid var(--border);
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0.25rem;
+      inset-block: 0 0;
+      block-size: 0.65rem;
+      inline-size: 1px;
+      background: var(--border);
+    }
   }
 
   .education {
@@ -396,13 +439,6 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     white-space: nowrap;
   }
 
-  @media (width >= 40rem) {
-    .current .entry-summary {
-      padding-inline-end: 11rem;
-      min-block-size: 10rem;
-    }
-  }
-
   @media (40rem <= width < 80rem) {
     .work-history {
       --date-column: 7rem;
@@ -410,8 +446,7 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     }
 
     .current .entry-summary {
-      padding-inline-end: 8.5rem;
-      min-block-size: 9rem;
+      --cheer-size: 8rem;
     }
   }
 
@@ -425,7 +460,9 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     .timeline-entry {
       grid-template-columns: var(--rail-column) minmax(0, 1fr);
 
-      &::before { inset-block-start: 2.75rem; }
+      &::before {
+        inset-block-start: 2.75rem;
+      }
     }
 
     .entry-content {
@@ -440,6 +477,10 @@ import { formatWorkDate, workDuration } from "@/lib/work"
 
     .entry-summary {
       padding-block-start: 3.5rem;
+    }
+
+    .current .entry-summary {
+      min-block-size: calc(var(--cheer-size) + 3.5rem);
     }
 
     .entry-logo {
@@ -457,87 +498,71 @@ import { formatWorkDate, workDuration } from "@/lib/work"
       gap: 0.4em;
     }
 
-    .duration { margin-block-start: var(--space-3xs); }
+    .duration {
+      margin-block-start: var(--space-3xs);
+    }
   }
 
-  @media (width < 48rem) {
+  @media (width < 75rem) {
     .work-history {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: [current] auto [hackcyom] auto [apprenticeship] auto [deloitte] auto [end] auto [education-end];
     }
 
     .education {
+      position: relative;
       grid-column: 1;
       grid-row: end / education-end;
       grid-template-columns: minmax(0, 1fr);
+      margin-inline-start: calc(var(--date-column) + var(--rail-column));
+      padding-inline-start: var(--space-m);
+      padding-block-start: var(--space-s);
     }
 
     .education-bracket {
-      display: none;
+      position: absolute;
+      grid-column: auto;
+      justify-self: start;
+      inset-inline-start: 0;
+      inset-block: calc(-1 * var(--space-m)) auto;
+      inline-size: 0.75rem;
+      block-size: calc(var(--space-m) + var(--space-s) + 0.5rem);
+      border: 0;
+      border-inline-start: 1px solid;
+      border-block-end: 1px solid;
+      border-color: color-mix(in oklab, var(--accent) 65%, var(--border));
+      border-end-start-radius: 0.5rem;
     }
 
     .education-details {
       grid-column: 1;
-      grid-template-columns: var(--rail-column) minmax(0, 1fr);
-      column-gap: 0;
-
-      > p {
-        grid-column: 2;
-      }
-
-      .education-label {
-        display: none;
-      }
-
-      .entry-logo {
-        grid-column: 1;
-        grid-row: 1 / 3;
-        justify-self: start;
-      }
-
-      h2 {
-        grid-row: 2;
-        margin-block-start: var(--space-xs);
-        font-size: var(--step-2);
-      }
-
-      .education-dates {
-        grid-row: 1;
-        margin-block-start: 0;
-        padding-block-start: 0.15rem;
-        font-family: var(--font-mono);
-        font-size: var(--step--1);
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0;
-      }
-
-      .education-role {
-        grid-row: 3;
-        margin-block-start: var(--space-3xs);
-        font-size: var(--step-0);
-      }
-
-      .education-note {
-        grid-row: 4;
-        font-size: var(--step--1);
-      }
+      max-inline-size: 30rem;
     }
 
     .timeline-entry:last-child {
-      padding-block-end: var(--space-l);
-
-      &::before {
-        display: block;
-      }
-
-      .entry-summary {
-        border-block-end: 1px solid var(--border);
-      }
+      padding-block-end: var(--space-s);
     }
   }
 
   @media (width < 40rem) {
-    .page-heading { margin-block-end: var(--space-xl); }
-    .timeline-entry { padding-block-end: var(--space-l); }
+    .page-heading {
+      margin-block-end: var(--space-xl);
+    }
+    .timeline-entry {
+      padding-block-end: var(--space-l);
+    }
+
+    .current .entry-summary {
+      --cheer-size: clamp(5rem, 23vw, 7rem);
+      padding-inline-end: calc(var(--cheer-size) + 0.25rem);
+      min-block-size: calc(var(--cheer-size) + 7.25rem);
+    }
+
+    .current h2 {
+      font-size: clamp(1.3rem, 5.6vw, 1.625rem);
+    }
+    .current .entry-role {
+      font-size: 0.9375rem;
+    }
   }
 </style>

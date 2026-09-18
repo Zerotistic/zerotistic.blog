@@ -1,0 +1,393 @@
+---
+const raisedPaper =
+  "M63 150L182 166L300 135L296 202Q309 211 300 246L298 294L280 314L183 328L92 316L73 297L66 249L68 211Z"
+const poses = [
+  {
+    name: "reading",
+    head: "M75 0H275V137L181 165L91 146Z",
+    paper: raisedPaper,
+  },
+  {
+    name: "lean",
+    head: "M75 0H280V140L181 168L89 156Z",
+    paper:
+      "M67 155L183 173L304 139L299 207Q311 222 299 253L295 297L281 316L181 329L86 313L68 291L66 248L67 219Z",
+  },
+  {
+    name: "discover",
+    head: "M68 0H291V191L182 225L91 204L75 166Z",
+    paper:
+      "M72 202L183 230L302 191L291 250Q310 255 298 287L294 316L277 335L183 344L80 336L72 309L75 277Q65 266 78 250Z",
+  },
+  {
+    name: "show",
+    head: "M70 0H279V166L144 195L113 195L71 165Z",
+    paper:
+      "M144 184L312 157L310 211Q331 218 319 247L315 249L319 331L158 339L151 274L128 280L111 265L112 241L139 230L151 237Z",
+  },
+  {
+    name: "proud",
+    head: "M70 0H279V166L144 195L113 195L71 165Z",
+    paper:
+      "M148 189L313 158L313 200Q331 207 319 236L320 319L157 326L151 266L128 270L111 257L112 233L139 222L151 229Z",
+  },
+  {
+    name: "turn",
+    head: "M68 0H285V189L222 227L122 214L79 178Z",
+    paper:
+      "M79 239L149 237L191 258L252 159L282 152L273 213L321 201L300 253Q327 257 315 287L301 319L192 335L101 328Z",
+  },
+  {
+    name: "curious",
+    head: "M67 0H291V143L187 167L91 149Z",
+    paper:
+      "M63 151L187 169L301 136L301 213Q315 221 302 253L295 310L191 331L91 312L70 291L68 251L66 220Z",
+  },
+]
+const source = (name: string) => `/static/mentions/newspaper/${name}.webp`
+---
+
+<figure class="mention-companion" data-pose="reading" data-scene="idle">
+  <button
+    class="newspaper-button"
+    type="button"
+    aria-label="Replay Artoria’s newspaper discovery"
+    title="Read the newspaper with Artoria"
+    disabled
+  >
+    <svg
+      class="newspaper-art"
+      viewBox="0 0 360 560"
+      width="360"
+      height="560"
+      aria-hidden="true"
+    >
+      <defs>
+        <clipPath id="news-lower"><path d="M0 330H360V560H0Z" /></clipPath>
+        <linearGradient id="news-seam" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="white" />
+          <stop offset="0.95" stop-color="white" />
+          <stop offset="1" stop-color="black" />
+        </linearGradient>
+        <mask id="news-upper">
+          <rect width="360" height="347" fill="url(#news-seam)" />
+        </mask>
+        <filter id="news-feather">
+          <feGaussianBlur stdDeviation="0.65" />
+        </filter>
+        <mask
+          id="news-eyes"
+          maskUnits="userSpaceOnUse"
+          x="141"
+          y="124"
+          width="82"
+          height="35"
+        >
+          <ellipse
+            cx="163"
+            cy="146"
+            rx="14"
+            ry="10"
+            fill="white"
+            filter="url(#news-feather)"
+          />
+          <ellipse
+            cx="205"
+            cy="137"
+            rx="9"
+            ry="12"
+            fill="white"
+            filter="url(#news-feather)"
+            transform="rotate(10 205 137)"
+          />
+        </mask>
+        {poses.map(({ name, head, paper }) => <>
+          <clipPath id={`news-${name}-head`}><path d={head} /></clipPath>
+          <clipPath id={`news-${name}-paper`}><path d={paper} /></clipPath>
+          <mask id={`news-${name}-body`}>
+            <rect width="360" height="560" fill="white" />
+            <path d={head} fill="black" /><path d={paper} fill="black" />
+          </mask>
+        </>)}
+        <clipPath id="news-turn-face">
+          <ellipse cx="187" cy="130" rx="52" ry="48" />
+        </clipPath>
+        <clipPath id="news-leaf">
+          <path d="M193 272L251 174L279 159L264 233Z" />
+        </clipPath>
+        <mask id="news-without-leaf">
+          <rect width="360" height="560" fill="white" />
+          <path d="M193 272L251 174L279 159L264 233Z" fill="black" />
+        </mask>
+        <clipPath id="news-pointing-hand">
+          <path
+            d="M143 239L150 229Q155 223 165 224L174 227L197 229Q199 232 197 235L178 236L178 244L176 253Q170 264 154 267L145 264Z"
+          />
+        </clipPath>
+        <mask id="news-without-hand">
+          <rect width="360" height="560" fill="white" />
+          <path
+            d="M143 239L150 229Q155 223 165 224L174 227L197 229Q199 232 197 235L178 236L178 244L176 253Q170 264 154 267L145 264Z"
+            fill="black"
+          />
+        </mask>
+      </defs>
+      <g class="newspaper-feet">
+        <g class="news-foot foot-left">
+          <image href={source("foot-left")} width="360" height="560" />
+        </g>
+        <g class="news-foot foot-right">
+          <image href={source("foot-right")} width="360" height="560" />
+        </g>
+      </g>
+      <image
+        href={source("seated-base")}
+        width="360"
+        height="560"
+        clip-path="url(#news-lower)"
+      />
+      <g mask="url(#news-upper)">
+        {poses.map(({ name }) => <g class="newspaper-pose" data-name={name}>
+          <g class="news-head" clip-path={`url(#news-${name}-head)`}>
+            <image href={source(name)} width="360" height="560" />
+            {name === "reading" && <image class="news-blink" href={source("blink")} width="360" height="560" x="2" y="3" mask="url(#news-eyes)" />}
+            {name === "turn" && <image href={source("proud")} width="360" height="560" x="2" y="4" clip-path="url(#news-turn-face)" />}
+          </g>
+          <image href={source(name)} width="360" height="560" mask={`url(#news-${name}-body)`} />
+          <g class="news-paper" clip-path={`url(#news-${name}-paper)`}>
+            {name === "turn" && <g class="news-leaf" clip-path="url(#news-leaf)"><image href={source(name)} width="360" height="560" /></g>}
+            {name === "show" && <g clip-path="url(#news-pointing-hand)"><image href={source(name)} x="-100" width="360" height="560" /></g>}
+            <image href={source(name)} width="360" height="560" mask={name === "turn" ? "url(#news-without-leaf)" : name === "show" ? "url(#news-without-hand)" : undefined} />
+            {name === "show" && <g class="news-hand" clip-path="url(#news-pointing-hand)"><image href={source(name)} width="360" height="560" /></g>}
+          </g>
+        </g>)}
+        <g class="news-lowering" clip-path="url(#news-reading-paper)">
+          <image href={source("reading")} width="360" height="560" />
+        </g>
+      </g>
+    </svg>
+  </button>
+  <figcaption aria-hidden="true">Look, that’s us!</figcaption>
+  <span class="newspaper-delight" aria-hidden="true"
+    ><svg viewBox="0 0 36 36">
+      <path d="m7 22-5-2m13-7-3-6m13 4 1-7" />
+    </svg></span
+  >
+  <span class="newspaper-visitor" aria-hidden="true">
+    <svg viewBox="0 0 40 32">
+      <g class="news-wing">
+        <path
+          d="M20 16C13 0 3 0 3 9c0 7 8 11 17 8C9 14 5 21 10 27c4 5 10-3 10-11Z"
+        />
+        <path class="wing-vein" d="M20 16 7 7m13 10-9 6" />
+        <ellipse class="wing-spot" cx="8" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <g class="news-wing">
+        <path
+          d="M20 16C27 0 37 0 37 9c0 7-8 11-17 8 11-3 15 4 10 10-4 5-10-3-10-11Z"
+        />
+        <path class="wing-vein" d="m20 16 13-9m-13 10 9 6" />
+        <ellipse class="wing-spot" cx="32" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <path class="visitor-body" d="M20 10v13m0-12-3-5m3 5 3-5" />
+    </svg>
+  </span>
+</figure>
+
+<script>
+  import { initMentionCompanion } from "@/lib/mention-companion"
+  document
+    .querySelectorAll<HTMLElement>(".mention-companion")
+    .forEach(initMentionCompanion)
+</script>
+
+<style>
+  .mention-companion {
+    position: relative;
+    inline-size: 100%;
+    isolation: isolate;
+    align-self: center;
+  }
+  .newspaper-button {
+    display: block;
+    inline-size: 100%;
+    border-radius: 30%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .newspaper-button:disabled {
+    cursor: default;
+  }
+  .newspaper-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .newspaper-art {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: visible;
+  }
+  .newspaper-pose {
+    visibility: hidden;
+  }
+  [data-pose="reading"] [data-name="reading"],
+  [data-pose="lean"] [data-name="lean"],
+  [data-pose="discover"] [data-name="discover"],
+  [data-pose="show"] [data-name="show"],
+  [data-pose="proud"] [data-name="proud"],
+  [data-pose="turn"] [data-name="turn"],
+  [data-pose="curious"] [data-name="curious"] {
+    visibility: visible;
+  }
+  .news-head {
+    transform-origin: 183px 195px;
+  }
+  .news-paper {
+    transform-origin: 184px 300px;
+  }
+  .news-leaf {
+    transform-origin: 193px 272px;
+  }
+  .news-hand {
+    transform-origin: 145px 254px;
+  }
+  .foot-left {
+    transform-origin: 192px 460px;
+  }
+  .foot-right {
+    transform-origin: 220px 445px;
+  }
+  .news-lowering {
+    visibility: hidden;
+    transform-origin: 181px 150px;
+  }
+  [data-lowering] .news-lowering {
+    visibility: visible;
+  }
+  [data-lowering] [data-name="discover"] .news-paper {
+    opacity: var(--paper-reveal, 0);
+  }
+  .news-blink {
+    opacity: 0;
+  }
+  [data-blinking] .news-blink {
+    opacity: 1;
+  }
+  figcaption {
+    position: absolute;
+    inset-inline-end: 2%;
+    inset-block-start: -0.6rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 0.8rem 0.8rem 0.25rem 0.8rem;
+    background: var(--sand-2);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    transform: translateY(4px) rotate(-3deg);
+    transform-origin: 75% 100%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .newspaper-delight {
+    position: absolute;
+    inset: 24% auto auto 5%;
+    inline-size: 22%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .newspaper-delight svg {
+    display: block;
+    inline-size: 100%;
+  }
+  .newspaper-delight path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+  .newspaper-visitor {
+    position: absolute;
+    inset: 0 auto auto 0;
+    inline-size: 20px;
+    block-size: 16px;
+    opacity: 0;
+    pointer-events: none;
+    color: light-dark(#b8a168, #c5d1bc);
+  }
+  .newspaper-visitor svg {
+    display: block;
+    inline-size: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+  }
+  .news-wing {
+    fill: currentColor;
+    stroke: light-dark(#887346, #a1af96);
+    stroke-width: 0.6;
+    transform-origin: 20px 16px;
+  }
+  [data-visiting] .news-wing {
+    animation: news-flutter 190ms ease-in-out infinite alternate;
+  }
+  [data-perched] .news-wing {
+    animation-duration: 1.4s;
+  }
+  .wing-vein,
+  .visitor-body {
+    fill: none;
+    stroke: light-dark(#746340, #8a9883);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+  .wing-vein {
+    opacity: 0.35;
+  }
+  .wing-spot {
+    fill: light-dark(#ebe1b8, #e3e9d9);
+    stroke: none;
+  }
+  @keyframes news-flutter {
+    from {
+      transform: scaleX(0.25);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @media (width < 40rem) {
+    figcaption {
+      font-size: 0.625rem;
+      padding: 0.3rem 0.4rem;
+      inset-inline-end: -0.25rem;
+    }
+    .newspaper-visitor {
+      inline-size: 16px;
+      block-size: 12.8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .news-head,
+    .news-paper,
+    .news-foot,
+    .news-hand,
+    .news-leaf,
+    .news-lowering {
+      transform: none !important;
+    }
+    .news-blink {
+      opacity: 0 !important;
+    }
+    .news-wing {
+      animation: none !important;
+    }
+    figcaption,
+    .newspaper-visitor,
+    .newspaper-delight {
+      display: none;
+    }
+  }
+</style>

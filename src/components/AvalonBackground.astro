@@ -1,46 +1,100 @@
-<!-- Decorative landscape for wide desktop margins. -->
-<div class="avalon-background" aria-hidden="true"></div>
+<div class="avalon-scene" aria-hidden="true">
+  <div class="avalon-landscape avalon-day"></div>
+  <div class="avalon-landscape avalon-night"></div>
+  <canvas class="avalon-life"></canvas>
+</div>
 
 <style is:global>
-  .avalon-background {
-    display: none;
+  .avalon-scene {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    contain: strict;
   }
 
-  @media (min-width: 1280px) {
-    .avalon-background {
-      display: block;
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image: url("/static/avalon-landscape.webp");
-      background-size: cover;
-      background-position: center bottom;
-      opacity: 0.38;
-      mask-image: linear-gradient(
-        to right,
-        #000,
-        #000 calc(50% - 38rem),
-        transparent calc(50% - 25rem),
-        transparent calc(50% + 25rem),
-        #000 calc(50% + 38rem),
-        #000
-      );
-    }
+  .avalon-landscape {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center bottom;
+    mask-image: linear-gradient(
+      to right,
+      #000,
+      #000 calc(50% - 38rem),
+      transparent calc(50% - 25rem),
+      transparent calc(50% + 25rem),
+      #000 calc(50% + 38rem),
+      #000
+    );
+    transition: opacity 1.2s ease;
+  }
 
-    :root[data-theme="dark"] .avalon-background {
-      background-image:
-        linear-gradient(to bottom, #111110 0%, rgb(17 17 16 / 0.85) 30%, transparent 65%),
-        url("/static/avalon-landscape-dusk.webp");
+  .avalon-day {
+    background-image: url("/static/avalon-landscape.webp");
+    opacity: 0.38;
+  }
+
+  .avalon-night {
+    background-image:
+      linear-gradient(
+        to bottom,
+        #111110 0%,
+        rgb(17 17 16 / 0.85) 30%,
+        transparent 65%
+      ),
+      url("/static/avalon-landscape-dusk.webp");
+    opacity: 0;
+  }
+
+  :root[data-theme="dark"] {
+    .avalon-day {
+      opacity: 0;
+    }
+    .avalon-night {
       opacity: 0.65;
     }
+  }
 
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme]) .avalon-background {
-        background-image:
-          linear-gradient(to bottom, #111110 0%, rgb(17 17 16 / 0.85) 30%, transparent 65%),
-          url("/static/avalon-landscape-dusk.webp");
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      .avalon-day {
+        opacity: 0;
+      }
+      .avalon-night {
         opacity: 0.65;
       }
     }
   }
+
+  .avalon-life {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  @media (width < 80rem) {
+    .avalon-landscape {
+      inset-block-start: auto;
+      block-size: 12rem;
+      mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.22));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avalon-life {
+      display: none;
+    }
+    .avalon-landscape {
+      transition: none;
+    }
+  }
 </style>
+
+<script>
+  import { initAvalon } from "@/lib/avalon-scene"
+  const canvas = document.querySelector<HTMLCanvasElement>(".avalon-life")
+  if (canvas) initAvalon(canvas)
+</script>

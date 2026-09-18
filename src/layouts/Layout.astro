@@ -26,9 +26,21 @@ import Sidebar from "@/components/Sidebar.astro"
 import TouchFeedback from "@/components/TouchFeedback.astro"
 import { SITE } from "@/consts"
 
-type Props = { crumbs?: { label: string; href: string }[]; showArtoria?: boolean; wide?: boolean; reading?: boolean }
+type Props = {
+  crumbs?: { label: string; href: string }[]
+  showArtoria?: boolean
+  wide?: boolean
+  reading?: boolean
+  narrowToc?: boolean
+}
 
-const { crumbs, showArtoria = true, wide = false, reading = false } = Astro.props
+const {
+  crumbs,
+  showArtoria = true,
+  wide = false,
+  reading = false,
+  narrowToc = false,
+} = Astro.props
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
@@ -38,7 +50,7 @@ const { crumbs, showArtoria = true, wide = false, reading = false } = Astro.prop
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <AvalonBackground />
-    <page-grid class:list={{ reading }}>
+    <page-grid class:list={{ reading, "narrow-toc": narrowToc }}>
       <page-header>
         <page-nav>
           <Sidebar crumbs={crumbs} showArtoria={showArtoria}
@@ -179,6 +191,19 @@ const { crumbs, showArtoria = true, wide = false, reading = false } = Astro.prop
       inline-size: 100%;
       max-inline-size: var(--measure);
       margin-inline: auto;
+    }
+  }
+
+  @media (width >= 64rem) {
+    page-grid.narrow-toc {
+      page-content {
+        grid-column: 3 / 11;
+      }
+
+      page-toc {
+        grid-column: 11 / 13;
+        width: calc(2 * var(--grid-column-width) + var(--grid-gutter));
+      }
     }
   }
 

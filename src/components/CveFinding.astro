@@ -1,0 +1,319 @@
+---
+import CveReference from "@/components/CveReference.astro"
+import type { Finding } from "@/data/cves"
+
+type Props = {
+  finding: Finding
+  anchor?: string
+  heading?: "h3" | "h4"
+  writeup?: string
+  note?: string
+}
+
+const {
+  finding,
+  anchor = finding.id.toLowerCase(),
+  heading: Heading = "h3",
+  writeup,
+  note,
+} = Astro.props
+const primaryLink = writeup
+  ? {
+      href: writeup,
+      label: "Technical write-up",
+      name: "Technical write-up",
+      external: false,
+    }
+  : finding.advisory
+    ? {
+        ...finding.advisory,
+        name: finding.advisory.label,
+        label: "Advisory",
+        external: true,
+      }
+    : finding.url
+      ? {
+          href: finding.url,
+          label: "CVE record",
+          name: "CVE record",
+          external: true,
+        }
+      : undefined
+const pendingLabel = finding.id.includes("XXXX")
+  ? "ID pending"
+  : finding.id.startsWith("GHSA-")
+    ? "CVE ID not assigned"
+    : "CVE record pending"
+---
+
+<article id={anchor} class="cve-finding" aria-labelledby={`${anchor}-title`}>
+  <details class="finding-details">
+    <summary>
+      <Heading id={`${anchor}-title`}>{finding.title}</Heading>
+      {finding.score && finding.severity ? (
+        <span class="severity" data-severity={finding.severity}>
+          <span>{finding.severity}</span><span aria-hidden="true">·</span>{finding.score}
+        </span>
+      ) : (
+        <span class="severity">{writeup ? "Duplicate" : "Score pending"}</span>
+      )}
+      <svg
+        class="disclosure"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+      >
+        <path d="m4 6 4 4 4-4" />
+      </svg>
+    </summary>
+
+    <div class="record-details">
+      <p>{finding.summary}</p>
+      <div class="record-context">
+        {finding.published ? (
+          <time datetime={finding.published}>{finding.published}</time>
+        ) : !writeup && <span>Publication pending</span>}
+        {finding.cvss && finding.score && <span>CVSS {finding.cvss} · {finding.score}</span>}
+        {!finding.url && <span>{pendingLabel}</span>}
+        {finding.url && primaryLink?.href !== finding.url && (
+          <a href={finding.url} target="_blank" rel="noopener noreferrer">
+            CVE record <span aria-hidden="true">↗</span>
+          </a>
+        )}
+        {note && (
+          <a href={note} target="_blank" rel="noopener noreferrer">
+            Original note <span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </div>
+    </div>
+  </details>
+
+  <footer class="record-actions">
+    <CveReference id={finding.id} anchor={anchor} />
+    {primaryLink && (
+      <a
+        class="primary-link"
+        href={primaryLink.href}
+        target={primaryLink.external ? "_blank" : undefined}
+        rel={primaryLink.external ? "noopener noreferrer" : undefined}
+        aria-label={`${primaryLink.name}: ${finding.title}`}
+        title={primaryLink.name}
+      >
+        {primaryLink.label}<span aria-hidden="true">{primaryLink.external ? "↗" : "→"}</span>
+      </a>
+    )}
+  </footer>
+</article>
+
+<style>
+  .cve-finding {
+    margin-inline: calc(-1 * var(--space-xs));
+    padding: var(--space-xs);
+    scroll-margin-block-start: var(--space-s);
+    transition: background-color 0.15s ease;
+
+    &:has(summary:hover),
+    &:has(:focus-visible),
+    &:has(details[open]) {
+      background-color: color-mix(in oklab, var(--muted) 45%, transparent);
+    }
+
+    &:target {
+      background-color: color-mix(in oklab, var(--accent) 8%, transparent);
+      box-shadow: -2px 0 0 var(--accent);
+    }
+  }
+
+  summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 1rem;
+    align-items: center;
+    gap: var(--space-xs);
+    min-block-size: 2.75rem;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    h3,
+    h4 {
+      font-size: var(--step-0);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.4;
+      text-wrap: pretty;
+    }
+
+    &:hover .disclosure {
+      color: var(--accent);
+    }
+  }
+
+  .severity {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    justify-self: start;
+    padding: 0.18rem 0.45rem;
+    border: 1px solid color-mix(in oklab, currentColor 22%, transparent);
+    border-radius: var(--radius-sm);
+    background-color: color-mix(in oklab, currentColor 5%, transparent);
+    color: var(--muted-foreground);
+    font: 0.8125rem / 1.5 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    span:first-child {
+      text-transform: capitalize;
+    }
+
+    &[data-severity="critical"] {
+      color: var(--destructive);
+    }
+
+    &[data-severity="high"] {
+      color: light-dark(#92520d, #dbb179);
+    }
+  }
+
+  .disclosure {
+    inline-size: 1rem;
+    block-size: 1rem;
+    color: var(--muted-foreground);
+    transition: rotate 0.15s ease;
+  }
+
+  details[open] .disclosure {
+    rotate: 180deg;
+  }
+
+  details[data-closing] .disclosure {
+    rotate: 0deg;
+  }
+
+  details[data-animating] {
+    overflow: clip;
+  }
+
+  .record-details {
+    padding-block: var(--space-2xs);
+
+    > p {
+      max-inline-size: 65ch;
+      color: var(--prose-foreground);
+    }
+  }
+
+  .record-context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-s);
+    margin-block-start: var(--space-xs);
+    color: var(--muted-foreground);
+    font: 0.8125rem / 1.5 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5ch;
+      min-block-size: 2rem;
+      text-decoration: underline;
+      text-decoration-color: var(--border);
+      text-underline-offset: 0.2em;
+
+      &:hover {
+        color: var(--foreground);
+        text-decoration-color: currentColor;
+      }
+    }
+  }
+
+  .record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3xs) var(--space-2xs);
+    margin-block-start: var(--space-3xs);
+  }
+
+  .primary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    min-block-size: 2rem;
+    color: var(--accent);
+    font: 500 0.8125rem / 1.5 var(--font-mono);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 0.2em;
+
+    &:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  @media (width < 40rem) {
+    summary {
+      grid-template-columns: minmax(0, 1fr) 1rem;
+      gap: var(--space-2xs);
+
+      .severity {
+        grid-column: 1;
+      }
+
+      .disclosure {
+        grid-column: 2;
+        grid-row: 1;
+      }
+    }
+  }
+
+  @media (width < 64rem) {
+    .cve-finding {
+      scroll-margin-block-start: var(--space-2xs);
+    }
+  }
+
+  @media (any-pointer: coarse) {
+    .primary-link,
+    .record-context a {
+      min-block-size: 2.75rem;
+    }
+  }
+</style>
+
+<script>
+  import { initFindingDisclosures } from "@/lib/finding-disclosure"
+  const openFinding = initFindingDisclosures()
+
+  const revealFinding = () => {
+    let id: string
+    try {
+      id = decodeURIComponent(location.hash.slice(1))
+    } catch {
+      return
+    }
+    const finding = document.getElementById(id)
+    if (!finding?.matches(".cve-finding")) return
+    const details = finding.querySelector("details")
+    if (details) openFinding(details)
+    requestAnimationFrame(() => finding.scrollIntoView({ block: "start" }))
+  }
+
+  revealFinding()
+  addEventListener("hashchange", revealFinding)
+  document.addEventListener("click", (event) => {
+    const link =
+      event.target instanceof Element
+        ? event.target.closest<HTMLAnchorElement>(".cve-reference a")
+        : null
+    if (link?.hash === location.hash) revealFinding()
+  })
+</script>

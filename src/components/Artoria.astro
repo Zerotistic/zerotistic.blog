@@ -4,48 +4,282 @@ import { artoriaForPath } from "@/lib/artoria"
 type Props = { placement: "sidebar" | "footer" }
 const { placement } = Astro.props
 const pose = artoriaForPath(Astro.url.pathname)
+const id = `artoria-${placement}`
+const investigating = pose.name === "investigating"
 ---
 
-<div class:list={["artoria", `artoria-${placement}`]} data-pose={pose.name}>
-  <img
-    src={pose.src}
-    width="360"
-    height="540"
-    alt={pose.alt}
-    loading="lazy"
-    decoding="async"
-  />
+<div
+  class:list={["artoria", `artoria-${placement}`]}
+  data-pose={pose.name}
+  data-state="idle"
+>
+  <button
+    class="artoria-interaction"
+    type="button"
+    aria-label="Say hello to Artoria"
+    title="Say hello to Artoria"
+    disabled
+  >
+    <svg
+      class="artoria-figure"
+      viewBox="0 0 360 540"
+      width="360"
+      height="540"
+      role="img"
+      aria-labelledby={`${id}-description`}
+    >
+      <title id={`${id}-description`}>{pose.alt}</title>
+      <defs>
+        <clipPath id={`${id}-skirt`}><path d="M0 300H360V540H0Z" /></clipPath>
+        <clipPath id={`${id}-upper`}><path d="M0 0H360V312H0Z" /></clipPath>
+        {investigating && <>
+          <filter id={`${id}-feather`}><feGaussianBlur stdDeviation="0.65" /></filter>
+          <mask id={`${id}-left-eye`} maskUnits="userSpaceOnUse" x="190" y="98" width="33" height="33">
+            <ellipse cx="206" cy="115.5" rx="12" ry="11" fill="white" filter={`url(#${id}-feather)`} transform="rotate(-12 206 115.5)" />
+          </mask>
+          <mask id={`${id}-right-eye`} maskUnits="userSpaceOnUse" x="225" y="87" width="27" height="34">
+            <ellipse cx="237" cy="104" rx="8" ry="12" fill="white" filter={`url(#${id}-feather)`} transform="rotate(12 237 104)" />
+          </mask>
+          <clipPath id={`${id}-lens`}><ellipse cx="264" cy="131" rx="15" ry="22" transform="rotate(28 264 131)" /></clipPath>
+          <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="white" stop-opacity="0" />
+            <stop offset="0.5" stop-color="#fff5d1" stop-opacity="0.85" />
+            <stop offset="1" stop-color="white" stop-opacity="0" />
+          </linearGradient>
+        </>}
+      </defs>
+      <image
+        href={pose.src}
+        width="360"
+        height="540"
+        clip-path={`url(#${id}-skirt)`}
+      />
+      <g class="artoria-lean">
+        <g class="artoria-greeting">
+          <g class="artoria-breath">
+            <image
+              href={pose.src}
+              width="360"
+              height="540"
+              clip-path={`url(#${id}-upper)`}
+            />
+            {investigating && <>
+              <g class="artoria-blink">
+                <g mask={`url(#${id}-left-eye)`}>
+                  <image href="/static/artoria/investigating-blink-source.webp" x="1" y="-3" width="360" height="540" />
+                </g>
+                <g mask={`url(#${id}-right-eye)`}>
+                  <image href="/static/artoria/investigating-blink-source.webp" x="0" y="-4" width="360" height="540" />
+                </g>
+              </g>
+              <g clip-path={`url(#${id}-lens)`}>
+                <path class="lens-shine" d="m228 94 15-8 54 78-15 8Z" fill={`url(#${id}-shine)`} />
+              </g>
+              <path class="lens-spark" d="M280 103v14m-7-7h14" fill="none" stroke="#e2c88c" stroke-width="1.4" stroke-linecap="round" />
+            </>}
+          </g>
+        </g>
+      </g>
+    </svg>
+  </button>
+  <span class="artoria-visitor" aria-hidden="true">
+    <svg viewBox="0 0 40 32" class="butterfly">
+      <g class="wing wing-left">
+        <path
+          d="M20 16C13 0 3 0 3 9c0 7 8 11 17 8C9 14 5 21 10 27c4 5 10-3 10-11Z"
+        />
+        <path class="wing-vein" d="M20 16 7 7m13 10-9 6" />
+        <ellipse class="wing-spot" cx="8" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <g class="wing wing-right">
+        <path
+          d="M20 16C27 0 37 0 37 9c0 7-8 11-17 8 11-3 15 4 10 10-4 5-10-3-10-11Z"
+        />
+        <path class="wing-vein" d="m20 16 13-9m-13 10 9 6" />
+        <ellipse class="wing-spot" cx="32" cy="10" rx="1.8" ry="2.5" />
+      </g>
+      <path class="butterfly-body" d="M20 10v13m0-12-3-5m3 5 3-5" />
+    </svg>
+  </span>
 </div>
 
 <style>
-  .artoria img {
+  .artoria {
+    position: relative;
+    --attention-angle: 0deg;
+    --study-angle: 2.8deg;
+    --pose-angle: 0deg;
+  }
+
+  .artoria-interaction {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 40%;
+    -webkit-tap-highlight-color: transparent;
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  .artoria-figure {
     display: block;
     width: 100%;
     height: auto;
-    object-fit: contain;
-    border: 0;
-    background: transparent;
+    overflow: visible;
+  }
+
+  .artoria-lean,
+  .artoria-greeting,
+  .artoria-breath {
+    transform-origin: 180px 307px;
+  }
+
+  .artoria-lean {
+    transform: rotate(calc(var(--pose-angle) + var(--attention-angle)));
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-awake] .artoria-breath {
+    animation: artoria-breathe 6.8s ease-in-out infinite;
+  }
+
+  [data-state="investigating"] {
+    --pose-angle: var(--study-angle);
+  }
+  [data-state="curious"] {
+    --pose-angle: -1.8deg;
+  }
+  .artoria-blink {
+    opacity: 0;
+  }
+
+  [data-blinking] .artoria-blink {
+    opacity: 1;
+  }
+
+  .lens-shine,
+  .lens-spark {
+    opacity: 0;
+  }
+
+  [data-sparkle] .lens-shine {
+    animation: lens-shimmer 1.2s ease-out both;
+  }
+
+  [data-sparkle] .lens-spark {
+    transform-origin: 280px 110px;
+    animation: lens-glint 1s ease-out both;
+  }
+
+  .artoria-visitor {
+    position: absolute;
+    inset: 0 auto auto 0;
+    inline-size: 23px;
+    block-size: 19px;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+    color: light-dark(#b8a168, #c5d1bc);
+  }
+
+  .butterfly {
+    display: block;
+    inline-size: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+  }
+
+  .wing {
+    fill: currentColor;
+    stroke: light-dark(#887346, #a1af96);
+    stroke-width: 0.6;
+    transform-origin: 20px 16px;
+  }
+
+  [data-visiting] .wing {
+    animation: butterfly-flutter 0.19s ease-in-out infinite alternate;
+  }
+
+  [data-perched] .wing {
+    animation-duration: 1.4s;
+  }
+
+  .wing-vein,
+  .butterfly-body {
+    fill: none;
+    stroke: light-dark(#746340, #8a9883);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+
+  .wing-vein {
+    opacity: 0.35;
+  }
+  .wing-spot {
+    fill: light-dark(#ebe1b8, #e3e9d9);
+    stroke: none;
   }
 
   .artoria-sidebar {
-    width: min(100%, 148px);
+    width: min(100%, 148px, 20svh);
     margin-block-start: 28px;
-
-    img {
-      max-height: 30svh;
-      object-position: left bottom;
-    }
   }
 
   .artoria-footer {
     display: none;
   }
 
+  @keyframes artoria-breathe {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    45% {
+      transform: translateY(-0.55px);
+    }
+  }
+
+  @keyframes lens-shimmer {
+    0% {
+      opacity: 0;
+      transform: translateX(-22px);
+    }
+    30% {
+      opacity: 0.55;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+  }
+
+  @keyframes lens-glint {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.5) rotate(-12deg);
+    }
+    35% {
+      opacity: 0.8;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes butterfly-flutter {
+    from {
+      transform: scaleX(0.25);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   @media (width < 64rem) {
     .artoria-sidebar {
       display: none;
     }
-
     .artoria-footer {
       display: block;
       width: 112px;
@@ -58,4 +292,27 @@ const pose = artoriaForPath(Astro.url.pathname)
       display: none;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artoria-lean {
+      transform: none;
+      transition: none;
+    }
+    .artoria-breath,
+    .wing,
+    .lens-shine,
+    .lens-spark {
+      animation: none !important;
+    }
+    .artoria-blink,
+    .artoria-visitor {
+      display: none;
+    }
+  }
 </style>
+
+<script>
+  import { initArtoria } from "@/lib/artoria-companion"
+  for (const element of document.querySelectorAll<HTMLElement>(".artoria"))
+    initArtoria(element)
+</script>

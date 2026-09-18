@@ -4,7 +4,10 @@ import Artoria from "@/components/Artoria.astro"
 import { NAVIGATION, SITE } from "@/consts"
 import { normalizePath } from "@/lib/utils"
 
-type Props = { crumbs?: { label: string; href: string }[]; showArtoria?: boolean }
+type Props = {
+  crumbs?: { label: string; href: string }[]
+  showArtoria?: boolean
+}
 
 const { crumbs = [], showArtoria = true } = Astro.props
 const pathname = normalizePath(Astro.url.pathname) || "/"

@@ -18,15 +18,42 @@ const { phase } = Astro.props
 </div>
 
 <style>
+  .phase {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(7.25rem, auto) 1fr;
+    align-items: baseline;
+    gap: 0.2rem 1rem;
+    padding-inline-start: 1.25rem;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0.0625rem;
+      inset-block-start: 0.45rem;
+      inline-size: 0.4375rem;
+      block-size: 0.4375rem;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      background: var(--background);
+    }
+  }
+
   .phase-label {
-    font-size: var(--step--1);
+    font-size: 0.875rem;
     font-weight: var(--font-weight-medium);
     color: var(--prose-foreground);
   }
 
   .phase-dates {
-    margin-block-start: var(--space-3xs);
     font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
     color: var(--muted-foreground);
+  }
+
+  @media (width >= 75rem), (width < 48rem) {
+    .phase {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -1,16 +1,24 @@
 ---
+import LinkIcon from "@/assets/icons/link.svg"
+
 type Props = { id: string; anchor?: string }
 const { id, anchor = id.toLowerCase() } = Astro.props
-const publishedId = /^CVE-\d{4}-\d+$/.test(id)
+const publishedId = /^(CVE-\d{4}-\d+|GHSA-[\da-z-]+)$/.test(id)
 ---
 
 <span class="cve-reference">
-  <a href={`#${anchor}`} title={`Link to ${id}`}>
-    <code>{id}</code><span class="hash" aria-hidden="true">#</span>
+  <code>{id}</code>
+  <a
+    href={`#${anchor}`}
+    data-icon-button
+    aria-label={`Permalink to ${id}`}
+    title="Permalink to finding"
+  >
+    <LinkIcon aria-hidden="true" />
   </a>
   {publishedId && (
     <span class="copy-id">
-      <button type="button" data-icon-button data-copy-id={id} aria-label={`Copy ${id} ID`} title="Copy CVE ID" hidden>
+      <button type="button" data-icon-button data-copy-id={id} aria-label={`Copy ${id} ID`} title="Copy finding ID" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <rect x="8" y="8" width="12" height="12" rx="2" />
           <path d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4" />
@@ -25,28 +33,26 @@ const publishedId = /^CVE-\d{4}-\d+$/.test(id)
   .cve-reference {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2xs);
+    gap: 0;
     min-inline-size: 0;
   }
 
-  a {
-    display: inline-flex;
-    align-items: center;
-    gap: 1ch;
-    min-block-size: 2rem;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--foreground);
-  }
-
   code {
-    font: inherit;
+    margin-inline-end: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
     letter-spacing: 0;
+    color: var(--muted-foreground);
   }
 
-  .hash,
+  a,
   button {
     color: var(--muted-foreground);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--accent);
+    }
   }
 
   .copy-id {
@@ -67,7 +73,7 @@ const publishedId = /^CVE-\d{4}-\d+$/.test(id)
     border: 1px solid var(--border);
     background: var(--background);
     color: var(--foreground);
-    font: 0.75rem var(--font-mono);
+    font: 0.8125rem var(--font-mono);
     white-space: nowrap;
     pointer-events: none;
   }
@@ -76,9 +82,6 @@ const publishedId = /^CVE-\d{4}-\d+$/.test(id)
     a,
     button {
       min-block-size: 2.75rem;
-    }
-
-    button {
       min-inline-size: 2.75rem;
     }
   }
@@ -87,8 +90,11 @@ const publishedId = /^CVE-\d{4}-\d+$/.test(id)
 <script>
   import { copyText } from "@/lib/clipboard"
 
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-id]")) {
-    const status = button.parentElement?.querySelector<HTMLElement>(".copy-status")
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    "[data-copy-id]",
+  )) {
+    const status =
+      button.parentElement?.querySelector<HTMLElement>(".copy-status")
     if (!status) continue
     button.hidden = false
     let timer: ReturnType<typeof setTimeout>
@@ -97,7 +103,9 @@ const publishedId = /^CVE-\d{4}-\d+$/.test(id)
       status.textContent = ""
       const copied = await copyText(button.dataset.copyId!)
       status.textContent = copied ? "Copied" : "Couldn’t copy"
-      timer = setTimeout(() => { status.textContent = "" }, 2000)
+      timer = setTimeout(() => {
+        status.textContent = ""
+      }, 2000)
     })
   }
 </script>
