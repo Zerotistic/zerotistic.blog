@@ -23,10 +23,10 @@ const findingAnchor = (id: string, product: string) =>
   />
 
   <div slot="toc" class="project-navigation">
-    <div class="project-picker" data-bar hidden>
+    <div class="project-picker" data-bar>
       <label for="project-picker">Project</label>
       <div class="select-wrap">
-        <select id="project-picker" aria-label="Jump to project">
+        <select id="project-picker" aria-label="Jump to project" disabled>
           <optgroup label="Published findings">
             {products.map((product) => (
               <option value={product.id}>{product.name} · {product.findings.length}</option>
@@ -427,7 +427,7 @@ const findingAnchor = (id: string, product: string) =>
       overflow: visible;
     }
 
-    .project-picker {
+    :global(:root[data-js]) .project-picker {
       display: flex;
       align-items: center;
       gap: var(--space-s);
@@ -468,7 +468,7 @@ const findingAnchor = (id: string, product: string) =>
       }
     }
 
-    .project-navigation:has(.project-picker:not([hidden])) .project-nav {
+    :global(:root[data-js]) .project-navigation .project-nav {
       display: none;
     }
 
@@ -548,7 +548,7 @@ const findingAnchor = (id: string, product: string) =>
   const pickerBar = document.querySelector<HTMLElement>(".project-picker")
 
   if (projectNav && picker && pickerBar) {
-    pickerBar.hidden = false
+    picker.disabled = false
     const mobile = matchMedia("(width < 64rem)")
     const links = [
       ...projectNav.querySelectorAll<HTMLAnchorElement>("a[href^='#']"),

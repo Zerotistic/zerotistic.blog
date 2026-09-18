@@ -1,3 +1,4 @@
+import { loadCompanionImages } from "./companion-images"
 import { motionRunning, observeMotion } from "./ambient-motion"
 import {
   mentionAtlas,
@@ -416,35 +417,10 @@ export function initMentionCompanion(element: HTMLElement) {
     { threshold: [0, 0.5] },
   ).observe(element)
   observeMotion(update)
-  Promise.all(
-    [
-      ...[
-        "reading",
-        "seated-base",
-        "foot-left",
-        "foot-right",
-        "lean",
-        "discover",
-        "show",
-        "proud",
-        "turn",
-        "blink",
-        "curious",
-      ].map((name) => `/static/mentions/newspaper/${name}.webp`),
-      mentionAtlas.src,
-    ].map((src) => {
-      const image = new Image()
-      image.src = src
-      return image.decode()
-    }),
-  )
-    .then(() => {
-      ready = true
-      update()
-    })
-    .catch(() => {
-      /* Keep the static reading pose if any frame fails to load. */
-    })
+  loadCompanionImages(element, () => {
+    ready = true
+    update()
+  })
   button.addEventListener("click", () => discover(true))
   document.addEventListener("avalon-visit", (event) => {
     if (!active) return

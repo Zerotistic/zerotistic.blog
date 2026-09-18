@@ -5,7 +5,6 @@
     <p class="preview-site"></p>
     <h2 id="link-preview-title"></h2>
     <p class="preview-description"></p>
-    <a class="preview-open" aria-label="Open previewed link"></a>
   </div>
 </dialog>
 
@@ -17,7 +16,8 @@
   const description = panel.querySelector<HTMLElement>(".preview-description")!
   const site = panel.querySelector<HTMLElement>(".preview-site")!
   const image = panel.querySelector<HTMLImageElement>("img")!
-  const openLink = panel.querySelector<HTMLAnchorElement>(".preview-open")!
+  const openLink = document.createElement("a")
+  openLink.className = "preview-open"
   const touch = matchMedia("(hover: none), (pointer: coarse), (width < 40rem)")
   let current: HTMLButtonElement | undefined
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
@@ -95,6 +95,7 @@
     openLink.setAttribute("aria-label", `Open ${data.title}`)
     openLink.target = anchor.target
     openLink.rel = "noopener noreferrer"
+    if (!openLink.isConnected) panel.querySelector(".preview-copy")!.append(openLink)
     // Images are build assets or cached copies, never third-party hover requests.
     image.hidden = !data.image
     if (data.image) image.src = data.image

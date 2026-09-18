@@ -1,5 +1,9 @@
 ---
-import sansWoff2 from "@/assets/fonts/IBMPlexSans-VariableFont_wdth,wght.woff2?url"
+import sansWoff2 from "@/assets/fonts/IBMPlexSans-VariableFont_wght.woff2?url"
+import monoWoff2 from "@/assets/fonts/IBMPlexMono-Regular.woff2?url"
+import monoMediumWoff2 from "@/assets/fonts/IBMPlexMono-Medium.woff2?url"
+import dayLandscape from "@/assets/optimized/landscape/day.avif?url"
+import nightLandscape from "@/assets/optimized/landscape/night.avif?url"
 import { SITE } from "@/consts"
 ---
 
@@ -47,12 +51,50 @@ import { SITE } from "@/consts"
   >
 
   <link rel="preload" href={sansWoff2} as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href={monoWoff2} as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href={monoMediumWoff2} as="font" type="font/woff2" crossorigin>
 
-  <script is:inline>
-    const theme = localStorage.theme
-    if (theme === "light" || theme === "dark")
-      document.documentElement.dataset.theme = theme
+  <script is:inline data-day={dayLandscape} data-night={nightLandscape}>
+    (() => {
+      const sources = document.currentScript.dataset
+      const root = document.documentElement
+      root.dataset.js = ""
+      try {
+        const theme = localStorage.theme
+        if (theme === "light" || theme === "dark") root.dataset.theme = theme
+      } catch {}
+      const systemTheme = matchMedia("(prefers-color-scheme: dark)")
+      const landscape = () => {
+        const dark = root.dataset.theme === "dark" || (!root.dataset.theme && systemTheme.matches)
+        const src = dark ? sources.night : sources.day
+        const fallback = dark ? "/static/avalon-landscape-dusk.webp" : "/static/avalon-landscape.webp"
+        // Remember each loaded theme to preserve the crossfade when switching.
+        // The unused landscape is never requested on initial navigation.
+        const candidates = `image-set(url("${src}") type("image/avif"), url("${fallback}") type("image/webp"))`
+        const supportsImageSet = CSS.supports("background-image", candidates)
+        root.style.setProperty(`--avalon-${dark ? "night" : "day"}-image`, supportsImageSet ? candidates : `url("${fallback}")`)
+        return { src: supportsImageSet ? src : fallback, type: supportsImageSet ? "image/avif" : "image/webp" }
+      }
+      const preload = document.createElement("link")
+      preload.rel = "preload"
+      preload.as = "image"
+      preload.fetchPriority = "high"
+      const initial = landscape()
+      preload.type = initial.type
+      preload.href = initial.src
+      document.head.append(preload)
+      new MutationObserver(landscape).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
+      systemTheme.addEventListener("change", landscape)
+    })()
   </script>
+  <noscript>
+    <style is:inline>
+      :root { --avalon-day-image: url("/static/avalon-landscape.webp"); }
+      @media (prefers-color-scheme: dark) {
+        :root { --avalon-day-image: none; --avalon-night-image: url("/static/avalon-landscape-dusk.webp"); }
+      }
+    </style>
+  </noscript>
 
   <slot />
 </head>

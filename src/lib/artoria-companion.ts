@@ -1,3 +1,4 @@
+import { loadCompanionImages } from "./companion-images"
 import { motionRunning, observeMotion } from "./ambient-motion"
 
 type Point = [number, number]
@@ -19,11 +20,11 @@ export function initArtoria(element: HTMLElement) {
   const investigating = element.dataset.pose === "investigating"
   let visible = false
   let active = false
+  let ready = false
   let stateTimer = 0
   let flight: Animation | undefined
   let hello: Animation | undefined
   const timers = new Set<number>()
-  button.disabled = false
 
   const later = (callback: () => void, delay: number) => {
     const timer = window.setTimeout(() => {
@@ -139,7 +140,8 @@ export function initArtoria(element: HTMLElement) {
   }
 
   const update = () => {
-    const next = visible && motionRunning()
+    const next = ready && visible && motionRunning()
+    button.disabled = !next
     if (next === active) return
     active = next
     element.toggleAttribute("data-awake", active)
@@ -172,6 +174,10 @@ export function initArtoria(element: HTMLElement) {
   )
   observer.observe(element)
   observeMotion(update)
+  loadCompanionImages(element, () => {
+    ready = true
+    update()
+  })
 
   button.addEventListener("pointermove", (event) => {
     if (!active || event.pointerType === "touch") return

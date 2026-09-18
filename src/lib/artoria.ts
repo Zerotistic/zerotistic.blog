@@ -1,24 +1,28 @@
+import wavingImage from "@/assets/optimized/artoria/waving.webp?url"
+import investigatingImage from "@/assets/optimized/artoria/investigating.webp?url"
+import readingImage from "@/assets/optimized/artoria/reading.webp?url"
+import restingImage from "@/assets/optimized/artoria/resting.webp?url"
 import { normalizePath } from "./utils"
 
 const poses = {
   resting: {
     name: "resting",
-    src: "/static/artoria-last-episode.webp",
+    src: restingImage,
     alt: "Artoria sitting quietly in her white Last Episode dress",
   },
   reading: {
     name: "reading",
-    src: "/static/artoria/reading.webp",
+    src: readingImage,
     alt: "Artoria sitting in her white dress, absorbed in an open book",
   },
   investigating: {
     name: "investigating",
-    src: "/static/artoria/investigating.webp",
+    src: investigatingImage,
     alt: "Artoria examining a tiny bug through a magnifying glass",
   },
   waving: {
     name: "waving",
-    src: "/static/artoria/waving.webp",
+    src: wavingImage,
     alt: "Artoria giving a small wave with a bashful smile",
   },
 } as const

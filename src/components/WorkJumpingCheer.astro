@@ -1,4 +1,6 @@
 ---
+const images = import.meta.glob<string>("/src/assets/optimized/jumping/*.webp", { eager: true, query: "?url", import: "default" })
+const source = (name: string) => images[`/src/assets/optimized/jumping/${name}.webp`]
 const poses = [
   { name: "crouch" },
   {
@@ -46,12 +48,8 @@ const poses = [
       viewBox="0 0 480 640"
       width="480"
       height="640"
-      role="img"
-      aria-labelledby="jump-artoria-title"
+      aria-hidden="true"
     >
-      <title id="jump-artoria-title">
-        A little Artoria happily jumping and pointing toward HiddenLayer
-      </title>
       <defs>
         {poses.map(({ name, arm }) => arm && <>
           <clipPath id={`jump-${name}-arm`}>
@@ -96,21 +94,21 @@ const poses = [
       </defs>
       <g class="jump-pose pose-proud">
         <image
-          href="/static/work/jumping/proud.webp"
+          href={source("proud")}
           width="480"
           height="640"
           clip-path="url(#jump-lower)"
         />
         <g class="jump-upper-body">
           <image
-            href="/static/work/jumping/proud.webp"
+            href={source("proud")}
             width="480"
             height="640"
             clip-path="url(#jump-upper)"
           />
           <image
             class="jump-blink"
-            href="/static/work/jumping/blink.webp"
+            data-src={source("blink")}
             width="480"
             height="640"
             mask="url(#jump-eyes)"
@@ -119,9 +117,9 @@ const poses = [
       </g>
       {poses.map(({ name, arm }) => <g class:list={["jump-pose", `pose-${name}`]}>
         {arm && <g data-pointing-arm={name} data-pivot={arm.pivot.join(",")} data-tip={arm.tip.join(",")} data-knuckle={arm.knuckle.join(",")}>
-          <image href={`/static/work/jumping/${name}.webp`} width="480" height="640" clip-path={`url(#jump-${name}-arm)`} />
+          <image data-src={source(name)} width="480" height="640" clip-path={`url(#jump-${name}-arm)`} />
         </g>}
-        <image href={`/static/work/jumping/${name}.webp`} width="480" height="640" mask={arm ? `url(#jump-${name}-body)` : undefined} />
+        <image data-src={source(name)} width="480" height="640" mask={arm ? `url(#jump-${name}-body)` : undefined} />
       </g>)}
     </svg>
   </button>

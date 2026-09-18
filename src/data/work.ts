@@ -1,3 +1,6 @@
+import deloitteLogo from "@/assets/optimized/logos/deloitte.webp?url"
+import hackcyomLogo from "@/assets/optimized/logos/hackcyom.webp?url"
+import hiddenlayerLogo from "@/assets/optimized/logos/hiddenlayer.webp?url"
 export type WorkEntry = {
   id: string
   organization: string
@@ -22,7 +25,7 @@ export const work: WorkEntry[] = [
   {
     id: "hiddenlayer",
     organization: "HiddenLayer",
-    logo: "/static/work/hiddenlayer.png",
+    logo: hiddenlayerLogo,
     role: "Security Researcher",
     kind: "Work",
     start: "2025-02",
@@ -31,7 +34,7 @@ export const work: WorkEntry[] = [
   {
     id: "hackcyom",
     organization: "Hackcyom",
-    logo: "/static/work/hackcyom.jpeg",
+    logo: hackcyomLogo,
     role: "Security Researcher",
     kind: "Work",
     start: "2023-02",
@@ -55,7 +58,7 @@ export const work: WorkEntry[] = [
   {
     id: "deloitte",
     organization: "Deloitte",
-    logo: "/static/work/deloitte.ico",
+    logo: deloitteLogo,
     role: "Junior Consultant",
     kind: "Apprenticeship",
     start: "2022-10",

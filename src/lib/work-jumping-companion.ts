@@ -1,3 +1,4 @@
+import { loadCompanionImages } from "./companion-images"
 import { motionRunning, observeMotion } from "./ambient-motion"
 
 type Pose = "proud" | "crouch" | "takeoff" | "air" | "land" | "curious"
@@ -377,22 +378,10 @@ export function initJumpingCompanion(element: HTMLElement) {
   )
   observer.observe(element)
   observeMotion(update)
-  Promise.all(
-    ["proud", "blink", "crouch", "takeoff", "air", "land", "curious"].map(
-      (name) => {
-        const image = new Image()
-        image.src = `/static/work/jumping/${name}.webp`
-        return image.decode()
-      },
-    ),
-  )
-    .then(() => {
-      ready = true
-      update()
-    })
-    .catch(() => {
-      // The static proud pose remains available if an animation frame fails to load.
-    })
+  loadCompanionImages(element, () => {
+    ready = true
+    update()
+  })
   button.addEventListener("click", () => celebrate(true))
   document.addEventListener("avalon-visit", (event) => {
     if (!active) return

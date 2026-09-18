@@ -32,7 +32,7 @@
   }
 
   .avalon-day {
-    background-image: url("/static/avalon-landscape.webp");
+    background-image: var(--avalon-day-image, none);
     opacity: 0.38;
   }
 
@@ -44,7 +44,7 @@
         rgb(17 17 16 / 0.85) 30%,
         transparent 65%
       ),
-      url("/static/avalon-landscape-dusk.webp");
+      var(--avalon-night-image, none);
     opacity: 0;
   }
 

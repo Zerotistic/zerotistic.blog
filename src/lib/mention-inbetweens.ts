@@ -1,3 +1,5 @@
+import atlasSource from "@/assets/optimized/newspaper/inbetweens-padded.webp?url"
+
 // Drawn poses between the original keyframes, packed in a single decoded atlas.
 const frameWidth = 360
 const frameHeight = 347
@@ -7,7 +9,7 @@ const strideX = frameWidth + padding * 2
 const strideY = frameHeight + padding * 2
 
 export const mentionAtlas = {
-  src: "/static/mentions/newspaper/inbetweens-padded.webp",
+  src: atlasSource,
   columns: 4,
   frameWidth,
   frameHeight,

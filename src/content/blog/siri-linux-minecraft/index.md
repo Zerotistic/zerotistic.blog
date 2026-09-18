@@ -580,7 +580,7 @@ siri: It's currently clear and 19 C in Paris, France.
 For Minecraft, I added (read: asked GPT to slop) a tiny server mod that watches for `hey siri,`, sends the question to the Python client and broadcasts its answer. Since the mod runs on the server, the players don't need to install anything.
 
 <figure class="siri-demo">
-<video controls playsinline preload="metadata" poster="/videos/hey_siri_clean-poster.webp" aria-label="Siri answering questions in Minecraft">
+<video controls playsinline preload="none" poster="/videos/hey_siri_clean-poster.webp" aria-label="Siri answering questions in Minecraft">
   <source src="/videos/hey_siri_clean.mp4" type="video/mp4">
   <a href="/videos/hey_siri_clean.mp4">Watch the Minecraft Siri demo</a>.
 </video>

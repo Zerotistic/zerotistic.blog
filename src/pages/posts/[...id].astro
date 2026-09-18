@@ -1,4 +1,14 @@
 ---
+import "@/styles/typography-headings.css"
+import "@/styles/typography-inline.css"
+import "@/styles/typography-lists.css"
+import "@/styles/typography-block.css"
+import "@/styles/typography-tables.css"
+import "@/styles/typography-math.css"
+import "@/styles/callout.css"
+import ImageViewer from "@/components/ImageViewer.astro"
+import SiriClock from "@/components/SiriClock.astro"
+import SiriDemo from "@/components/SiriDemo.astro"
 import MetaPost from "@/components/MetaPost.astro"
 import LinkPreviews from "@/components/LinkPreviews.astro"
 import { postLinkPreviews } from "@/lib/link-previews"
@@ -91,6 +101,9 @@ if (chain.length > 1) {
     )}
   <PostActions slot="actions" prev={prev} next={next} />
   <ScrollToTop floating />
+  <ImageViewer />
+  <SiriClock />
+  <SiriDemo />
   <LinkPreviews />
   <CodeTools />
   {rendered.map(({ entry, Content, authors, linkPreviews }, i) => (

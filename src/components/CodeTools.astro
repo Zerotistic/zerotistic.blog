@@ -1,42 +1,76 @@
 <script>
+  type CodeBlock = { pre: HTMLElement; scroll: HTMLElement; visible: boolean }
+  const blocks = new Map<Element, CodeBlock>()
+  const pending = new Set<CodeBlock>()
+  let frame = 0
+
+  const flush = () => {
+    frame = 0
+    // Measure every visible block before writing any styles. Leave distant
+    // blocks under content-visibility; reading their size would force layout.
+    const measurements = [...pending].filter((block) => block.visible).map((block) => {
+      const { scrollLeft, scrollWidth, clientWidth, scrollHeight, clientHeight } = block.pre
+      return { ...block, start: scrollLeft > 1, end: scrollWidth - clientWidth - scrollLeft > 1, overflowing: scrollWidth > clientWidth + 1 || scrollHeight > clientHeight + 1 }
+    })
+    pending.clear()
+    for (const { pre, scroll, start, end, overflowing } of measurements) {
+      scroll.toggleAttribute("data-overflow-start", start)
+      scroll.toggleAttribute("data-overflow-end", end)
+      pre.tabIndex = overflowing ? 0 : -1
+      if (overflowing) pre.setAttribute("aria-label", "Scrollable code block")
+      else pre.removeAttribute("aria-label")
+    }
+  }
+  const schedule = (block: CodeBlock) => {
+    if (!block.visible) return
+    pending.add(block)
+    if (!frame) frame = requestAnimationFrame(flush)
+  }
+  const visibility = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const block = blocks.get(entry.target)!
+      block.visible = entry.isIntersecting
+      schedule(block)
+    }
+  }, { rootMargin: "300px" })
+  const resize = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const block = blocks.get(entry.target)
+      if (block) schedule(block)
+    }
+  })
+
   // Keep Expressive Code's source-aware copy behavior and success feedback.
   for (const pre of document.querySelectorAll<HTMLElement>("prose-content .expressive-code pre")) {
-    const frame = pre.closest<HTMLElement>(".frame")
-    if (!frame || pre.parentElement?.classList.contains("code-scroll")) continue
+    const container = pre.closest<HTMLElement>(".expressive-code")
+    const codeFrame = pre.closest<HTMLElement>(".frame")
+    if (!container || !codeFrame || pre.parentElement?.classList.contains("code-scroll")) continue
     const scroll = document.createElement("div")
     scroll.className = "code-scroll"
     pre.before(scroll)
     scroll.append(pre)
+    const block = { pre, scroll, visible: false }
+    blocks.set(container, block)
+    blocks.set(pre, block)
+    visibility.observe(container)
+    resize.observe(pre)
+    const code = pre.querySelector("code")
+    if (code) { blocks.set(code, block); resize.observe(code) }
+    const update = () => schedule(block)
+    pre.addEventListener("scroll", update, { passive: true })
+    codeFrame.addEventListener("toggle", update, true)
+    container.addEventListener("contentvisibilityautostatechange", update)
 
-    const button = frame.querySelector<HTMLButtonElement>(".copy button")
+    const button = codeFrame.querySelector<HTMLButtonElement>(".copy button")
     if (button) {
       button.type = "button"
       button.setAttribute("aria-label", "Copy code")
       button.dataset.copied = "Copied"
     }
-
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth, scrollHeight, clientHeight } = pre
-      scroll.toggleAttribute("data-overflow-start", scrollLeft > 1)
-      scroll.toggleAttribute("data-overflow-end", scrollWidth - clientWidth - scrollLeft > 1)
-      const overflowing = scrollWidth > clientWidth + 1 || scrollHeight > clientHeight + 1
-      // Only add an extra keyboard stop when there is something to scroll.
-      pre.tabIndex = overflowing ? 0 : -1
-      if (overflowing) pre.setAttribute("aria-label", "Scrollable code block")
-      else pre.removeAttribute("aria-label")
-    }
-
-    pre.addEventListener("scroll", update, { passive: true })
-    frame.addEventListener("toggle", update, true)
-    const observer = new ResizeObserver(update)
-    observer.observe(pre)
-    const code = pre.querySelector("code")
-    if (code) observer.observe(code)
-    // content-visibility may defer layout until the block approaches the viewport.
-    frame.parentElement?.addEventListener("contentvisibilityautostatechange", update)
-    document.fonts.ready.then(update)
-    update()
   }
+  document.fonts.ready.then(() => {
+    for (const block of new Set(blocks.values())) schedule(block)
+  })
 </script>
 
 <style is:global>

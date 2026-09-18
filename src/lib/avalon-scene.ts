@@ -40,6 +40,25 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   let targetNight = 0
   let nextVisit = remainingVisitDelay()
   let visitorStart = -100
+  let pixelRatio = 0
+  let blades: {
+    x: number
+    root: number
+    length: number
+    bend: number
+    flower: boolean
+  }[] = []
+  // Reuse one glow texture instead of constructing a gradient for every
+  // firefly on every frame. Opacity still follows the day/night crossfade.
+  const glow = document.createElement("canvas")
+  glow.width = glow.height = 64
+  const glowContext = glow.getContext("2d")!
+  const gradient = glowContext.createRadialGradient(32, 32, 0, 32, 32, 32)
+  gradient.addColorStop(0, "rgba(226,226,153,0.65)")
+  gradient.addColorStop(0.25, "rgba(178,210,148,0.2)")
+  gradient.addColorStop(1, "rgba(162,192,148,0)")
+  glowContext.fillStyle = gradient
+  glowContext.fillRect(0, 0, 64, 64)
   const themeQuery = matchMedia("(prefers-color-scheme: dark)")
   const saveVisitDelay = () => {
     try {
@@ -63,9 +82,14 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   }))
 
   const resize = () => {
-    width = canvas.clientWidth
-    height = canvas.clientHeight
+    const nextWidth = canvas.clientWidth
+    const nextHeight = canvas.clientHeight
     const ratio = Math.min(devicePixelRatio || 1, 2)
+    if (width === nextWidth && height === nextHeight && pixelRatio === ratio)
+      return
+    width = nextWidth
+    height = nextHeight
+    pixelRatio = ratio
     canvas.width = Math.round(width * ratio)
     canvas.height = Math.round(height * ratio)
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
@@ -75,6 +99,23 @@ export function initAvalon(canvas: HTMLCanvasElement) {
         : width >= 1024
           ? 28
           : 12
+    const count = width < 1024 ? 5 : 19
+    const reach = width < 1024 ? 15 : Math.min(edge * 0.75, 120)
+    blades = [-1, 1].flatMap((side) =>
+      Array.from({ length: count }, (_, i) => {
+        const seed = i + (side === 1 ? 75 : 0)
+        const root = noise(seed + 2) * reach
+        return {
+          x: side < 0 ? root : width - root,
+          root,
+          length:
+            (width < 1024 ? 20 : 38) +
+            noise(seed + 5) * (width < 1024 ? 30 : 72),
+          bend: (noise(seed + 8) - 0.5) * 24,
+          flower: i % 4 === 0,
+        }
+      }),
+    )
   }
   const theme = () => {
     const preference = document.documentElement.dataset.theme
@@ -83,60 +124,52 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   }
 
   function grass() {
-    const count = width < 1024 ? 5 : 19
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < count; i++) {
-        const seed = i + (side === 1 ? 75 : 0)
-        const reach = width < 1024 ? 15 : Math.min(edge * 0.75, 120)
-        const root = noise(seed + 2) * reach
-        const x = side < 0 ? root : width - root
-        const length =
-          (width < 1024 ? 20 : 38) + noise(seed + 5) * (width < 1024 ? 30 : 72)
-        const sway =
-          Math.sin(time * 0.6 + root * 0.024) * 5 + Math.sin(time * 0.21) * 7
-        const bend = (noise(seed + 8) - 0.5) * 24 + sway
-        const tipX = x + bend
-        const tipY = height - length
+    for (const { x, root, length, bend: restingBend, flower } of blades) {
+      const sway =
+        Math.sin(time * 0.6 + root * 0.024) * 5 + Math.sin(time * 0.21) * 7
+      const bend = restingBend + sway
+      const tipX = x + bend
+      const tipY = height - length
+      ctx.fillStyle =
+        night > 0.5 ? "rgba(133,154,137,0.13)" : "rgba(132,145,104,0.22)"
+      ctx.beginPath()
+      ctx.moveTo(x - 0.8, height + 3)
+      ctx.quadraticCurveTo(x + bend * 0.15, height - length * 0.6, tipX, tipY)
+      ctx.quadraticCurveTo(
+        x + bend * 0.4 + 1,
+        height - length * 0.5,
+        x + 1.3,
+        height + 3,
+      )
+      ctx.fill()
+      if (flower) {
+        ctx.save()
+        ctx.translate(tipX, tipY)
+        ctx.rotate(bend * 0.018)
         ctx.fillStyle =
-          night > 0.5 ? "rgba(133,154,137,0.13)" : "rgba(132,145,104,0.22)"
-        ctx.beginPath()
-        ctx.moveTo(x - 0.8, height + 3)
-        ctx.quadraticCurveTo(x + bend * 0.15, height - length * 0.6, tipX, tipY)
-        ctx.quadraticCurveTo(
-          x + bend * 0.4 + 1,
-          height - length * 0.5,
-          x + 1.3,
-          height + 3,
-        )
-        ctx.fill()
-        if (i % 4 === 0) {
-          ctx.save()
-          ctx.translate(tipX, tipY)
-          ctx.rotate(bend * 0.018)
-          ctx.fillStyle =
-            night > 0.5 ? "rgba(176,172,140,0.16)" : "rgba(159,139,94,0.25)"
-          for (let j = 0; j < 4; j++) {
-            ctx.beginPath()
-            ctx.ellipse(
-              (j % 2 ? 1 : -1) * 1.5,
-              j * 3,
-              1.5,
-              3.3,
-              j % 2 ? 0.5 : -0.5,
-              0,
-              tau,
-            )
-            ctx.fill()
-          }
-          ctx.restore()
+          night > 0.5 ? "rgba(176,172,140,0.16)" : "rgba(159,139,94,0.25)"
+        for (let j = 0; j < 4; j++) {
+          ctx.beginPath()
+          ctx.ellipse(
+            (j % 2 ? 1 : -1) * 1.5,
+            j * 3,
+            1.5,
+            3.3,
+            j % 2 ? 0.5 : -0.5,
+            0,
+            tau,
+          )
+          ctx.fill()
         }
+        ctx.restore()
       }
     }
   }
 
   function motes() {
     const count = width < 1024 ? 6 : particles.length
-    for (const p of particles.slice(0, count)) {
+    for (let i = 0; i < count; i++) {
+      const p = particles[i]
       const drift =
         Math.sin(time * 0.16 * p.speed + p.phase) * Math.min(18, edge / 3)
       const rawX = 4 + p.x * Math.max(1, edge - 12) + drift
@@ -146,14 +179,11 @@ export function initAvalon(canvas: HTMLCanvasElement) {
       const alpha = 0.12 + pulse * 0.38
       ctx.globalAlpha = alpha * (width < 1024 ? 0.6 : 1)
       if (night > 0.01) {
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, p.size * 4.5)
-        glow.addColorStop(0, `rgba(226,226,153,${night * 0.65})`)
-        glow.addColorStop(0.25, `rgba(178,210,148,${night * 0.2})`)
-        glow.addColorStop(1, "rgba(162,192,148,0)")
-        ctx.fillStyle = glow
-        ctx.beginPath()
-        ctx.arc(x, y, p.size * 4.5, 0, tau)
-        ctx.fill()
+        const opacity = ctx.globalAlpha
+        const radius = p.size * 4.5
+        ctx.globalAlpha = opacity * night
+        ctx.drawImage(glow, x - radius, y - radius, radius * 2, radius * 2)
+        ctx.globalAlpha = opacity
       }
       ctx.fillStyle = night > 0.5 ? "#e5e3ad" : "#b9a273"
       ctx.beginPath()
@@ -211,7 +241,10 @@ export function initAvalon(canvas: HTMLCanvasElement) {
     lastFrame = now
     time += dt
     night += (targetNight - night) * Math.min(1, dt * 2)
-    ctx.clearRect(0, 0, width, height)
+    // All moving details stay at the edges. Leave the empty center untouched.
+    const strip = Math.min(width / 2, Math.ceil(edge + 32))
+    ctx.clearRect(0, 0, strip, height)
+    ctx.clearRect(width - strip, 0, strip, height)
     grass()
     motes()
     visitor()

@@ -1,4 +1,5 @@
 ---
+import eyePatch from "@/assets/optimized/artoria/investigating-eyes.webp?url"
 import { artoriaForPath } from "@/lib/artoria"
 
 type Props = { placement: "sidebar" | "footer" }
@@ -25,10 +26,8 @@ const investigating = pose.name === "investigating"
       viewBox="0 0 360 540"
       width="360"
       height="540"
-      role="img"
-      aria-labelledby={`${id}-description`}
+      aria-hidden="true"
     >
-      <title id={`${id}-description`}>{pose.alt}</title>
       <defs>
         <clipPath id={`${id}-skirt`}><path d="M0 300H360V540H0Z" /></clipPath>
         <clipPath id={`${id}-upper`}><path d="M0 0H360V312H0Z" /></clipPath>
@@ -66,10 +65,10 @@ const investigating = pose.name === "investigating"
             {investigating && <>
               <g class="artoria-blink">
                 <g mask={`url(#${id}-left-eye)`}>
-                  <image href="/static/artoria/investigating-blink-source.webp" x="1" y="-3" width="360" height="540" />
+                  <image data-src={eyePatch} x="186" y="77" width="80" height="65" />
                 </g>
                 <g mask={`url(#${id}-right-eye)`}>
-                  <image href="/static/artoria/investigating-blink-source.webp" x="0" y="-4" width="360" height="540" />
+                  <image data-src={eyePatch} x="185" y="76" width="80" height="65" />
                 </g>
               </g>
               <g clip-path={`url(#${id}-lens)`}>

@@ -46,7 +46,8 @@ const poses = [
       "M63 151L187 169L301 136L301 213Q315 221 302 253L295 310L191 331L91 312L70 291L68 251L66 220Z",
   },
 ]
-const source = (name: string) => `/static/mentions/newspaper/${name}.webp`
+const images = import.meta.glob<string>("/src/assets/optimized/newspaper/*.webp", { eager: true, query: "?url", import: "default" })
+const source = (name: string) => images[`/src/assets/optimized/newspaper/${name}.webp`]
 ---
 
 <figure class="mention-companion" data-pose="reading" data-scene="idle">
@@ -143,23 +144,24 @@ const source = (name: string) => `/static/mentions/newspaper/${name}.webp`
       </g>
       <image
         href={source("seated-base")}
+        y="330"
         width="360"
-        height="560"
+        height="230"
         clip-path="url(#news-lower)"
       />
       <g mask="url(#news-upper)">
         {poses.map(({ name }) => <g class="newspaper-pose" data-name={name}>
           <g class="news-head" clip-path={`url(#news-${name}-head)`}>
-            <image href={source(name)} width="360" height="560" />
-            {name === "reading" && <image class="news-blink" href={source("blink")} width="360" height="560" x="2" y="3" mask="url(#news-eyes)" />}
-            {name === "turn" && <image href={source("proud")} width="360" height="560" x="2" y="4" clip-path="url(#news-turn-face)" />}
+            <image href={name === "reading" ? source(name) : undefined} data-src={name !== "reading" ? source(name) : undefined} width="360" height="560" />
+            {name === "reading" && <image class="news-blink" data-src={source("blink")} width="360" height="560" x="2" y="3" mask="url(#news-eyes)" />}
+            {name === "turn" && <image data-src={source("proud")} width="360" height="560" x="2" y="4" clip-path="url(#news-turn-face)" />}
           </g>
-          <image href={source(name)} width="360" height="560" mask={`url(#news-${name}-body)`} />
+          <image href={name === "reading" ? source(name) : undefined} data-src={name !== "reading" ? source(name) : undefined} width="360" height="560" mask={`url(#news-${name}-body)`} />
           <g class="news-paper" clip-path={`url(#news-${name}-paper)`}>
-            {name === "turn" && <g class="news-leaf" clip-path="url(#news-leaf)"><image href={source(name)} width="360" height="560" /></g>}
-            {name === "show" && <g clip-path="url(#news-pointing-hand)"><image href={source(name)} x="-100" width="360" height="560" /></g>}
-            <image href={source(name)} width="360" height="560" mask={name === "turn" ? "url(#news-without-leaf)" : name === "show" ? "url(#news-without-hand)" : undefined} />
-            {name === "show" && <g class="news-hand" clip-path="url(#news-pointing-hand)"><image href={source(name)} width="360" height="560" /></g>}
+            {name === "turn" && <g class="news-leaf" clip-path="url(#news-leaf)"><image data-src={source(name)} width="360" height="560" /></g>}
+            {name === "show" && <g clip-path="url(#news-pointing-hand)"><image data-src={source(name)} x="-100" width="360" height="560" /></g>}
+            <image href={name === "reading" ? source(name) : undefined} data-src={name !== "reading" ? source(name) : undefined} width="360" height="560" mask={name === "turn" ? "url(#news-without-leaf)" : name === "show" ? "url(#news-without-hand)" : undefined} />
+            {name === "show" && <g class="news-hand" clip-path="url(#news-pointing-hand)"><image data-src={source(name)} width="360" height="560" /></g>}
           </g>
         </g>)}
         <svg
@@ -171,7 +173,7 @@ const source = (name: string) => `/static/mentions/newspaper/${name}.webp`
         >
           <image
             class="news-inbetween-atlas"
-            href={mentionAtlas.src}
+            data-src={mentionAtlas.src}
             width={mentionAtlas.width}
             height={mentionAtlas.height}
             x={-mentionAtlas.padding}
