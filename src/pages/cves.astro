@@ -31,7 +31,7 @@ const findingAnchor = (id: string, product: string) =>
             <span aria-hidden="true">//</span>
             projects
           </span>
-          <span class="count-label">CVEs</span>
+          <span class="count-label">findings</span>
         </p>
         <ol>
           {products.map((product, productIndex) => (
@@ -41,7 +41,7 @@ const findingAnchor = (id: string, product: string) =>
                   aria-current={productIndex === 0 ? "location" : undefined}
                 >
                   <span>{product.name}</span>
-                  <span class="index-count" aria-label={`${product.findings.length} CVEs`}>
+                  <span class="index-count" aria-label={`${product.findings.length} findings`}>
                     {product.findings.length.toString().padStart(2, "0")}
                   </span>
                 </a>
@@ -89,7 +89,7 @@ const findingAnchor = (id: string, product: string) =>
 
   <dl class="stats" aria-label="CVE summary">
     <div>
-      <dt>published CVEs</dt>
+      <dt>published findings</dt>
       <dd>{findingCount.toString().padStart(2, "0")}</dd>
     </div>
     <div>
@@ -113,7 +113,7 @@ const findingAnchor = (id: string, product: string) =>
           <header class="product-heading">
             <h2 id={`${product.id}-heading`}>{product.name}</h2>
             <p>
-              {product.context} · {product.findings.length} {product.findings.length === 1 ? "CVE" : "CVEs"}
+              {product.context} · {product.findings.length} {product.findings.length === 1 ? "finding" : "findings"}
             </p>
           </header>
 
@@ -154,7 +154,11 @@ const findingAnchor = (id: string, product: string) =>
                           </a>
                         ) : (
                           <span class="record-pending">
-                            {finding.id.includes("XXXX") ? "ID pending" : "CVE record pending"}
+                            {finding.id.includes("XXXX")
+                              ? "ID pending"
+                              : finding.id.startsWith("GHSA-")
+                                ? "CVE ID not assigned"
+                                : "CVE record pending"}
                           </span>
                         )}
                         {finding.advisory && (
@@ -235,7 +239,8 @@ const findingAnchor = (id: string, product: string) =>
   </div>
 
   <p class="score-note">
-    Scores shown are CNA-provided base scores from the linked CVE records.
+    Scores shown are published base scores from the linked vulnerability
+    records.
   </p>
 </Layout>
 

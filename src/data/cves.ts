@@ -71,6 +71,69 @@ const productData: Product[] = [
     ],
   },
   {
+    id: "payload-cms",
+    name: "Payload CMS",
+    context: "Headless content management system",
+    findings: [
+      {
+        id: "GHSA-r488-j9vj-wx3q",
+        title: "Remote code execution in Payload Form Builder",
+        summary:
+          "A crafted form submission could execute arbitrary code on a server using the Payload Form Builder plugin.",
+        published: "2026-09-18",
+        score: "10.0",
+        cvss: "3.1",
+        severity: "critical",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-r488-j9vj-wx3q",
+        },
+      },
+      {
+        id: "GHSA-f7hx-52q9-hcrf",
+        title: "Unauthorized update to collection documents",
+        summary:
+          "The reorder endpoint could update arbitrary collection fields without enforcing collection or field-level access controls.",
+        published: "2026-09-18",
+        score: "9.8",
+        cvss: "3.1",
+        severity: "critical",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-f7hx-52q9-hcrf",
+        },
+      },
+      {
+        id: "GHSA-66wr-7vmr-p5jq",
+        title: "Reserved-claim collision in authentication tokens",
+        summary:
+          "A custom field mapped to a reserved authentication claim could inject unintended values into the token issued at login.",
+        published: "2026-09-18",
+        score: "9.2",
+        cvss: "4.0",
+        severity: "critical",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-66wr-7vmr-p5jq",
+        },
+      },
+      {
+        id: "GHSA-vc4h-q48j-5hcx",
+        title: "Field access-control bypass through document duplication",
+        summary:
+          "The duplicate operation could copy protected fields from an auth-collection document despite hidden, read, create, or duplication controls.",
+        published: "2026-09-18",
+        score: "9.3",
+        cvss: "4.0",
+        severity: "critical",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-vc4h-q48j-5hcx",
+        },
+      },
+    ],
+  },
+  {
     id: "mlflow",
     name: "MLflow",
     context: "Machine-learning lifecycle platform",
