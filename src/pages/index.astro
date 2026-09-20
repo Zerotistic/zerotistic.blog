@@ -64,6 +64,9 @@ const latestReadingTime = readingTime(
         >X</a
       >.
     </p>
+    <p class="about-link">
+      <a href="/about">more about me <span aria-hidden="true">→</span></a>
+    </p>
   </home-intro>
 
   {latest && (
@@ -183,6 +186,21 @@ const latestReadingTime = readingTime(
       max-inline-size: 42rem;
       margin-block-start: var(--space-s);
       color: var(--prose-foreground);
+    }
+
+    .about-link {
+      margin-block-start: var(--space-xs);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      color: var(--muted-foreground);
+
+      a {
+        letter-spacing: 0;
+      }
+
+      span {
+        color: var(--accent);
+      }
     }
   }
 

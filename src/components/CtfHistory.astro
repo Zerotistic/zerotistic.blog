@@ -1,0 +1,497 @@
+---
+import { Image } from "astro:assets"
+import idekLogo from "@/assets/about/teams/idek.png"
+import sekaiLogo from "@/assets/about/teams/project-sekai.png"
+import { ctfTimeline } from "@/data/ctf-history"
+
+const teamLogos = { idek: idekLogo, "Project Sekai": sekaiLogo }
+const timelineRows = ctfTimeline.map((entry, index) => ({
+  entry,
+  year: entry.date.slice(0, 4),
+  startsYear: index === 0 || ctfTimeline[index - 1].date.slice(0, 4) !== entry.date.slice(0, 4),
+}))
+---
+
+<section class="ctf-history" aria-labelledby="ctf-heading">
+  <h2 id="ctf-heading">ctfs, over the years</h2>
+
+  <ol class="ctf-timeline" role="list" aria-label="Teams and competitions over the years">
+    <li class="timeline-entry team-milestone year-start">
+      <p class="entry-date"><span class="date-qualifier">around</span><span class="entry-year year-marker">2018–2019</span></p>
+      <div class="entry-content">
+        <h3>Started playing</h3>
+        <p class="event-note">
+          Probably closer to 2018. Mostly pwn and reverse engineering.
+        </p>
+      </div>
+    </li>
+
+    {timelineRows.map(({ entry, year, startsYear }) => (
+      <li class:list={[
+        "timeline-entry",
+        entry.kind === "competition" && entry.highlight && `highlight-${entry.highlight}`,
+        {
+          "year-start": startsYear,
+          "team-milestone": entry.kind === "team",
+          "team-joined": entry.kind === "team",
+          "current-team": entry.kind === "team" && entry.team === "Project Sekai",
+          "ecsc-event": entry.kind === "ecsc",
+        },
+      ]}>
+        <p class="entry-date">
+          {entry.kind === "team" && <span class="date-qualifier">around</span>}
+          <time datetime={entry.date}>
+            <span class={startsYear ? "entry-year year-marker" : "sr-only"}>{year}{!startsYear && " "}</span>
+            {entry.month && <span class="entry-month">{entry.month}</span>}
+          </time>
+        </p>
+
+        <div class="entry-content">
+          {entry.kind === "team" ? (
+            <>
+              <h3 class="team-actions">
+                {entry.team === "Project Sekai" && (
+                  <span class="team-action action-leave">
+                    <span class="action-symbol" aria-hidden="true">−</span>
+                    <span>Left <a href="https://idek.team/" target="_blank" rel="noopener noreferrer">idek</a></span>
+                  </span>
+                )}
+                <span class="team-action action-join">
+                  <span class="action-symbol" aria-hidden="true">+</span>
+                  <span>Joined</span>
+                  <a class="team-identity" href={entry.href} target="_blank" rel="noopener noreferrer">
+                    <Image
+                      class="team-logo"
+                      src={teamLogos[entry.team]}
+                      width={24}
+                      height={24}
+                      widths={[24, 48]}
+                      sizes="24px"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span>{entry.team}</span>
+                  </a>
+                </span>
+              </h3>
+              {entry.team === "idek" && <p class="event-note">{entry.note}</p>}
+              {entry.team === "idek" ? (
+                <p class="merger-team">
+                  Also playing with
+                  <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer">Friendly Maltese Citizens</a>,
+                  the merger team I’ve played with during both idek and Project Sekai.
+                </p>
+              ) : (
+                <p class="merger-team">
+                  Still playing with
+                  <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer">Friendly Maltese Citizens</a>, too.
+                </p>
+              )}
+            </>
+          ) : entry.kind === "ecsc" ? (
+            <>
+              <div class="event-heading">
+                <h3>
+                  <a
+                    href={"https://ecsc.eu/past-editions/" + entry.year}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={"ECSC " + entry.year + ", " + entry.city + " (opens in a new tab)"}
+                  >ECSC <span aria-hidden="true">·</span> {entry.city}</a>
+                </h3>
+                <span class="event-context">Team Belgium</span>
+              </div>
+              {entry.year === "2022" && (
+                <p class="event-note">My first of four consecutive years representing Belgium.</p>
+              )}
+              {entry.year === "2025" && (
+                <p class="event-note">My fourth year with the Belgian team. I stepped back afterward because I got too busy.</p>
+              )}
+            </>
+          ) : (
+            <>
+              <div class="event-heading">
+                <h3>{entry.title}</h3>
+                <a
+                  class="event-result"
+                  href={entry.resultUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={entry.title + " " + entry.date.slice(0, 4) + ": " + entry.result + ". Results (opens in a new tab)"}
+                >{entry.result}<span aria-hidden="true">↗</span></a>
+              </div>
+              <p class="event-meta">
+                <span class="event-context">
+                  {entry.team === "Friendly Maltese Citizens" ? <abbr title={entry.team}>FMC</abbr> : entry.team}
+                </span>
+                {entry.note && <><span aria-hidden="true"> · </span>{entry.note}</>}
+                {entry.link && (
+                  <>
+                    {" "}
+                    <a class="event-link" href={entry.link.href} target="_blank" rel="noopener noreferrer">
+                      {entry.link.label}<span aria-hidden="true">↗</span>
+                      <span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </>
+                )}
+              </p>
+            </>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <p class="more-ctfs">
+    I’ve also played at Hackceler8 once, and plenty of other big CTFs in between.
+  </p>
+</section>
+
+<style>
+  .ctf-history {
+    --team-join: light-dark(#276d59, #88c6ac);
+    --team-leave: light-dark(#975927, #d7ad7b);
+    --result-gold: light-dark(#865b12, #ddc17c);
+    --result-bronze: light-dark(#92552e, #cfaa89);
+    display: block;
+    padding-block: var(--space-xl);
+    border-block-start: 1px solid var(--border);
+  }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0;
+  }
+
+  a {
+    color: var(--foreground);
+    --underline: var(--border);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .ctf-timeline {
+    list-style: none;
+    padding: 0;
+    margin-block-start: var(--space-m);
+  }
+
+  .timeline-entry {
+    --date-column: 5.75rem;
+    --node-center: 0.65rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--date-column) minmax(0, 1fr);
+    column-gap: var(--space-m);
+    padding-block-end: var(--space-s);
+  }
+
+  .timeline-entry::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: var(--date-column);
+    inset-block: var(--node-center) calc(-1 * var(--node-center));
+    border-inline-start: 1px solid var(--border);
+  }
+
+  .timeline-entry::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: calc(var(--date-column) - 2px);
+    inset-block-start: calc(var(--node-center) - 2.5px);
+    inline-size: 5px;
+    block-size: 5px;
+    border: 1px solid var(--muted-foreground);
+    border-radius: 50%;
+    background: var(--background);
+  }
+
+  .timeline-entry:last-child {
+    padding-block-end: 0;
+  }
+
+  .timeline-entry:last-child::before {
+    content: none;
+  }
+
+  .team-milestone {
+    padding-block-end: var(--space-m);
+  }
+
+  .timeline-entry:has(+ .team-joined),
+  .timeline-entry:has(+ .year-start) {
+    padding-block-end: var(--space-m);
+  }
+
+  .team-milestone::after {
+    inset-inline-start: calc(var(--date-column) - 4px);
+    inset-block-start: calc(var(--node-center) - 4.5px);
+    inline-size: 9px;
+    block-size: 9px;
+    border-color: var(--accent);
+  }
+
+  .team-joined::after {
+    border-color: var(--team-join);
+    background: var(--team-join);
+  }
+
+  .team-milestone .entry-date {
+    color: var(--accent);
+  }
+
+  .entry-date,
+  .event-context,
+  .event-result,
+  .event-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  .entry-date {
+    color: var(--muted-foreground);
+    padding-block-start: 0.1rem;
+  }
+
+  .entry-date time,
+  .date-qualifier,
+  .entry-year,
+  .entry-month {
+    display: block;
+  }
+
+  .year-marker {
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 550;
+    white-space: nowrap;
+  }
+
+  .entry-content {
+    min-inline-size: 0;
+  }
+
+  h3 {
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  .team-milestone h3 {
+    font-size: var(--step-0);
+  }
+
+  .team-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-s);
+  }
+
+  .team-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .action-symbol {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .action-join,
+  .action-join a {
+    color: var(--team-join);
+  }
+
+  .action-leave,
+  .action-leave a {
+    color: var(--team-leave);
+  }
+
+  .action-leave {
+    font-size: var(--step--1);
+  }
+
+  .team-identity {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    white-space: nowrap;
+  }
+
+  .team-logo {
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    object-fit: contain;
+    border-radius: 0.125rem;
+  }
+
+  .event-note,
+  .event-meta,
+  .merger-team {
+    color: var(--prose-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .event-note,
+  .event-meta {
+    margin-block-start: 0.125rem;
+  }
+
+  .merger-team {
+    position: relative;
+    margin-block-start: var(--space-2xs);
+    padding-inline-start: var(--space-s);
+  }
+
+  .merger-team::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: -0.125rem;
+    inline-size: var(--space-xs);
+    block-size: 0.75rem;
+    border-inline-start: 1px solid var(--border);
+    border-block-end: 1px solid var(--border);
+    border-end-start-radius: 0.375rem;
+  }
+
+  .event-context {
+    color: var(--muted-foreground);
+  }
+
+  abbr {
+    text-decoration: none;
+  }
+
+  .event-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-xs);
+    min-block-size: 1.5rem;
+  }
+
+  .event-result,
+  .event-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    min-block-size: 1.5rem;
+    color: var(--accent);
+  }
+
+  .event-result > span[aria-hidden],
+  .event-link > span[aria-hidden] {
+    flex: none;
+  }
+
+  .highlight-winner .event-result {
+    color: var(--result-gold);
+    --underline: color-mix(in oklab, var(--result-gold) 45%, transparent);
+  }
+
+  .highlight-podium .event-result {
+    color: var(--result-bronze);
+    --underline: color-mix(in oklab, var(--result-bronze) 45%, transparent);
+  }
+
+  .highlight-winner h3 {
+    font-size: var(--step-0);
+  }
+
+  :is(.highlight-winner, .highlight-podium, .highlight-finals) h3 {
+    font-weight: 550;
+  }
+
+  :is(.highlight-winner, .highlight-podium) .event-result {
+    font-size: 0.8125rem;
+    font-weight: 550;
+  }
+
+  :is(.highlight-winner, .highlight-podium, .highlight-finals)::after {
+    inset-inline-start: calc(var(--date-column) - 3px);
+    inset-block-start: calc(var(--node-center) - 3.5px);
+    inline-size: 7px;
+    block-size: 7px;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .highlight-winner::after {
+    background: var(--result-gold);
+    border-color: var(--result-gold);
+    border-radius: 0;
+    transform: rotate(45deg);
+  }
+
+  .highlight-podium::after {
+    background: var(--result-bronze);
+    border-color: var(--result-bronze);
+  }
+
+  .event-link {
+    margin-inline-start: var(--space-3xs);
+    white-space: nowrap;
+  }
+
+  .more-ctfs {
+    margin-block-start: var(--space-m);
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (width < 40rem) {
+    .timeline-entry {
+      --date-column: 4px;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-3xs);
+      padding-inline-start: var(--space-m);
+      padding-block-end: var(--space-m);
+    }
+
+    .team-milestone,
+    .timeline-entry:has(+ .team-joined),
+    .timeline-entry:has(+ .year-start) {
+      padding-block-end: var(--space-m);
+    }
+
+    .entry-date,
+    .entry-date time {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 0.375rem;
+      padding-block-start: 0;
+    }
+
+    .team-actions {
+      column-gap: var(--space-s);
+    }
+  }
+</style>

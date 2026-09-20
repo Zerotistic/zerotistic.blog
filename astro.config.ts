@@ -24,7 +24,6 @@ export default defineConfig({
       "/posts/binary-ninja-zero-to-hero/part-1",
     "/posts/binary-ninja-zero-to-hero-2":
       "/posts/binary-ninja-zero-to-hero/part-2",
-    "/about": "/",
     "/archives": "/posts",
     "/categories": "/tags",
   },

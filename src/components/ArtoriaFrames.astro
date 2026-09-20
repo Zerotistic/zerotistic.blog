@@ -1,0 +1,57 @@
+---
+import { artoriaPoses } from "@/lib/artoria"
+import {
+  artoriaSequence,
+  artoriaTiming,
+  type ArtoriaPose,
+} from "@/lib/artoria-sequences"
+
+type Props = { pose: ArtoriaPose }
+const { pose } = Astro.props
+const sequence = artoriaSequence(pose)
+---
+
+<svg
+  class="artoria-frames"
+  viewBox="0 0 360 540"
+  width="360"
+  height="540"
+  aria-hidden="true"
+  data-columns={sequence?.columns}
+  data-durations={JSON.stringify(artoriaTiming[pose])}
+>
+  <image
+    class="frame-idle"
+    href={sequence?.idle ?? artoriaPoses[pose].src}
+    width="360"
+    height="540"
+  />
+  {sequence && (
+    <image
+      class="frame-atlas"
+      data-src={sequence.atlas}
+      width={360 * sequence.columns}
+      height={540 * Math.ceil(sequence.count / sequence.columns)}
+      x="0"
+      y="0"
+    />
+  )}
+</svg>
+
+<style>
+  .artoria-frames {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    overflow: hidden;
+  }
+
+  .frame-atlas,
+  [data-playing] .frame-idle {
+    display: none;
+  }
+
+  [data-playing] .frame-atlas {
+    display: block;
+  }
+</style>

@@ -1,0 +1,394 @@
+---
+import { Image } from "astro:assets"
+import blackCat from "@/assets/about/black-cat.png"
+import rangeSaber from "@/assets/about/saber-range.png"
+import Artoria from "@/components/Artoria.astro"
+import RangeAndMusic from "@/components/RangeAndMusic.astro"
+import { favoriteShelves } from "@/data/favorites"
+---
+
+<section class="off-duty" aria-labelledby="off-duty-heading">
+  <header class="off-duty-header">
+    <h2 id="off-duty-heading">away from the debugger</h2>
+  </header>
+
+  <div class="personal-notes">
+    <div class="gaming-note">
+      <h3 class="note-heading">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 6h8c3 0 4 3 5 8 .7 3-1 5-3 3l-3-3H9l-3 3c-2 2-3.7 0-3-3C4 9 5 6 8 6Z" />
+          <path d="M7 9v4m-2-2h4m7-1h.01m2 2h.01" />
+        </svg>
+        games, with friends
+      </h3>
+      <p>Mostly FPS games, fast-paced shooters, and Minecraft. I like having friends along.</p>
+    </div>
+
+    <div class="cat-note">
+      <h3 class="note-heading">and three cats</h3>
+      <p>I have a particularly big soft spot for the black one.</p>
+      <Image
+        class="cat-sticker"
+        src={blackCat}
+        width={120}
+        widths={[120, 240]}
+        sizes="(max-width: 639px) 96px, 112px"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  </div>
+
+  <figure class="reader">
+    <div class="reader-stage">
+      <Artoria
+        placement="inline"
+        id="about-reading"
+        pose="reading"
+        remarks={[
+          "One more chapter…",
+          "I’m listening. Mostly.",
+          "This is a very good chapter.",
+        ]}
+      />
+    </div>
+    <figcaption>currently unavailable</figcaption>
+  </figure>
+
+  <div class="favorites">
+    {favoriteShelves.map(({ label, items }) => (
+      <div class="shelf" role="group" aria-labelledby={"favorite-" + label}>
+        <div class="shelf-header">
+          <h3 class="shelf-heading" id={"favorite-" + label}>{label}</h3>
+          {label === "anime" && <span class="shelf-note">a few favorites</span>}
+        </div>
+        <ul class="shelf-items" role="list">
+          {items.map(({ title, cover, href, note }) => (
+            <li class="favorite">
+              <a
+                class="favorite-link"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={title + (note ? " — " + note : "") + " on AniList (opens in a new tab)"}
+              >
+                <span class="cover-wrap">
+                  <Image
+                    class="favorite-cover"
+                    src={cover}
+                    width={72}
+                    widths={[72, 144]}
+                    sizes="64px"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+                <span class="favorite-caption">
+                  <span class="favorite-title">{title}</span>
+                  {note && <span class="favorite-note">{note}</span>}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="extra-interests">
+    <RangeAndMusic saber={rangeSaber} />
+  </div>
+</section>
+
+<style>
+  .off-duty {
+    position: relative;
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "heading heading"
+      "notes notes"
+      "reader favorites"
+      "extras extras";
+    align-items: start;
+    gap: var(--space-m) var(--space-l);
+    padding-block: var(--space-xl);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .off-duty-header {
+    grid-area: heading;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-s);
+  }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0;
+  }
+
+  .shelf-note {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-style: italic;
+    transform: rotate(-3deg);
+  }
+
+  .reader {
+    grid-area: reader;
+    align-self: center;
+    min-inline-size: 0;
+    padding-block-start: var(--space-m);
+    transform: rotate(-3deg);
+  }
+
+  .reader-stage {
+    position: relative;
+  }
+
+  .reader :global(.artoria-remark) {
+    inset-inline: 0;
+    max-inline-size: 100%;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .reader-stage::before {
+    content: "";
+    position: absolute;
+    inset: 30% -10% -5%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      light-dark(rgb(215 199 160 / 0.19), rgb(143 161 177 / 0.09)),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  figcaption {
+    margin-block-start: var(--space-2xs);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-style: italic;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .favorites {
+    grid-area: favorites;
+    display: grid;
+    gap: var(--space-m);
+    min-inline-size: 0;
+  }
+
+  .extra-interests {
+    grid-area: extras;
+    min-inline-size: 0;
+  }
+
+  .shelf-heading,
+  .note-heading {
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  .shelf-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-block-end: var(--space-xs);
+  }
+
+  .shelf-items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--space-s);
+    padding: 0;
+    list-style: none;
+  }
+
+  .favorite {
+    --cover-tilt: -3deg;
+    min-inline-size: 0;
+  }
+
+  .favorite:nth-child(2) {
+    --cover-tilt: 2deg;
+  }
+
+  .favorite:nth-child(3) {
+    --cover-tilt: -1deg;
+  }
+
+  .favorite-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-xs);
+    color: var(--foreground);
+    text-decoration: none;
+    --underline: transparent;
+  }
+
+  .favorite-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  .cover-wrap {
+    display: block;
+    flex: 0 0 4rem;
+    inline-size: 4rem;
+    block-size: 6rem;
+    transform: rotate(var(--cover-tilt));
+    transform-origin: center bottom;
+    filter: drop-shadow(1px 3px 3px rgb(0 0 0 / 0.2));
+    transition: transform 180ms ease;
+  }
+
+  .favorite-cover {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+  }
+
+  .favorite-caption {
+    flex: 1 1 4.5rem;
+    min-inline-size: 0;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  .favorite-title,
+  .favorite-note {
+    display: block;
+  }
+
+  .favorite-note {
+    margin-block-start: var(--space-3xs);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  .personal-notes {
+    grid-area: notes;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: var(--space-l);
+    padding-block-end: var(--space-s);
+    border-block-end: 1px solid var(--border);
+  }
+
+  .note-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .note-heading svg {
+    color: var(--accent);
+    flex: none;
+  }
+
+  .personal-notes p {
+    color: var(--prose-foreground);
+    font-size: var(--step--1);
+    line-height: 1.6;
+  }
+
+  .cat-note {
+    position: relative;
+    min-block-size: 5.5rem;
+    padding-inline-end: 7rem;
+  }
+
+  .cat-sticker {
+    position: absolute;
+    inset-inline-end: -0.25rem;
+    inset-block-end: 0;
+    inline-size: 7rem;
+    block-size: auto;
+    transform: rotate(4deg);
+    pointer-events: none;
+  }
+
+  @media (hover: hover) {
+    .favorite-link:hover .cover-wrap {
+      transform: translateY(-3px) rotate(0deg);
+    }
+
+    .favorite-link:hover .favorite-title {
+      text-decoration: underline;
+      text-decoration-color: var(--border);
+      text-underline-offset: 3px;
+    }
+  }
+
+  @media (width < 40rem) {
+    .off-duty {
+      grid-template-columns: minmax(0, 1fr) 5.5rem;
+      grid-template-areas:
+        "heading reader"
+        "notes notes"
+        "favorites favorites"
+        "extras extras";
+      gap: var(--space-m) var(--space-s);
+    }
+
+    .off-duty-header {
+      align-self: center;
+      display: block;
+    }
+
+    .reader {
+      padding-block-start: var(--space-s);
+    }
+
+    .reader figcaption {
+      display: none;
+    }
+
+    .personal-notes {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-m);
+    }
+
+    .cat-note {
+      min-block-size: 4.5rem;
+      padding-inline-end: 7rem;
+    }
+
+    .cat-sticker {
+      inline-size: 6rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cover-wrap {
+      transition: none;
+    }
+
+    .favorite-link:hover .cover-wrap {
+      transform: rotate(var(--cover-tilt));
+    }
+  }
+</style>

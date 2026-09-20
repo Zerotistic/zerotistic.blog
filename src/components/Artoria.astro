@@ -1,11 +1,19 @@
 ---
 import eyePatch from "@/assets/optimized/artoria/investigating-eyes.webp?url"
-import { artoriaForPath } from "@/lib/artoria"
+import ArtoriaFrames from "@/components/ArtoriaFrames.astro"
+import { artoriaForPath, artoriaPoses } from "@/lib/artoria"
 
-type Props = { placement: "sidebar" | "footer" }
-const { placement } = Astro.props
-const pose = artoriaForPath(Astro.url.pathname)
-const id = `artoria-${placement}`
+type Props = {
+  remarks?: string[]
+} & (
+  | { placement: "sidebar" | "footer"; id?: never; pose?: never }
+  | { placement: "inline"; id: string; pose: keyof typeof artoriaPoses }
+)
+const { placement, remarks = [] } = Astro.props
+const pose = Astro.props.pose
+  ? artoriaPoses[Astro.props.pose]
+  : artoriaForPath(Astro.url.pathname)
+const id = Astro.props.id ?? `artoria-${placement}`
 const investigating = pose.name === "investigating"
 ---
 
@@ -13,15 +21,24 @@ const investigating = pose.name === "investigating"
   class:list={["artoria", `artoria-${placement}`]}
   data-pose={pose.name}
   data-state="idle"
+  data-remarks={remarks.length ? JSON.stringify(remarks) : undefined}
 >
+  {remarks.length > 0 && (
+    <p class="artoria-remark" id={`${id}-remark`} role="status">{remarks[0]}</p>
+  )}
   <button
     class="artoria-interaction"
     type="button"
-    aria-label="Say hello to Artoria"
+    aria-label={placement === "inline"
+      ? `Say hello to Artoria: ${pose.name}`
+      : "Say hello to Artoria"}
+    aria-describedby={remarks.length ? `${id}-remark` : undefined}
     title="Say hello to Artoria"
     disabled
   >
-    <svg
+    {placement === "inline" ? (
+      <ArtoriaFrames pose={pose.name} />
+    ) : (<svg
       class="artoria-figure"
       viewBox="0 0 360 540"
       width="360"
@@ -79,7 +96,7 @@ const investigating = pose.name === "investigating"
           </g>
         </g>
       </g>
-    </svg>
+    </svg>)}
   </button>
   <span class="artoria-visitor" aria-hidden="true">
     <svg viewBox="0 0 40 32" class="butterfly">
@@ -230,6 +247,31 @@ const investigating = pose.name === "investigating"
     display: none;
   }
 
+  .artoria-inline {
+    inline-size: 100%;
+  }
+
+  .artoria-remark {
+    position: absolute;
+    inset-block-end: calc(100% + 0.5rem);
+    inset-inline: -1rem;
+    inline-size: fit-content;
+    max-inline-size: calc(100% + 2rem);
+    margin-inline: auto;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.9rem 0.9rem 0.9rem 0.15rem;
+    background: var(--background);
+    color: var(--muted-foreground);
+    font-size: var(--step--1);
+    font-style: italic;
+    line-height: 1.4;
+    text-align: center;
+    text-wrap: balance;
+    pointer-events: none;
+    transform: rotate(-3deg);
+  }
+
   @keyframes artoria-breathe {
     0%,
     100% {
@@ -312,6 +354,10 @@ const investigating = pose.name === "investigating"
 
 <script>
   import { initArtoria } from "@/lib/artoria-companion"
-  for (const element of document.querySelectorAll<HTMLElement>(".artoria"))
-    initArtoria(element)
+  import { initArtoriaFrames } from "@/lib/artoria-frame-player"
+  for (const element of document.querySelectorAll<HTMLElement>(".artoria")) {
+    if (element.classList.contains("artoria-inline")) {
+      initArtoriaFrames(element)
+    } else initArtoria(element)
+  }
 </script>

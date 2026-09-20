@@ -1,0 +1,514 @@
+---
+import { Image } from "astro:assets"
+import avatar from "../../public/static/avatar.png"
+import artoriaHeart from "@/assets/about/artoria-heart.webp"
+import Artoria from "@/components/Artoria.astro"
+import ContactLinks from "@/components/ContactLinks.astro"
+import CtfHistory from "@/components/CtfHistory.astro"
+import MetaPage from "@/components/MetaPage.astro"
+import OffDuty from "@/components/OffDuty.astro"
+import Layout from "@/layouts/Layout.astro"
+---
+
+<Layout wide showArtoria={false}>
+  <MetaPage
+    slot="head"
+    title="About me"
+    description="Zerotistic: security researcher, anime and manga enjoyer, cat lover, and hopelessly fond of Artoria."
+  />
+
+  <article class="about-page" aria-labelledby="about-heading">
+    <header class="introduction">
+      <div class="intro-copy">
+        <div class="identity">
+          <Image
+            class="avatar"
+            src={avatar}
+            alt="Zerotistic’s illustrated avatar"
+            width={44}
+            height={44}
+            widths={[44, 88]}
+            sizes="44px"
+            loading="eager"
+            decoding="async"
+          />
+          <h1 id="about-heading">about me</h1>
+        </div>
+        <p class="greeting">hey, I’m zerotistic.</p>
+        <p class="aside-line">Automation nerd. Probably unhinged.</p>
+        <p class="bio">
+          I’m a security researcher at
+          <a href="https://hiddenlayer.com" target="_blank" rel="noopener noreferrer">HiddenLayer</a>, into reverse
+          engineering, pwn, and automation. I also play CTFs with
+          <a href="https://sekai.team/" target="_blank" rel="noopener noreferrer">Project Sekai</a>
+          and
+          <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer">Friendly Maltese Citizens</a>.
+        </p>
+        <p class="bio-links">
+          See my
+          <a href="/work/" target="_blank" rel="noopener noreferrer">work history</a>
+          and
+          <a href="/cves/" target="_blank" rel="noopener noreferrer">published CVEs</a>
+          for more.
+        </p>
+      </div>
+      <figure class="companion welcome">
+        <div class="companion-stage">
+          <Artoria
+            placement="inline"
+            id="about-welcome"
+            pose="waving"
+            remarks={[
+              "oh, hello.",
+              "You can stay a while.",
+              "Yes, there are more of me.",
+            ]}
+          />
+        </div>
+        <figcaption>say hello <span aria-hidden="true">↑</span></figcaption>
+      </figure>
+    </header>
+
+    <OffDuty />
+
+    <section class="artoria-corner" aria-labelledby="artoria-heading">
+      <div class="section-copy">
+        <p class="margin-note">
+          she’s taking over <span aria-hidden="true">↘</span>
+        </p>
+        <h2 id="artoria-heading">and then there’s Artoria.</h2>
+        <p class="artoria-intro">
+          Artoria is my favorite anime character, and I don’t really have words
+          for how much I love her. She’s an obsession, in the most affectionate
+          sense.
+        </p>
+        <div class="artoria-signoff">
+          <p class="artoria-closing">
+            So yes, she gets to be everywhere here.
+            <span class="her-site">It’s her site too.</span>
+          </p>
+          <figure class="companion at-home">
+            <div class="companion-stage">
+              <Artoria
+                placement="inline"
+                id="about-artoria"
+                pose="resting"
+                remarks={[
+                  "I live here now.",
+                  "There’s room for one more Artoria.",
+                  "Make yourself at home.",
+                ]}
+              />
+            </div>
+            <figcaption>very much at home</figcaption>
+          </figure>
+        </div>
+      </div>
+      <figure class="artoria-montage">
+        <a
+          class="montage-link"
+          href={artoriaHeart.src}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open the full Artoria collage in a new tab"
+        >
+          <Image
+            src={artoriaHeart}
+            width={440}
+            widths={[320, 440, 640, 891]}
+            sizes="(max-width: 527px) calc(100vw - 48px), (max-width: 767px) 480px, 420px"
+            alt="A collage of Artoria smiling, eating and relaxing, with a small red heart between her hands in the foreground."
+            loading="lazy"
+            decoding="async"
+            quality={90}
+          />
+        </a>
+      </figure>
+    </section>
+
+    <CtfHistory />
+
+    <footer class="contact" aria-labelledby="contact-heading">
+      <div class="contact-copy">
+        <h2 id="contact-heading">say hi</h2>
+        <p>You can find me around here.</p>
+        <ContactLinks />
+      </div>
+      <figure class="link-detective">
+        <Artoria placement="inline" id="about-links" pose="investigating" />
+        <figcaption>found the links.</figcaption>
+      </figure>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  .about-page {
+    max-inline-size: 50rem;
+    padding-block-start: var(--space-xs);
+    font-size: var(--step-0);
+    line-height: calc(var(--leading-offset) + 1em);
+  }
+
+  .introduction,
+  section {
+    display: grid;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+
+  .introduction {
+    grid-template-columns: minmax(0, 1fr) 11rem;
+    padding-block-end: var(--space-xl);
+  }
+
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+
+  .avatar {
+    inline-size: 44px;
+    block-size: 44px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0;
+  }
+
+  h1 {
+    color: var(--muted-foreground);
+  }
+
+  .greeting {
+    margin-block-start: var(--space-m);
+    font-size: clamp(1.75rem, 1.25rem + 1.5vw, 2.625rem);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .aside-line {
+    margin-block-start: var(--space-xs);
+    color: var(--muted-foreground);
+    font-size: var(--step--1);
+  }
+
+  .bio {
+    margin-block-start: var(--space-l);
+  }
+
+  .bio-links {
+    margin-block-start: var(--space-s);
+    font-size: var(--step--1);
+  }
+
+  .bio,
+  .bio-links,
+  .artoria-closing,
+  .section-copy > p:not(.margin-note) {
+    color: var(--prose-foreground);
+  }
+
+  .bio a,
+  .bio-links a {
+    color: var(--foreground);
+    --underline: var(--border);
+  }
+
+  section {
+    position: relative;
+    padding-block: var(--space-xl);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .artoria-corner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    gap: var(--space-l) var(--space-s);
+  }
+
+  .section-copy {
+    max-inline-size: 32rem;
+
+    h2 {
+      margin-block-end: var(--space-s);
+    }
+
+    p + p {
+      margin-block-start: var(--space-s);
+    }
+  }
+
+  .companion {
+    position: relative;
+    min-inline-size: 0;
+    padding-block-start: var(--space-xl);
+  }
+
+  .companion-stage {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 30% -10% -5%;
+      border-radius: 50%;
+      background: radial-gradient(
+        ellipse,
+        light-dark(rgb(215 199 160 / 0.19), rgb(143 161 177 / 0.09)),
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+  }
+
+  figcaption {
+    margin-block-start: var(--space-2xs);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-style: italic;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .welcome {
+    rotate: 3deg;
+  }
+
+  .at-home {
+    padding-block-start: 0;
+    rotate: 2deg;
+  }
+
+  .artoria-signoff {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 6.5rem;
+    align-items: center;
+    gap: var(--space-s);
+    margin-block-start: var(--space-s);
+  }
+
+  .at-home :global(.artoria-remark) {
+    position: static;
+    max-inline-size: calc(100% + 1rem);
+    margin-block-end: var(--space-xs);
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .at-home :global(.artoria-interaction) {
+    inline-size: min(100%, 5.5rem);
+    margin-inline: auto;
+  }
+
+  .artoria-montage {
+    min-inline-size: 0;
+  }
+
+  .montage-link {
+    display: block;
+    --underline: transparent;
+  }
+
+  .montage-link img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    /* Only soften the edge next to the copy; keep the face and heart opaque. */
+    mask-image: linear-gradient(to right, transparent, #000 8%);
+  }
+
+  .montage-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 5px;
+  }
+
+  .her-site {
+    white-space: nowrap;
+    text-decoration-line: underline;
+    text-decoration-color: light-dark(rgb(163 68 75 / 0.6), rgb(199 110 118 / 0.75));
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.22em;
+  }
+
+  .margin-note {
+    inline-size: fit-content;
+    margin-block-end: var(--space-m);
+    color: var(--accent);
+    font-size: var(--step--1);
+    font-style: italic;
+    transform: rotate(-4deg);
+
+    span {
+      display: inline-block;
+      margin-inline-start: var(--space-xs);
+      font-size: var(--step-1);
+    }
+  }
+
+  .contact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-l);
+    padding-block-start: var(--space-l);
+    border-block-start: 1px solid var(--border);
+
+    p {
+      margin-block-start: var(--space-2xs);
+      color: var(--muted-foreground);
+      font-size: var(--step--1);
+    }
+  }
+
+  .contact-copy {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .link-detective {
+    flex: 0 0 5.5rem;
+    inline-size: 5.5rem;
+    rotate: 6deg;
+
+    figcaption {
+      white-space: nowrap;
+    }
+  }
+
+  @media (width < 48rem) {
+    .introduction {
+      grid-template-columns: minmax(0, 1fr) 8rem;
+      gap: var(--space-m);
+    }
+
+    .intro-copy {
+      display: contents;
+    }
+
+    .identity,
+    .greeting,
+    .aside-line {
+      grid-column: 1;
+      margin-block-start: 0;
+    }
+
+    .identity {
+      align-self: end;
+    }
+
+    .aside-line {
+      align-self: start;
+    }
+
+    .welcome {
+      grid-column: 2;
+      grid-row: 1 / 4;
+    }
+
+    .bio {
+      grid-column: 1 / -1;
+      margin-block-start: var(--space-xs);
+    }
+
+    .bio-links {
+      grid-column: 1 / -1;
+      margin-block-start: 0;
+    }
+
+    .artoria-corner {
+      grid-template-columns: minmax(0, 1fr) 7rem;
+      grid-template-areas:
+        "note companion"
+        "heading companion"
+        "intro intro"
+        "montage montage"
+        "closing closing";
+      gap: var(--space-m);
+    }
+
+    .section-copy,
+    .artoria-signoff {
+      display: contents;
+    }
+
+    .section-copy h2,
+    .margin-note {
+      grid-column: 1;
+      margin: 0;
+    }
+
+    .section-copy h2 {
+      align-self: end;
+    }
+
+    .section-copy > p:not(.margin-note) {
+      grid-column: 1 / -1;
+      margin: 0;
+    }
+
+    .at-home {
+      grid-area: companion;
+    }
+
+    .artoria-corner h2 {
+      grid-area: heading;
+      align-self: start;
+    }
+
+    .margin-note {
+      grid-area: note;
+      align-self: end;
+    }
+
+    .artoria-intro {
+      grid-area: intro;
+    }
+
+    .artoria-montage {
+      grid-area: montage;
+      inline-size: min(100%, 30rem);
+      justify-self: center;
+    }
+
+    .montage-link img {
+      /* On small screens the copy sits above and below the collage. */
+      mask-image: linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent);
+    }
+
+    .artoria-closing {
+      grid-area: closing;
+    }
+  }
+
+  @media (width < 25rem) {
+    .introduction {
+      grid-template-columns: minmax(0, 1fr) 6rem;
+      gap: var(--space-s);
+    }
+
+    .artoria-corner {
+      grid-template-columns: minmax(0, 1fr) 6rem;
+    }
+
+    .companion {
+      margin-inline-end: var(--space-xs);
+    }
+
+    .identity {
+      gap: var(--space-xs);
+    }
+
+    .link-detective {
+      margin-inline-end: var(--space-xs);
+    }
+  }
+</style>

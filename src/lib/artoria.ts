@@ -4,7 +4,7 @@ import readingImage from "@/assets/optimized/artoria/reading.webp?url"
 import restingImage from "@/assets/optimized/artoria/resting.webp?url"
 import { normalizePath } from "./utils"
 
-const poses = {
+export const artoriaPoses = {
   resting: {
     name: "resting",
     src: restingImage,
@@ -30,8 +30,9 @@ const poses = {
 export function artoriaForPath(pathname: string) {
   const path = normalizePath(pathname)
 
-  if (path === "/cves") return poses.investigating
-  if (path === "/mentions") return poses.waving
-  if (path === "/posts" || path.startsWith("/posts/")) return poses.reading
-  return poses.resting
+  if (path === "/cves") return artoriaPoses.investigating
+  if (path === "/about" || path === "/mentions") return artoriaPoses.waving
+  if (path === "/posts" || path.startsWith("/posts/"))
+    return artoriaPoses.reading
+  return artoriaPoses.resting
 }

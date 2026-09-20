@@ -1,0 +1,174 @@
+---
+import { Image } from "astro:assets"
+import type { ImageMetadata } from "astro"
+
+type Props = { saber: ImageMetadata }
+const { saber } = Astro.props
+---
+
+<div class="range-and-music" role="group" aria-label="Shooting range and music">
+  <div class="interest range-interest">
+    <Image
+      class="range-saber"
+      src={saber}
+      width={160}
+      widths={[160, 320]}
+      sizes="(max-width: 767px) 112px, 144px"
+      alt="Saber wearing hearing protection and holding a lowered Windham AR-15."
+      loading="lazy"
+      decoding="async"
+    />
+
+    <div class="range-note">
+      <h3>at the range</h3>
+      <p>I enjoy going to the shooting range and own a few guns.</p>
+    </div>
+  </div>
+
+  <div class="interest music-interest">
+    <svg class="music-art" viewBox="0 0 160 180" width="160" height="180" fill="none" aria-hidden="true" focusable="false">
+      <g transform="rotate(-8 64 94)">
+        <rect class="record-sleeve" x="12" y="38" width="101" height="112" rx="2" />
+        <path class="sleeve-lines" d="M22 124h24m-24 5h16M23 47h78" stroke-linecap="round" />
+        <path class="sleeve-decoration" d="M21 104c14-5 13-33 29-33s13 31 29 31 16-34 25-38" stroke-width="2" />
+      </g>
+      <circle class="record" cx="96" cy="94" r="55" />
+      <g class="record-grooves" stroke-width="0.8">
+        <circle cx="96" cy="94" r="48" />
+        <circle cx="96" cy="94" r="43" />
+        <circle cx="96" cy="94" r="38" />
+        <circle cx="96" cy="94" r="33" />
+      </g>
+      <path class="record-shine" d="M69 58a45 45 0 0 1 21-8m32 77a42 42 0 0 1-19 8" stroke-width="3" stroke-linecap="round" />
+      <circle class="record-label" cx="96" cy="94" r="21" />
+      <circle class="label-ring" cx="96" cy="94" r="16" />
+      <path class="label-lines" d="M89 84h14m-11 3h8m-9 17h10" stroke-linecap="round" />
+      <circle class="record" cx="96" cy="94" r="3" />
+    </svg>
+
+    <div class="music-note">
+      <h3>music</h3>
+      <p>I also enjoy classical music and jazz.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .range-and-music {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: var(--space-m) var(--space-l);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .interest {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-s);
+    min-inline-size: 0;
+    min-block-size: 14rem;
+  }
+
+  .range-note,
+  .music-note {
+    align-self: start;
+    padding-block-start: 3.25rem;
+  }
+
+  .range-saber,
+  .music-art {
+    justify-self: center;
+    display: block;
+    inline-size: 9rem;
+  }
+
+  .range-saber {
+    block-size: 14rem;
+    object-fit: contain;
+  }
+
+  .music-art {
+    block-size: auto;
+    filter: drop-shadow(1px 4px 3px rgb(0 0 0 / 0.12));
+  }
+
+  .record-sleeve {
+    fill: light-dark(#d4c6ac, #c0b397);
+    stroke: light-dark(#b9a98c, #a3977f);
+  }
+
+  .sleeve-lines,
+  .sleeve-decoration {
+    stroke: #87775f;
+  }
+
+  .record {
+    fill: #252829;
+    stroke: #434749;
+  }
+
+  .record-grooves {
+    stroke: #414749;
+  }
+
+  .record-shine {
+    stroke: #5d6669;
+    opacity: 0.5;
+  }
+
+  .record-label {
+    fill: #92a8b5;
+  }
+
+  .label-ring,
+  .label-lines {
+    stroke: #627c8c;
+  }
+
+  h3 {
+    margin-block-end: var(--space-xs);
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  p {
+    color: var(--prose-foreground);
+    font-size: var(--step-0);
+    line-height: 1.6;
+  }
+
+  @media (width < 48rem) {
+    .range-and-music {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-m);
+    }
+
+    .interest {
+      grid-template-columns: 7rem minmax(0, 1fr);
+      gap: var(--space-m);
+      min-block-size: 0;
+    }
+
+    .range-note,
+    .music-note {
+      align-self: center;
+      padding-block-start: 0;
+    }
+
+    .range-saber,
+    .music-art {
+      inline-size: 7rem;
+    }
+
+    .range-saber {
+      block-size: 10.5rem;
+    }
+  }
+</style>
