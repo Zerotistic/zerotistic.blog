@@ -40,7 +40,7 @@ const publishedId = /^(CVE-\d{4}-\d+|GHSA-[\da-z-]+)$/.test(id)
   code {
     margin-inline-end: var(--space-3xs);
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--text-meta);
     letter-spacing: 0;
     color: var(--muted-foreground);
   }
@@ -73,7 +73,7 @@ const publishedId = /^(CVE-\d{4}-\d+|GHSA-[\da-z-]+)$/.test(id)
     border: 1px solid var(--border);
     background: var(--background);
     color: var(--foreground);
-    font: 0.8125rem var(--font-mono);
+    font: var(--text-meta) / 1.5 var(--font-mono);
     white-space: nowrap;
     pointer-events: none;
   }

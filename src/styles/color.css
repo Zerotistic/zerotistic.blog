@@ -30,6 +30,7 @@
   --accent:             light-dark(#9c5a34, #8ea6c8);
   --accent-muted:       color-mix(in oklab, var(--accent) 20%, transparent);
   --ring:               var(--accent);
+  --row-hover:          color-mix(in oklab, var(--accent) 6%, transparent);
 
   color-scheme: light dark;
 }

@@ -44,10 +44,19 @@
 
   --page-offset-top: var(--space-xl);
   --page-offset-bottom: var(--space-m);
+
+  --row-padding-block: var(--space-s);
+  --row-inset: var(--space-xs);
+
+  --project-index-width: 11rem;
 }
 
 html {
   scrollbar-gutter: stable;
+
+  &:has(page-grid.overview) {
+    --bar-gutter: max(var(--grid-gutter), (100% - var(--measure-overview)) / 2);
+  }
 
   @media (width < 64rem) {
     --bar-nav-height: calc(2.75rem + 2 * var(--space-2xs) + 2px);

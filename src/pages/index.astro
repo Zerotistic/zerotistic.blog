@@ -1,310 +1,413 @@
 ---
+import Artoria from "@/components/Artoria.astro"
 import MetaPage from "@/components/MetaPage.astro"
-import PostList from "@/components/PostList.astro"
 import Layout from "@/layouts/Layout.astro"
 import { getPosts, getSubposts, titleHtml } from "@/lib/content"
 import { formatDate, readingTime } from "@/lib/utils"
 
-const roles = [
-  "automation nerd",
-  "vulnerability researcher",
-  "reverse engineer",
-  "pwn enthusiast",
-  "probably unhinged",
-]
-
 const posts = await getPosts()
 const series = await getSubposts()
 const latest = posts[0]
-const latestChain = latest ? [latest, ...(series.get(latest.id) ?? [])] : []
-const latestTags = [
-  ...new Set(latestChain.flatMap((entry) => entry.data.tags ?? [])),
-]
-const latestReadingTime = readingTime(
-  latestChain.map((entry) => entry.body ?? "").join("\n"),
-)
+const postReadingTime = (post: (typeof posts)[number]) =>
+  readingTime(
+    [post, ...(series.get(post.id) ?? [])]
+      .map((entry) => entry.body ?? "")
+      .join("\n"),
+  )
+
+// These are editorial picks; the newest post is featured separately above them.
+const selections = [
+  {
+    id: "redis-stream-pel-uaf",
+    label: "vulnerability research",
+    description:
+      "A Redis 8.6 stream ownership bug that can lead to remote code execution.",
+  },
+  {
+    id: "cff-remover",
+    label: "a deeper dive",
+    description:
+      "How a Binary Ninja plugin untangles flattened control flow, and the reasoning behind it.",
+  },
+].flatMap((selection) => {
+  const post = posts.find(
+    (entry) => entry.id === selection.id && entry.id !== latest?.id,
+  )
+  return post ? [{ ...selection, post, parts: series.get(post.id) ?? [] }] : []
+})
 ---
 
-<Layout>
+<Layout wide showArtoria={false}>
   <MetaPage slot="head" />
-  <home-intro>
-    <h1>vulnerability research &amp; reverse engineering</h1>
-    <p class="lead">
-      <rotating-role data-roles={JSON.stringify(roles)}
-        >{roles[0]}</rotating-role
-      >
-    </p>
-    <p class="bio">
-      Security researcher at
-      <a
-        href="https://hiddenlayer.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        >HiddenLayer</a
-      >, CTF player for
-      <a href="https://sekai.team/" target="_blank" rel="noopener noreferrer"
-        >Project Sekai</a
-      >
-      and
-      <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer"
-        >Friendly Maltese Citizens</a
-      >. Notes on reverse engineering, pwn, Binary Ninja and dumb ideas. Find me
-      on
-      <a
-        href="https://github.com/Zerotistic"
-        target="_blank"
-        rel="noopener noreferrer"
-        >GitHub</a
-      >
-      and
-      <a
-        href="https://x.com/gegrgtezrze"
-        target="_blank"
-        rel="noopener noreferrer"
-        >X</a
-      >.
-    </p>
-    <p class="about-link">
-      <a href="/about">more about me <span aria-hidden="true">→</span></a>
-    </p>
-  </home-intro>
 
-  {latest && (
-    <section class="latest" aria-labelledby="latest-heading">
-      <section-heading>
-        <h2 id="latest-heading">latest</h2>
-      </section-heading>
-      <article>
-        <post-meta>
-          <time datetime={latest.data.date.toISOString()}>
-            {formatDate(latest.data.date)}
-          </time>
-          <span>{latestReadingTime}</span>
-        </post-meta>
-        <h3><a href={`/posts/${latest.id}`} set:html={titleHtml(latest.data.title)} /></h3>
-        <p>{latest.data.description}</p>
-        <post-tags aria-label="Tags">
-          {latestTags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}
-        </post-tags>
-      </article>
-    </section>
-  )}
+  <div class="home-page">
+    <header class="introduction">
+      <div class="intro-copy">
+        <p class="eyebrow">
+          <span aria-hidden="true">//</span>
+          hey, I’m zerotistic.
+        </p>
+        <h1>
+          reverse engineering,<br>
+          pwn &amp; dumb ideas.
+        </h1>
+        <p class="bio">
+          Security researcher at
+          <a
+            href="https://hiddenlayer.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            >HiddenLayer</a
+          >. I write about reverse engineering, pwn, and automation.
+        </p>
+        <a class="about-link" href="/about"
+          >more about me <span aria-hidden="true">→</span></a
+        >
+      </div>
 
-  {posts.length > 1 && (
-    <section class="recent" aria-labelledby="recent-heading">
-      <section-heading>
-        <h2 id="recent-heading">recent</h2>
-        <a href="/posts">all posts <span aria-hidden="true">→</span></a>
-      </section-heading>
-      <PostList start={1} limit={4} />
-    </section>
-  )}
+      <div class="welcome">
+        <Artoria
+          placement="inline"
+          id="home-welcome"
+          pose="resting"
+          remarks={[
+            "Make yourself at home.",
+            "There’s plenty to read.",
+            "I’m staying here.",
+          ]}
+        />
+      </div>
+    </header>
+
+    {latest && (
+      <section class="writing" aria-labelledby="writing-heading">
+        <header class="section-heading">
+          <h2 class="section-title" id="writing-heading">writing</h2>
+          <p>latest &amp; handpicked</p>
+        </header>
+
+        <article class="featured">
+          <a class="story-link editorial-row" href={`/posts/${latest.id}`} aria-labelledby="featured-title">
+            <p class="story-label latest-label"><span aria-hidden="true"></span> latest</p>
+            <h3 id="featured-title">
+              <span class="row-title" set:html={titleHtml(latest.data.title)} />
+              <span class="story-arrow link-arrow" aria-hidden="true">→</span>
+            </h3>
+            <p class="description">{latest.data.description}</p>
+            <div class="story-meta">
+              <time datetime={latest.data.date.toISOString()}>{formatDate(latest.data.date)}</time>
+              <span aria-hidden="true">·</span>
+              <span>{postReadingTime(latest)}</span>
+            </div>
+          </a>
+        </article>
+
+        {selections.length > 0 && (
+          <div class="selected-writing">
+            {selections.map(({ post, label, description, parts }) => (
+              <article class="selected">
+                <a class="story-link editorial-row" href={`/posts/${post.id}`} aria-labelledby={`selected-${post.id}`}>
+                  <p class="story-label">{label}</p>
+                  <h3 id={`selected-${post.id}`}>
+                    <span class="row-title" set:html={titleHtml(post.data.title)} />
+                    <span class="story-arrow link-arrow" aria-hidden="true">→</span>
+                  </h3>
+                  <p class="description">{description}</p>
+                  <div class="story-meta">
+                    {parts.length > 0 ? (
+                      <><span>series</span><span aria-hidden="true">·</span><span>{parts.length} parts</span></>
+                    ) : (
+                      <span>{postReadingTime(post)}</span>
+                    )}
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+        )}
+
+        <div class="archive-link">
+          <a href="/posts">all posts <span aria-hidden="true">→</span></a>
+          <span>{posts.length} posts</span>
+        </div>
+      </section>
+    )}
+  </div>
 </Layout>
 
-<script>
-  class RotatingRole extends HTMLElement {
-    timer?: ReturnType<typeof setInterval>
-
-    connectedCallback() {
-      let roles: string[] = []
-      try {
-        roles = JSON.parse(this.dataset.roles ?? "[]")
-      } catch {
-        return
-      }
-      if (
-        roles.length < 2 ||
-        matchMedia("(prefers-reduced-motion: reduce)").matches
-      )
-        return
-
-      let i = 0
-      const swap = () => {
-        i = (i + 1) % roles.length
-        this.classList.add("swapping")
-        setTimeout(() => {
-          this.textContent = roles[i]
-          this.classList.remove("swapping")
-        }, 280)
-      }
-      this.timer = setInterval(swap, 2600)
-    }
-
-    disconnectedCallback() {
-      clearInterval(this.timer)
-    }
-  }
-
-  if (!customElements.get("rotating-role"))
-    customElements.define("rotating-role", RotatingRole)
-</script>
-
 <style>
-  home-intro {
-    display: block;
-    margin-block-end: var(--space-l);
+  .home-page {
+    padding-block-start: var(--space-xs);
+  }
 
-    @media (width >= 64rem) {
-      margin-block-start: -0.2em;
-    }
+  .introduction {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 10rem;
+    align-items: center;
+    gap: var(--space-l);
+    padding-block-end: var(--space-xl);
+  }
 
-    h1 {
-      max-inline-size: 35rem;
-      font-size: var(--step-3);
-      line-height: calc(var(--leading-offset) + 1em);
-      font-weight: var(--font-weight-medium);
-    }
+  .eyebrow,
+  .about-link,
+  .section-heading,
+  .story-label,
+  .story-meta,
+  .archive-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
 
-    .lead {
-      min-block-size: calc(var(--leading-offset) + 1em);
-      margin-block-start: var(--space-2xs);
-      font-family: var(--font-mono);
-      font-size: var(--step-0);
-      letter-spacing: 0;
-      color: var(--foreground);
-    }
+  .eyebrow {
+    color: var(--muted-foreground);
 
-    rotating-role {
-      display: inline-block;
-      will-change: filter, translate;
-      transition:
-        filter 0.28s ease,
-        translate 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-
-      &::before {
-        content: "// ";
-        color: var(--muted-foreground);
-      }
-
-      &.swapping {
-        filter: blur(1.5px);
-        translate: 0 -0.15em;
-      }
-    }
-
-    .bio {
-      max-inline-size: 42rem;
-      margin-block-start: var(--space-s);
-      color: var(--prose-foreground);
-    }
-
-    .about-link {
-      margin-block-start: var(--space-xs);
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      color: var(--muted-foreground);
-
-      a {
-        letter-spacing: 0;
-      }
-
-      span {
-        color: var(--accent);
-      }
+    span {
+      color: var(--accent);
     }
   }
 
-  section-heading {
+  h1 {
+    margin-block-start: var(--space-s);
+    font-size: clamp(1.75rem, 1.2rem + 1.65vw, 2.625rem);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    text-wrap: initial;
+  }
+
+  .bio {
+    max-inline-size: 33rem;
+    margin-block-start: var(--space-m);
+    font-size: var(--step-0);
+    line-height: calc(var(--leading-offset) + 1em);
+    color: var(--prose-foreground);
+
+    a {
+      color: var(--foreground);
+      --underline: var(--border);
+    }
+  }
+
+  .about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    min-block-size: 2.75rem;
+    margin-block-start: var(--space-2xs);
+    color: var(--muted-foreground);
+
+    span {
+      color: var(--accent);
+    }
+  }
+
+  .welcome {
+    padding-block-start: var(--space-s);
+  }
+
+  .section-heading {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--space-s);
-    margin-block-end: var(--space-xs);
+    padding-block-end: var(--space-xs);
+    border-block-end: 1px solid var(--border);
 
-    h2,
-    a {
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
-    }
-
-    h2 {
-      font-weight: var(--font-weight-medium);
-      color: var(--foreground);
-    }
-
-    a {
+    p {
       color: var(--muted-foreground);
+    }
+  }
+
+  .story-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    block-size: 100%;
+    text-decoration: none;
+  }
+
+  .story-label {
+    color: var(--muted-foreground);
+    font-size: var(--text-caption);
+  }
+
+  .latest-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    color: var(--accent);
+
+    span {
+      inline-size: 0.35rem;
+      block-size: 0.35rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
+  h3 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    inline-size: 100%;
+    margin-block-start: var(--space-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .story-arrow {
+    font-size: var(--step-0);
+  }
+
+  .description {
+    margin-block-start: var(--space-xs);
+    padding-block-end: var(--space-m);
+    font-size: var(--step-0);
+    line-height: calc(var(--leading-offset) + 1em);
+    color: var(--prose-foreground);
+  }
+
+  .story-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-start: auto;
+    color: var(--muted-foreground);
+
+    time {
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .featured {
+    h3 {
+      font-size: var(--step-3);
+
+      > span:first-child {
+        max-inline-size: 35rem;
+      }
+    }
+
+    .description {
+      max-inline-size: 39rem;
+    }
+  }
+
+  .selected-writing {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-l);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .selected {
+    h3 {
+      font-size: var(--step-1);
+    }
+
+    .description {
+      font-size: var(--step--1);
+    }
+  }
+
+  .archive-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    border-block-start: 1px solid var(--border);
+    padding-block-start: var(--space-xs);
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2xs);
+      min-block-size: 2.75rem;
+      white-space: nowrap;
 
       span {
         color: var(--accent);
       }
     }
-  }
 
-  .latest {
-    margin-block-end: var(--space-xl);
-
-    article {
-      padding-block: var(--space-m);
-      border-block: 1px solid var(--border);
-    }
-
-    post-meta,
-    post-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2xs);
-      font-family: var(--font-mono);
-      font-size: var(--step--1);
-      letter-spacing: 0;
+    > span {
       color: var(--muted-foreground);
     }
+  }
 
-    post-meta {
-      time {
-        font-variant-numeric: tabular-nums;
-      }
+  @media (width < 48rem) {
+    .introduction {
+      grid-template-columns: minmax(0, 1fr) 8rem;
+      gap: var(--space-s);
+      padding-block-end: var(--space-xl);
+    }
+  }
 
-      span::before {
-        content: "·";
-        margin-inline-end: var(--space-2xs);
-      }
+  @media (width < 36rem) {
+    .introduction {
+      grid-template-columns: minmax(0, 1fr) 4.5rem;
+      align-items: start;
+      column-gap: var(--space-xs);
+      padding-block-end: var(--space-l);
     }
 
-    h3 {
-      max-inline-size: 38rem;
-      margin-block-start: var(--space-2xs);
+    .intro-copy {
+      display: contents;
+    }
+
+    .eyebrow {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    h1 {
+      grid-column: 1;
+      grid-row: 2;
+      margin-block-start: 0;
+      font-size: clamp(1.3125rem, 5.9vw, 1.875rem);
+    }
+
+    .welcome {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-self: center;
+      padding-block-start: 0;
+    }
+
+    .welcome :global(.artoria-remark) {
+      display: none;
+    }
+
+    .bio {
+      grid-column: 1 / -1;
+      margin-block-start: 0;
+    }
+
+    .about-link {
+      grid-column: 1 / -1;
+      justify-self: start;
+      margin-block-start: -0.25rem;
+    }
+
+    .selected-writing {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .selected + .selected {
+      border-block-start: 1px solid var(--border);
+    }
+
+    .featured h3 {
       font-size: var(--step-2);
-      font-weight: var(--font-weight-medium);
-      line-height: calc(var(--leading-offset) + 1em);
-
-      a {
-        text-decoration-color: color-mix(
-          in oklab,
-          var(--foreground) 30%,
-          transparent
-        );
-      }
     }
 
-    article > p {
-      max-inline-size: 38rem;
-      margin-block-start: var(--space-2xs);
-      color: var(--prose-foreground);
-    }
-
-    post-tags {
-      margin-block-start: var(--space-xs);
-
-      a {
-        color: var(--muted-foreground);
-        text-decoration-color: transparent;
-
-        &:hover {
-          color: var(--foreground);
-        }
-      }
-    }
-  }
-
-  .recent {
-    display: block;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    home-intro rotating-role {
-      transition: none;
+    .description {
+      padding-block-end: var(--space-s);
     }
   }
 </style>

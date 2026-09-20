@@ -46,7 +46,11 @@ const pendingLabel = finding.id.includes("XXXX")
     : "CVE record pending"
 ---
 
-<article id={anchor} class="cve-finding" aria-labelledby={`${anchor}-title`}>
+<article
+  id={anchor}
+  class="cve-finding editorial-row"
+  aria-labelledby={`${anchor}-title`}
+>
   <details class="finding-details">
     <summary>
       <Heading id={`${anchor}-title`}>{finding.title}</Heading>
@@ -79,12 +83,12 @@ const pendingLabel = finding.id.includes("XXXX")
         {!finding.url && <span>{pendingLabel}</span>}
         {finding.url && primaryLink?.href !== finding.url && (
           <a href={finding.url} target="_blank" rel="noopener noreferrer">
-            CVE record <span aria-hidden="true">↗</span>
+            CVE record <span class="link-arrow" aria-hidden="true">↗</span>
           </a>
         )}
         {note && (
           <a href={note} target="_blank" rel="noopener noreferrer">
-            Original note <span aria-hidden="true">↗</span>
+            Original note <span class="link-arrow" aria-hidden="true">↗</span>
           </a>
         )}
       </div>
@@ -102,7 +106,7 @@ const pendingLabel = finding.id.includes("XXXX")
         aria-label={`${primaryLink.name}: ${finding.title}`}
         title={primaryLink.name}
       >
-        {primaryLink.label}<span aria-hidden="true">{primaryLink.external ? "↗" : "→"}</span>
+        {primaryLink.label}<span class="link-arrow" aria-hidden="true">{primaryLink.external ? "↗" : "→"}</span>
       </a>
     )}
   </footer>
@@ -110,15 +114,10 @@ const pendingLabel = finding.id.includes("XXXX")
 
 <style>
   .cve-finding {
-    margin-inline: calc(-1 * var(--space-xs));
-    padding: var(--space-xs);
     scroll-margin-block-start: var(--space-s);
-    transition: background-color 0.15s ease;
 
-    &:has(summary:hover),
-    &:has(:focus-visible),
     &:has(details[open]) {
-      background-color: color-mix(in oklab, var(--muted) 45%, transparent);
+      background-color: var(--row-hover);
     }
 
     &:target {
@@ -163,7 +162,8 @@ const pendingLabel = finding.id.includes("XXXX")
     border-radius: var(--radius-sm);
     background-color: color-mix(in oklab, currentColor 5%, transparent);
     color: var(--muted-foreground);
-    font: 0.8125rem / 1.5 var(--font-mono);
+    font: var(--text-meta) / 1.5 var(--font-mono);
+    letter-spacing: 0;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 
@@ -215,7 +215,8 @@ const pendingLabel = finding.id.includes("XXXX")
     gap: var(--space-2xs) var(--space-s);
     margin-block-start: var(--space-xs);
     color: var(--muted-foreground);
-    font: 0.8125rem / 1.5 var(--font-mono);
+    font: var(--text-meta) / 1.5 var(--font-mono);
+    letter-spacing: 0;
     font-variant-numeric: tabular-nums;
 
     a {
@@ -248,14 +249,16 @@ const pendingLabel = finding.id.includes("XXXX")
     align-items: center;
     gap: 0.5ch;
     min-block-size: 2rem;
-    color: var(--accent);
-    font: 500 0.8125rem / 1.5 var(--font-mono);
+    color: var(--muted-foreground);
+    font: var(--text-meta) / 1.5 var(--font-mono);
+    letter-spacing: 0;
     text-decoration: underline;
-    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-decoration-color: var(--border);
     text-underline-offset: 0.2em;
 
     &:hover {
-      text-decoration-color: currentColor;
+      color: var(--foreground);
+      text-decoration-color: var(--accent);
     }
   }
 

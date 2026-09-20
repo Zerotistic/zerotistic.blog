@@ -1,6 +1,7 @@
 ---
 import { cveUrl, duplicateProject, products } from "@/data/cves"
 import MetaPage from "@/components/MetaPage.astro"
+import PageHeader from "@/components/PageHeader.astro"
 import CveFinding from "@/components/CveFinding.astro"
 import Layout from "@/layouts/Layout.astro"
 
@@ -94,17 +95,14 @@ const findingAnchor = (id: string, product: string) =>
     </nav>
   </div>
 
-  <header class="page-heading">
-    <p class="eyebrow">
-      <span aria-hidden="true">//</span>
-      vulnerability research
-    </p>
-    <h1>cves</h1>
-    <p class="intro">Published vulnerabilities from my security research.</p>
+  <PageHeader
+    title="cves"
+    description="Published vulnerabilities from my security research."
+  >
     <p class="pipeline-note">
       Additional findings are moving through coordinated disclosure.
     </p>
-  </header>
+  </PageHeader>
 
   <dl class="stats" aria-label="CVE summary">
     <div>
@@ -125,7 +123,7 @@ const findingAnchor = (id: string, product: string) =>
     {products.map((product) => (
       <section id={product.id} class="product-group" aria-labelledby={`${product.id}-heading`}>
         <header class="product-heading">
-          <h2 id={`${product.id}-heading`}>{product.name}<span class="product-count" aria-label={`${product.findings.length} findings`}>{product.findings.length.toString().padStart(2, "0")}</span></h2>
+          <h2 class="section-title" id={`${product.id}-heading`}>{product.name}<span class="product-count" aria-label={`${product.findings.length} findings`}>{product.findings.length.toString().padStart(2, "0")}</span></h2>
           <p>{product.context}</p>
         </header>
         <ol class="finding-list" role="list">
@@ -153,7 +151,7 @@ const findingAnchor = (id: string, product: string) =>
         aria-labelledby={`${duplicateProject.id}-heading`}
       >
         <header class="product-heading">
-          <h3 id={`${duplicateProject.id}-heading`}>
+          <h3 class="section-title" id={`${duplicateProject.id}-heading`}>
             {duplicateProject.name}
             <span class="product-count" aria-label="1 finding">01</span>
           </h3>
@@ -215,9 +213,8 @@ const findingAnchor = (id: string, product: string) =>
     }
 
     .count-label {
-      font-size: 0.6875rem;
+      font-size: var(--text-caption);
       font-weight: var(--font-weight-normal);
-      text-transform: uppercase;
       color: var(--muted-foreground);
     }
 
@@ -237,12 +234,12 @@ const findingAnchor = (id: string, product: string) =>
       border-inline-start: 2px solid transparent;
       color: var(--muted-foreground);
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: var(--text-meta);
       transition: background-color 0.15s ease;
 
       &:hover {
         color: var(--foreground);
-        background-color: color-mix(in oklab, var(--muted) 45%, transparent);
+        background-color: var(--row-hover);
       }
 
       &[aria-current] {
@@ -258,50 +255,24 @@ const findingAnchor = (id: string, product: string) =>
     }
   }
 
-  .page-heading {
-    margin-block-end: var(--space-s);
+  .pipeline-note {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--muted-foreground);
 
-    .eyebrow {
-      margin-block-end: var(--space-3xs);
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--muted-foreground);
-
-      span {
-        color: var(--accent);
-      }
-    }
-
-    h1 {
-      font-family: var(--font-mono);
-      font-size: var(--step-3);
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0;
-      line-height: 1.2;
-    }
-
-    .intro {
-      margin-block-start: var(--space-2xs);
-      color: var(--prose-foreground);
-    }
-
-    .pipeline-note {
-      display: flex;
-      align-items: baseline;
-      gap: var(--space-2xs);
-      margin-block-start: var(--space-2xs);
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--muted-foreground);
-
-      &::before {
-        content: "";
-        flex: none;
-        inline-size: 0.3rem;
-        block-size: 0.3rem;
-        border-radius: var(--radius-full);
-        background-color: var(--accent);
-      }
+    &::before {
+      content: "";
+      flex: none;
+      inline-size: 0.3rem;
+      block-size: 0.3rem;
+      border-radius: var(--radius-full);
+      background-color: var(--accent);
     }
   }
 
@@ -326,7 +297,7 @@ const findingAnchor = (id: string, product: string) =>
 
     dt {
       font-family: var(--font-mono);
-      font-size: 0.8125rem;
+      font-size: var(--text-meta);
       color: var(--muted-foreground);
     }
 
@@ -341,7 +312,7 @@ const findingAnchor = (id: string, product: string) =>
   .product-index {
     display: flex;
     flex-direction: column;
-    gap: var(--space-l);
+    gap: var(--space-xl);
   }
 
   .product-group {
@@ -360,14 +331,10 @@ const findingAnchor = (id: string, product: string) =>
       display: flex;
       align-items: baseline;
       gap: var(--space-2xs);
-      font-family: var(--font-mono);
-      font-size: var(--step-1);
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0;
     }
 
     .product-count {
-      font-size: 0.75rem;
+      font-size: var(--text-caption);
       font-weight: var(--font-weight-normal);
       font-variant-numeric: tabular-nums;
       color: var(--muted-foreground);
@@ -375,7 +342,7 @@ const findingAnchor = (id: string, product: string) =>
 
     p {
       font-family: var(--font-mono);
-      font-size: 0.8125rem;
+      font-size: var(--text-meta);
       color: var(--muted-foreground);
       text-align: end;
     }
@@ -414,7 +381,7 @@ const findingAnchor = (id: string, product: string) =>
 
   .score-note {
     margin-block-start: var(--space-s);
-    font: 0.8125rem / 1.5 var(--font-mono);
+    font: var(--text-meta) / 1.5 var(--font-mono);
     color: var(--muted-foreground);
   }
 
@@ -432,7 +399,7 @@ const findingAnchor = (id: string, product: string) =>
       align-items: center;
       gap: var(--space-s);
       padding-block: 0;
-      font-size: 0.8125rem;
+      font-size: var(--text-meta);
 
       label {
         flex: none;
@@ -526,7 +493,7 @@ const findingAnchor = (id: string, product: string) =>
       }
 
       dt {
-        font-size: 0.75rem;
+        font-size: var(--text-meta);
       }
     }
 

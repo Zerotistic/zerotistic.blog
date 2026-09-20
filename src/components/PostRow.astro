@@ -7,24 +7,28 @@ type Props = {
   post: CollectionEntry<"blog">
   partCount: number
   tags: string[]
+  showYear?: boolean
 }
 
-const { post, partCount, tags } = Astro.props
+const { post, partCount, tags, showYear = true } = Astro.props
 ---
 
 <li data-post-row data-tags={tags.join(" ")}>
-  <article>
+  <article class:list={["editorial-row", { "short-date": !showYear }]}>
     <a class="post-link" href={`/posts/${post.id}`}>
-      <row-marker aria-hidden="true">&rsaquo;</row-marker>
-      <time datetime={post.data.date.toISOString()}>
-        {formatDate(post.data.date)}
+      <time
+        datetime={post.data.date.toISOString()}
+        aria-label={showYear ? undefined : formatDate(post.data.date)}
+      >
+        {formatDate(post.data.date, showYear)}
       </time>
       <row-title>
-        <span set:html={titleHtml(post.data.title)} />
+        <span class="row-title" set:html={titleHtml(post.data.title)} />
         {partCount > 0 && (
           <series-badge>series · {partCount} parts</series-badge>
         )}
       </row-title>
+      <span class="post-arrow link-arrow" aria-hidden="true">→</span>
     </a>
     {tags.length > 0 && (
       <row-tags aria-label="Tags">
@@ -47,10 +51,13 @@ const { post, partCount, tags } = Astro.props
     position: relative;
     display: grid;
     /* Reserve the same width for dates with one- and two-digit days. */
-    grid-template-columns: 7.25rem minmax(0, 1fr);
+    grid-template-columns: var(--post-date-width, 7.25rem) minmax(0, 1fr) auto;
     align-items: baseline;
     gap: var(--space-2xs) var(--space-s);
-    padding-block: var(--space-s);
+
+    &.short-date {
+      --post-date-width: 4.25rem;
+    }
   }
 
   .post-link {
@@ -77,21 +84,12 @@ const { post, partCount, tags } = Astro.props
       }
     }
 
-    row-marker {
-      position: absolute;
-      inset-inline-start: -1rem;
-      inset-block-start: var(--space-s);
-      font-family: var(--font-mono);
-      line-height: calc(var(--leading-offset) + 1em);
-      color: var(--accent);
-      opacity: 0;
-    }
-
     time {
       grid-row: 1;
       grid-column: 1;
       font-family: var(--font-mono);
-      font-size: var(--step--1);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
       font-variant-numeric: tabular-nums;
       color: var(--muted-foreground);
       white-space: nowrap;
@@ -113,25 +111,18 @@ const { post, partCount, tags } = Astro.props
       margin-inline-start: var(--space-2xs);
       padding-inline: var(--space-2xs);
       font-family: var(--font-mono);
-      font-size: 0.7em;
+      font-size: var(--text-caption);
       letter-spacing: 0;
       color: var(--muted-foreground);
       white-space: nowrap;
       border: 1px solid var(--border);
-      border-radius: var(--radius-full);
+      border-radius: var(--radius-sm);
     }
 
-    &:hover,
-    &:focus-visible {
-      row-marker {
-        opacity: 1;
-      }
-
-      row-title > span {
-        text-decoration: underline;
-        text-decoration-color: var(--foreground);
-        text-underline-offset: 0.2em;
-      }
+    .post-arrow {
+      grid-column: 3;
+      grid-row: 1;
+      font-size: var(--step-0);
     }
   }
 
@@ -143,7 +134,7 @@ const { post, partCount, tags } = Astro.props
     flex-wrap: wrap;
     gap: var(--space-2xs);
     font-family: var(--font-mono);
-    font-size: var(--step--1);
+    font-size: var(--text-meta);
     letter-spacing: 0;
 
     a {
@@ -158,12 +149,12 @@ const { post, partCount, tags } = Astro.props
 
   @media (width < 34rem) {
     article {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: var(--space-3xs);
     }
 
     .post-link {
-      grid-template-columns: 1fr;
+      grid-template-columns: subgrid;
       row-gap: var(--space-3xs);
 
       time {
@@ -176,8 +167,9 @@ const { post, partCount, tags } = Astro.props
         grid-column: 1;
       }
 
-      row-marker {
-        display: none;
+      .post-arrow {
+        grid-column: 2;
+        grid-row: 2;
       }
     }
 

@@ -1,0 +1,41 @@
+/* Shared headings and rows for overview pages. Article prose has its own scale. */
+.section-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-section);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.editorial-row {
+  margin-inline: calc(-1 * var(--row-inset));
+  padding: var(--row-padding-block) var(--row-inset);
+  transition: background-color 160ms ease;
+}
+
+.editorial-row:is(:hover, :focus-within) {
+  background-color: var(--row-hover);
+}
+
+.editorial-row :is(a, summary):is(:hover, :focus-visible) {
+  text-decoration-color: var(--accent);
+}
+
+.editorial-row:is(:hover, :focus-within) .row-title {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.link-arrow {
+  display: inline-block;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  transition: color 160ms ease;
+}
+
+:is(a:hover, a:focus-visible, .editorial-row:hover, .editorial-row:focus-within) .link-arrow {
+  color: var(--accent);
+}

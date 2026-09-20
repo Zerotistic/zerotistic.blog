@@ -17,9 +17,9 @@ const years = Map.groupBy(entries, ({ post }) =>
 <archive-groups>
   {[...years].map(([year, yearEntries]) => (
     <section aria-labelledby={`year-${year}`}>
-      <h2 id={`year-${year}`}>{year}</h2>
+      <h2 class="section-title" id={`year-${year}`}>{year}</h2>
       <ol>
-        {yearEntries.map((entry) => <PostRow {...entry} />)}
+        {yearEntries.map((entry) => <PostRow {...entry} showYear={false} />)}
       </ol>
     </section>
   ))}
@@ -30,6 +30,10 @@ const years = Map.groupBy(entries, ({ post }) =>
     display: flex;
     flex-direction: column;
     gap: var(--space-xl);
+
+    @media (width < 34rem) {
+      gap: var(--space-l);
+    }
   }
 
   section {
@@ -37,11 +41,7 @@ const years = Map.groupBy(entries, ({ post }) =>
 
     h2 {
       margin-block-end: var(--space-xs);
-      font-family: var(--font-mono);
-      font-size: var(--step-1);
-      font-weight: var(--font-weight-medium);
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0;
       color: var(--foreground);
     }
   }

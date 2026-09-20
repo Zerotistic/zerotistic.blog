@@ -8,6 +8,7 @@ import "@/styles/icon-button.css"
 import "@/styles/bar.css"
 import "@/styles/shape.css"
 import "@/styles/interaction.css"
+import "@/styles/editorial.css"
 
 import Footer from "@/components/Footer.astro"
 import AvalonBackground from "@/components/AvalonBackground.astro"
@@ -40,7 +41,9 @@ const {
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <AvalonBackground />
-    <page-grid class:list={{ reading, "narrow-toc": narrowToc }}>
+    <page-grid
+      class:list={{ reading, overview: wide || narrowToc, "narrow-toc": narrowToc }}
+    >
       <page-header>
         <page-nav>
           <Sidebar crumbs={crumbs} showArtoria={showArtoria}
@@ -155,7 +158,11 @@ const {
     grid-column: 3 / 10;
     grid-row: 1;
     min-width: 0;
-    margin-block-start: -0.1em;
+    max-inline-size: var(--measure);
+
+    &.wide {
+      max-inline-size: var(--measure-overview);
+    }
 
     main {
       flex: 1;
@@ -176,7 +183,6 @@ const {
       grid-column: 1 / -1;
       grid-row: auto;
       inline-size: 100%;
-      max-inline-size: var(--measure);
       margin-inline: auto;
     }
   }
@@ -184,17 +190,37 @@ const {
   @media (width >= 64rem) {
     page-grid.narrow-toc {
       page-content {
-        grid-column: 3 / 11;
+        grid-column: 3 / -1;
+        max-inline-size: calc(
+          min(100%, var(--measure-overview)) -
+          var(--project-index-width) -
+          var(--grid-gutter)
+        );
       }
 
       page-toc {
         grid-column: 11 / 13;
-        width: calc(2 * var(--grid-column-width) + var(--grid-gutter));
+        width: var(--project-index-width);
+        inset-inline-end: calc(
+          var(--grid-edge) +
+          max(
+            0px,
+            10 *
+            var(--grid-column-width) +
+            9 *
+            var(--grid-gutter) -
+            var(--measure-overview)
+          )
+        );
       }
     }
   }
 
   @media (width < 64rem) {
+    page-grid.overview page-content {
+      max-inline-size: var(--measure-overview);
+    }
+
     page-grid.reading {
       row-gap: 0;
 

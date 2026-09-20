@@ -9,17 +9,29 @@ const teamLogos = { idek: idekLogo, "Project Sekai": sekaiLogo }
 const timelineRows = ctfTimeline.map((entry, index) => ({
   entry,
   year: entry.date.slice(0, 4),
-  startsYear: index === 0 || ctfTimeline[index - 1].date.slice(0, 4) !== entry.date.slice(0, 4),
-  linkExternal: entry.kind === "competition" && !!entry.link && isExternalLink(entry.link.href),
+  startsYear:
+    index === 0 ||
+    ctfTimeline[index - 1].date.slice(0, 4) !== entry.date.slice(0, 4),
+  linkExternal:
+    entry.kind === "competition" &&
+    !!entry.link &&
+    isExternalLink(entry.link.href),
 }))
 ---
 
 <section class="ctf-history" aria-labelledby="ctf-heading">
-  <h2 id="ctf-heading">ctfs, over the years</h2>
+  <h2 class="section-title" id="ctf-heading">ctfs, over the years</h2>
 
-  <ol class="ctf-timeline" role="list" aria-label="Teams and competitions over the years">
+  <ol
+    class="ctf-timeline"
+    role="list"
+    aria-label="Teams and competitions over the years"
+  >
     <li class="timeline-entry team-milestone year-start">
-      <p class="entry-date"><span class="date-qualifier">around</span><span class="entry-year year-marker">2018–2019</span></p>
+      <p class="entry-date">
+        <span class="date-qualifier">around</span
+        ><span class="entry-year year-marker">2018–2019</span>
+      </p>
       <div class="entry-content">
         <h3>Started playing</h3>
         <p class="event-note">
@@ -151,7 +163,8 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
   </ol>
 
   <p class="more-ctfs">
-    I’ve also played at Hackceler8 once, and plenty of other big CTFs in between.
+    I’ve also played at Hackceler8 once, and plenty of other big CTFs in
+    between.
   </p>
 </section>
 
@@ -164,13 +177,6 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
     display: block;
     padding-block: var(--space-xl);
     border-block-start: 1px solid var(--border);
-  }
-
-  h2 {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: 0;
   }
 
   a {
@@ -258,7 +264,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
   .event-result,
   .event-link {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--text-meta);
     line-height: 1.5;
     letter-spacing: 0;
   }
@@ -277,7 +283,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
 
   .year-marker {
     color: var(--foreground);
-    font-size: 0.875rem;
+    font-size: var(--text-meta);
     font-weight: 550;
     white-space: nowrap;
   }
@@ -350,7 +356,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
   .event-meta,
   .merger-team {
     color: var(--prose-foreground);
-    font-size: 0.875rem;
+    font-size: var(--text-meta);
     line-height: 1.5;
   }
 
@@ -426,7 +432,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
   }
 
   :is(.highlight-winner, .highlight-podium) .event-result {
-    font-size: 0.8125rem;
+    font-size: var(--text-meta);
     font-weight: 550;
   }
 
@@ -459,7 +465,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
   .more-ctfs {
     margin-block-start: var(--space-m);
     color: var(--muted-foreground);
-    font-size: 0.875rem;
+    font-size: var(--text-meta);
     line-height: 1.5;
   }
 

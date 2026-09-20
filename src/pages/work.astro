@@ -1,10 +1,10 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
+import PageHeader from "@/components/PageHeader.astro"
 import WorkJumpingCheer from "@/components/WorkJumpingCheer.astro"
-import WorkPhase from "@/components/WorkPhase.astro"
 import { education, work } from "@/data/work"
 import Layout from "@/layouts/Layout.astro"
-import { formatWorkDate, workDuration } from "@/lib/work"
+import { formatWorkDate } from "@/lib/work"
 ---
 
 <Layout showArtoria={false} wide>
@@ -14,154 +14,112 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     description="Experience and education. HiddenLayer, Hackcyom, Deloitte, and École 2600."
   />
 
-  <header class="page-heading">
-    <h1>work</h1>
-    <p>Experience &amp; education.</p>
-  </header>
+  <div class="work-page">
+    <PageHeader title="work" description="Experience & education." />
 
-  <div class="work-history">
-    <ol class="timeline" role="list" aria-label="Work experience, newest first">
-      {work.map((entry) => {
-        const current = !entry.end
-        const duration = workDuration(entry.start, entry.end)
-        const [fullTime, apprenticeship] = entry.phases ?? []
-        return (
-          <li class:list={["timeline-entry", { current, "has-phases": !!entry.phases }]}>
-            <div class="entry-dates">
-              <p class="date-range">
-                <time datetime={entry.start}>{formatWorkDate(entry.start)}</time>
-                <span class="date-end">
-                  <span aria-hidden="true">—</span>{" "}
-                  {entry.end ? (
-                    <time datetime={entry.end}>{formatWorkDate(entry.end)}</time>
-                  ) : (
-                    <span>Present</span>
-                  )}
-                </span>
-              </p>
-              {duration && (
-                <p class="duration" data-ongoing-since={current ? entry.start : undefined}>
-                  {duration}
-                </p>
-              )}
+    <div class="work-history">
+      <ol
+        class="work-list"
+        role="list"
+        aria-label="Work experience, newest first"
+      >
+        {work.map((entry) => {
+          const current = !entry.end
+          const fullTime = entry.phases?.find((phase) => phase.label === "Full-time")
+          return (
+            <li class:list={["work-entry", { current, "has-phases": !!fullTime }]}>
+              <article
+                class="entry-content"
+                aria-labelledby={`${entry.id}-heading`}
+                aria-describedby={entry.kind === "Apprenticeship" ? "education-connection" : undefined}
+              >
+                <div class="entry-summary">
+                  <div class:list={["entry-logo", `entry-logo-${entry.id}`]} aria-hidden="true">
+                    <img src={entry.logo} width="40" height="40" alt="" decoding="async" />
+                  </div>
+                  <div class="entry-copy">
+                    <h2 id={`${entry.id}-heading`}>{entry.organization}</h2>
+                    <p class="entry-role">
+                      {entry.role}
+                      {entry.kind === "Apprenticeship" && <span class="entry-kind"> · Apprenticeship</span>}
+                    </p>
+                    <div class="entry-meta">
+                      <p class="date-range">
+                        <time datetime={entry.start}>{formatWorkDate(entry.start)}</time>
+                        <span aria-hidden="true">—</span>
+                        {entry.end ? (
+                          <time datetime={entry.end}>{formatWorkDate(entry.end)}</time>
+                        ) : (
+                          <span>Present</span>
+                        )}
+                      </p>
+                      {entry.location && <p class="entry-location">{entry.location}</p>}
+                    </div>
+                  </div>
+                  {current && <div class="current-companion"><WorkJumpingCheer /></div>}
+                </div>
+                {fullTime && (
+                  <p class="entry-note" aria-describedby="education-connection">
+                    I joined as an apprentice and went full-time {fullTime.approximateStart ? "around " : "in "}
+                    <time datetime={fullTime.start}>{new Date(`${fullTime.start}-01T00:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })}</time>.
+                  </p>
+                )}
+              </article>
+            </li>
+          )
+        })}
+      </ol>
+
+      <aside class="education" aria-labelledby="ecole-2600-heading">
+        <div class="education-bracket" aria-hidden="true"></div>
+        <div class="education-details">
+          <p class="education-label">alongside work</p>
+          <div class="education-heading">
+            <div class="entry-logo entry-logo-ecole-2600" aria-hidden="true">
+              <img
+                src={education.logo}
+                width="32"
+                height="32"
+                alt=""
+                decoding="async"
+              >
             </div>
-
-            <div class:list={["entry-logo", `entry-logo-${entry.id}`]} aria-hidden="true">
-              <img src={entry.logo} width="48" height="48" alt="" decoding="async" />
-            </div>
-
-            <article
-              class="entry-content"
-              aria-labelledby={`${entry.id}-heading`}
-              aria-describedby={entry.kind === "Apprenticeship" ? "education-connection" : undefined}
+            <h2 id="ecole-2600-heading">{education.organization}</h2>
+          </div>
+          <p class="education-role">{education.role}</p>
+          <p class="education-dates">
+            <time datetime={education.start}
+              >{formatWorkDate(education.start)}</time
             >
-              <div class="entry-summary">
-                <div class="entry-heading">
-                  <h2 id={`${entry.id}-heading`}>{entry.organization}</h2>
-                </div>
-                <p class="entry-role">{entry.role}</p>
-                <div class="entry-meta">
-                  {current && <span class="current-label">Current</span>}
-                  {entry.kind !== "Work" && <p class="entry-kind">{entry.kind}</p>}
-                  {entry.kind !== "Work" && entry.location && <span aria-hidden="true">·</span>}
-                  {entry.location && <p class="entry-location">{entry.location}</p>}
-                </div>
-                {current && <WorkJumpingCheer />}
-                {fullTime && <div class="full-time-phase"><WorkPhase phase={fullTime} /></div>}
-              </div>
-              {apprenticeship && (
-                <div class="apprenticeship-phase" aria-describedby="education-connection">
-                  <WorkPhase phase={apprenticeship} />
-                </div>
-              )}
-            </article>
-          </li>
-        )
-      })}
-    </ol>
-
-    <aside class="education" aria-labelledby="ecole-2600-heading">
-      <div class="education-bracket" aria-hidden="true"></div>
-      <div class="education-details">
-        <p class="education-label">Alongside work</p>
-        <div class="entry-logo entry-logo-ecole-2600" aria-hidden="true">
-          <img
-            src={education.logo}
-            width="48"
-            height="48"
-            alt=""
-            decoding="async"
-          >
+            {" — "}{education.approximateEnd && "around "}
+            <time datetime={education.end}
+              >{formatWorkDate(education.end!)}</time
+            >
+          </p>
+          <p class="education-connection" id="education-connection">
+            Studied while apprenticing at Deloitte, then Hackcyom.
+          </p>
+          <p class="education-note">{education.note}</p>
         </div>
-        <h2 id="ecole-2600-heading">{education.organization}</h2>
-        <p class="education-dates">
-          <time datetime={education.start}
-            >{formatWorkDate(education.start)}</time
-          >
-          {" — "}{education.approximateEnd && "around "}
-          <time datetime={education.end}>{formatWorkDate(education.end!)}</time>
-        </p>
-        <p class="education-role">{education.role}</p>
-        <p class="education-connection" id="education-connection">
-          Studied while apprenticing at Deloitte, then Hackcyom.
-        </p>
-        <p class="education-note">{education.note}</p>
-      </div>
-    </aside>
+      </aside>
+    </div>
   </div>
 </Layout>
 
-<script>
-  import { workDuration } from "@/lib/work"
-
-  const updateDuration = () => {
-    document
-      .querySelectorAll<HTMLElement>("[data-ongoing-since]")
-      .forEach((element) => {
-        const duration = workDuration(element.dataset.ongoingSince!)
-        if (duration) element.textContent = duration
-      })
-  }
-
-  updateDuration()
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) updateDuration()
-  })
-</script>
-
 <style>
-  .page-heading {
-    margin-block-end: var(--space-2xl);
-
-    @media (width >= 64rem) {
-      margin-block-start: -0.2em;
-    }
-
-    h1 {
-      font-family: var(--font-mono);
-      font-size: var(--step-3);
-      font-weight: var(--font-weight-medium);
-      letter-spacing: 0;
-      line-height: calc(var(--leading-offset) + 1em);
-    }
-
-    p {
-      margin-block-start: var(--space-2xs);
-      color: var(--muted-foreground);
-    }
+  .work-page {
+    --logo-size: 2.5rem;
+    --entry-gap: var(--space-s);
   }
 
   .work-history {
-    --date-column: 8.5rem;
-    --rail-column: 4.25rem;
-    --rail-position: calc(var(--date-column) + var(--rail-column) / 2);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 2.5rem clamp(13rem, 20vw, 16rem);
-    /* Share the two apprenticeship rows, not the whole Hackcyom tenure. */
+    grid-template-columns: minmax(0, 1fr) 16.5rem;
     grid-template-rows: [current] auto [hackcyom] auto [apprenticeship] auto [deloitte] auto [end];
+    column-gap: var(--space-m);
   }
 
-  .timeline {
+  .work-list {
     display: grid;
     grid-column: 1;
     grid-row: current / end;
@@ -170,70 +128,88 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     list-style: none;
   }
 
-  .timeline-entry {
+  .work-entry {
     position: relative;
     display: grid;
-    grid-template-columns: var(--date-column) var(--rail-column) minmax(0, 1fr);
     grid-template-rows: subgrid;
-    padding-block-end: var(--space-xl);
+    min-inline-size: 0;
+    padding-block: var(--space-m);
 
     &::before {
       content: "";
       position: absolute;
-      inset-inline-start: var(--rail-position);
-      inset-block: 3.5rem 0.5rem;
+      inset-inline-start: calc(var(--logo-size) / 2);
+      inset-block-start: calc(
+        var(--space-m) +
+        var(--logo-size) +
+        var(--space-2xs)
+      );
+      inset-block-end: calc(var(--space-2xs) - var(--space-m));
       inline-size: 1px;
       background: var(--border);
+      pointer-events: none;
+    }
+
+    &:first-child {
+      padding-block-start: 0;
+
+      &::before {
+        inset-block-start: calc(var(--logo-size) + var(--space-2xs));
+      }
     }
 
     &.current::before {
       background: linear-gradient(var(--accent), var(--border));
     }
 
-    &.has-phases {
-      grid-row: span 2;
+    &:last-child::before {
+      display: none;
     }
 
-    &:last-child {
-      padding-block-end: 0;
-
-      &::before {
-        display: none;
-      }
+    &.has-phases {
+      grid-row: span 2;
     }
   }
 
   .entry-content {
-    grid-column: 3;
-    grid-row: 1 / -1;
     display: grid;
     grid-template-rows: subgrid;
+    grid-row: 1 / -1;
     min-inline-size: 0;
   }
 
   .entry-summary {
     position: relative;
-    padding-block-end: var(--space-m);
+    display: grid;
+    grid-template-columns: var(--logo-size) minmax(0, 1fr);
+    align-content: start;
+    gap: var(--entry-gap);
+  }
+
+  .entry-copy {
+    min-inline-size: 0;
   }
 
   .current .entry-summary {
-    --cheer-size: 10rem;
-    padding-inline-end: calc(var(--cheer-size) + 1rem);
-    min-block-size: calc(var(--cheer-size) + 0.5rem);
-    border-block-end: 1px solid var(--border);
+    --cheer-size: 6.5rem;
+    padding-inline-end: calc(var(--cheer-size) + var(--space-s));
+    min-block-size: 8rem;
+  }
+
+  .current-companion {
+    position: absolute;
+    inset-block-start: -1.25rem;
+    inset-inline-end: 0;
+    inline-size: var(--cheer-size);
   }
 
   .entry-logo {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: center;
-    align-self: start;
-    inline-size: 3rem;
-    block-size: 3rem;
+    inline-size: var(--logo-size);
+    block-size: var(--logo-size);
+    padding: 0.3125rem;
     overflow: hidden;
-    padding: 0.375rem;
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     background: #fff;
 
     img {
@@ -246,188 +222,124 @@ import { formatWorkDate, workDuration } from "@/lib/work"
 
   .entry-logo-hiddenlayer {
     background: #07151e;
-    border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
-    box-shadow: 0 0 0 3px var(--accent-muted);
   }
 
-  .entry-logo-ecole-2600 {
-    padding: 0.5rem;
+  h2 {
+    font-size: var(--step-2);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
   }
 
-  .entry-dates {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    padding-block-start: 0.15rem;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0;
-  }
-
-  .date-range {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3xs);
+  .entry-role {
+    margin-block-start: var(--space-3xs);
+    font-size: var(--step-0);
+    line-height: 1.5;
     color: var(--prose-foreground);
   }
 
-  .date-end {
-    white-space: nowrap;
-  }
-
-  .duration {
-    margin-block-start: var(--space-xs);
-    font-size: 0.75rem;
+  .entry-kind {
+    font-size: var(--step--1);
     color: var(--muted-foreground);
-  }
-
-  .entry-heading {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
   }
 
   .entry-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.25em 0.5em;
+    gap: var(--space-3xs) var(--space-s);
     margin-block-start: var(--space-xs);
-    font-size: var(--step--1);
     color: var(--muted-foreground);
+    font-size: var(--text-meta);
+    line-height: 1.6;
   }
 
-  .current-label {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.1em 0.6em;
-    border: 1px solid var(--accent-muted);
-    border-radius: 3px;
-    background: color-mix(in oklab, var(--accent) 6%, transparent);
-    color: var(--accent);
+  .date-range {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0;
+
+    time {
+      white-space: nowrap;
+    }
   }
 
-  h2 {
-    font-size: var(--step-2);
-    font-weight: 500;
-    line-height: 1.3;
-  }
-
-  .entry-role {
-    margin-block-start: var(--space-3xs);
+  .entry-note {
+    margin-inline-start: calc(var(--logo-size) + var(--entry-gap));
+    padding-block-start: var(--space-xs);
+    max-inline-size: 29rem;
+    font-size: var(--step--1);
+    line-height: 1.6;
     color: var(--prose-foreground);
-    line-height: 1.55;
-  }
-
-  .has-phases .entry-summary {
-    padding-block-end: 0;
-  }
-
-  .full-time-phase {
-    position: relative;
-    margin-block-start: var(--space-m);
-    padding-block-end: var(--space-s);
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset-inline-start: 0.25rem;
-      inset-block: 0.6rem 0;
-      inline-size: 1px;
-      background: var(--border);
-    }
-  }
-
-  .apprenticeship-phase {
-    position: relative;
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset-inline-start: 0.25rem;
-      inset-block: 0 0;
-      block-size: 0.65rem;
-      inline-size: 1px;
-      background: var(--border);
-    }
   }
 
   .education {
-    grid-column: 2 / -1;
-    grid-row: apprenticeship / end;
+    /* Connect the apprenticeship note and Deloitte, not Hackcyom's full-time role. */
     display: grid;
-    grid-template-columns: subgrid;
+    grid-column: 2;
+    grid-row: apprenticeship / end;
+    grid-template-columns: 0.75rem minmax(0, 1fr);
+    gap: var(--space-xs);
+    padding-block: var(--space-xs) var(--space-m);
     min-inline-size: 0;
   }
 
   .education-bracket {
-    grid-column: 1;
-    justify-self: center;
-    inline-size: 1.125rem;
     border-block: 1px solid;
     border-inline-end: 1px solid;
     border-color: color-mix(in oklab, var(--accent) 65%, var(--border));
   }
 
   .education-details {
-    grid-column: 2;
     align-self: center;
     min-inline-size: 0;
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    column-gap: var(--space-xs);
-
-    > p {
-      grid-column: 1 / -1;
-    }
-
-    .entry-logo {
-      grid-column: 1;
-      grid-row: 2;
-      inline-size: 2.25rem;
-      block-size: 2.25rem;
-      border-radius: 0.5rem;
-      padding: 0.375rem;
-    }
-
-    h2 {
-      grid-column: 2;
-      grid-row: 2;
-      align-self: center;
-      font-size: var(--step-1);
-    }
   }
 
   .education-label {
-    margin-block-end: var(--space-s);
-    color: var(--accent);
+    margin-block-end: var(--space-xs);
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-size: var(--text-caption);
+    color: var(--accent);
+    letter-spacing: 0;
   }
 
-  .education-dates {
-    margin-block-start: var(--space-s);
-    font-size: 0.8125rem;
-    color: var(--muted-foreground);
+  .education-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+
+    .entry-logo {
+      flex-shrink: 0;
+      inline-size: 2rem;
+      block-size: 2rem;
+      padding: 0.25rem;
+      border-radius: 0.375rem;
+    }
+
+    h2 {
+      font-size: var(--step-1);
+    }
   }
 
   .education-role {
     margin-block-start: var(--space-xs);
     font-size: var(--step--1);
+    line-height: 1.5;
     color: var(--prose-foreground);
   }
 
-  .education-connection,
+  .education-dates,
+  .education-note {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--text-meta);
+    line-height: 1.6;
+    color: var(--muted-foreground);
+  }
+
   .education-note {
     margin-block-start: var(--space-xs);
-    font-size: 0.8125rem;
-    color: var(--muted-foreground);
   }
 
   .education-connection {
@@ -439,94 +351,34 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     white-space: nowrap;
   }
 
-  @media (40rem <= width < 80rem) {
+  @media (48rem <= width < 75rem) {
     .work-history {
-      --date-column: 7rem;
-      --rail-column: 3.5rem;
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      column-gap: var(--space-s);
     }
 
     .current .entry-summary {
-      --cheer-size: 8rem;
+      --cheer-size: 5.5rem;
     }
   }
 
-  @media (width < 64rem) {
-    .work-history {
-      --date-column: 0rem;
-      --rail-column: 3.25rem;
-      --rail-position: 1.125rem;
-    }
-
-    .timeline-entry {
-      grid-template-columns: var(--rail-column) minmax(0, 1fr);
-
-      &::before {
-        inset-block-start: 2.75rem;
-      }
-    }
-
-    .entry-content {
-      grid-column: 2;
-    }
-
-    .entry-dates {
-      grid-column: 2;
-      grid-row: 1;
-      align-self: start;
-    }
-
-    .entry-summary {
-      padding-block-start: 3.5rem;
-    }
-
-    .current .entry-summary {
-      min-block-size: calc(var(--cheer-size) + 3.5rem);
-    }
-
-    .entry-logo {
-      grid-column: 1;
-      justify-self: start;
-      inline-size: 2.25rem;
-      block-size: 2.25rem;
-      padding: 0.25rem;
-      border-radius: 0.5rem;
-    }
-
-    .date-range {
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 0.4em;
-    }
-
-    .duration {
-      margin-block-start: var(--space-3xs);
-    }
-  }
-
-  @media (width < 75rem) {
+  @media (width < 48rem) {
     .work-history {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: [current] auto [hackcyom] auto [apprenticeship] auto [deloitte] auto [end] auto [education-end];
     }
 
     .education {
-      position: relative;
       grid-column: 1;
       grid-row: end / education-end;
-      grid-template-columns: minmax(0, 1fr);
-      margin-inline-start: calc(var(--date-column) + var(--rail-column));
-      padding-inline-start: var(--space-m);
-      padding-block-start: var(--space-s);
+      margin-inline-start: calc(var(--logo-size) + var(--entry-gap));
+      padding-block: 0;
     }
 
     .education-bracket {
-      position: absolute;
-      grid-column: auto;
-      justify-self: start;
-      inset-inline-start: 0;
-      inset-block: calc(-1 * var(--space-m)) auto;
-      inline-size: 0.75rem;
-      block-size: calc(var(--space-m) + var(--space-s) + 0.5rem);
+      align-self: start;
+      block-size: 2rem;
+      margin-block-start: -1rem;
       border: 0;
       border-inline-start: 1px solid;
       border-block-end: 1px solid;
@@ -535,34 +387,27 @@ import { formatWorkDate, workDuration } from "@/lib/work"
     }
 
     .education-details {
-      grid-column: 1;
-      max-inline-size: 30rem;
-    }
-
-    .timeline-entry:last-child {
-      padding-block-end: var(--space-s);
+      align-self: start;
     }
   }
 
   @media (width < 40rem) {
-    .page-heading {
-      margin-block-end: var(--space-xl);
-    }
-    .timeline-entry {
-      padding-block-end: var(--space-l);
+    .work-page {
+      --logo-size: 2.25rem;
+      --entry-gap: var(--space-xs);
     }
 
     .current .entry-summary {
-      --cheer-size: clamp(5rem, 23vw, 7rem);
-      padding-inline-end: calc(var(--cheer-size) + 0.25rem);
-      min-block-size: calc(var(--cheer-size) + 7.25rem);
+      --cheer-size: clamp(4.5rem, 20vw, 5.25rem);
+      min-block-size: 7rem;
     }
 
-    .current h2 {
-      font-size: clamp(1.3rem, 5.6vw, 1.625rem);
+    .current-companion {
+      inset-block-start: -0.75rem;
     }
-    .current .entry-role {
-      font-size: 0.9375rem;
+
+    h2 {
+      font-size: var(--step-1);
     }
   }
 </style>

@@ -144,7 +144,7 @@ export function initJumpingCompanion(element: HTMLElement) {
     element.removeAttribute("data-blinking")
     const started = performance.now()
     const jumpHeight = Math.min(30, element.clientWidth * 0.23)
-    const bubbleAbove = matchMedia("(min-width: 40rem)").matches
+    const bubbleAbove = getComputedStyle(bubble).bottom !== "auto"
     // Cache layout once. The title and character scroll together; a resize cancels the scene.
     const screen = art.getScreenCTM()
     const headingBox = heading?.getBoundingClientRect()

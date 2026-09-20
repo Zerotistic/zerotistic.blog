@@ -1,6 +1,6 @@
-export function formatDate(date: Date): string {
+export function formatDate(date: Date, includeYear = true): string {
   return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
+    year: includeYear ? "numeric" : undefined,
     month: "short",
     day: "numeric",
     timeZone: "UTC",

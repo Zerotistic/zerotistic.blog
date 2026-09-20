@@ -38,11 +38,23 @@ import Layout from "@/layouts/Layout.astro"
         <p class="aside-line">Automation nerd. Probably unhinged.</p>
         <p class="bio">
           I’m a security researcher at
-          <a href="https://hiddenlayer.com" target="_blank" rel="noopener noreferrer">HiddenLayer</a>, into reverse
-          engineering, pwn, and automation. I also play CTFs with
-          <a href="https://sekai.team/" target="_blank" rel="noopener noreferrer">Project Sekai</a>
+          <a
+            href="https://hiddenlayer.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            >HiddenLayer</a
+          >, into reverse engineering, pwn, and automation. I also play CTFs
+          with
+          <a
+            href="https://sekai.team/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Project Sekai</a
+          >
           and
-          <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer">Friendly Maltese Citizens</a>.
+          <a href="https://ctf.mt/" target="_blank" rel="noopener noreferrer"
+            >Friendly Maltese Citizens</a
+          >.
         </p>
         <p class="bio-links">
           See my
@@ -76,7 +88,9 @@ import Layout from "@/layouts/Layout.astro"
         <p class="margin-note">
           she’s taking over <span aria-hidden="true">↘</span>
         </p>
-        <h2 id="artoria-heading">and then there’s Artoria.</h2>
+        <h2 class="section-title" id="artoria-heading">
+          and then there’s Artoria.
+        </h2>
         <p class="artoria-intro">
           Artoria is my favorite anime character, and I don’t really have words
           for how much I love her. She’s an obsession, in the most affectionate
@@ -128,7 +142,7 @@ import Layout from "@/layouts/Layout.astro"
 
     <footer class="contact" aria-labelledby="contact-heading">
       <div class="contact-copy">
-        <h2 id="contact-heading">say hi</h2>
+        <h2 class="section-title" id="contact-heading">say hi</h2>
         <p>You can find me around here.</p>
         <ContactLinks />
       </div>
@@ -142,7 +156,6 @@ import Layout from "@/layouts/Layout.astro"
 
 <style>
   .about-page {
-    max-inline-size: 50rem;
     padding-block-start: var(--space-xs);
     font-size: var(--step-0);
     line-height: calc(var(--leading-offset) + 1em);
@@ -173,8 +186,7 @@ import Layout from "@/layouts/Layout.astro"
     border-radius: var(--radius-lg);
   }
 
-  h1,
-  h2 {
+  h1 {
     font-family: var(--font-mono);
     font-size: var(--step--1);
     font-weight: var(--font-weight-medium);
@@ -202,6 +214,7 @@ import Layout from "@/layouts/Layout.astro"
 
   .bio {
     margin-block-start: var(--space-l);
+    max-inline-size: 60ch;
   }
 
   .bio-links {
@@ -271,7 +284,7 @@ import Layout from "@/layouts/Layout.astro"
   figcaption {
     margin-block-start: var(--space-2xs);
     color: var(--muted-foreground);
-    font-size: 0.75rem;
+    font-size: var(--text-caption);
     font-style: italic;
     line-height: 1.4;
     text-align: center;
@@ -332,7 +345,10 @@ import Layout from "@/layouts/Layout.astro"
   .her-site {
     white-space: nowrap;
     text-decoration-line: underline;
-    text-decoration-color: light-dark(rgb(163 68 75 / 0.6), rgb(199 110 118 / 0.75));
+    text-decoration-color: light-dark(
+      rgb(163 68 75 / 0.6),
+      rgb(199 110 118 / 0.75)
+    );
     text-decoration-thickness: 2px;
     text-underline-offset: 0.22em;
   }
@@ -479,7 +495,13 @@ import Layout from "@/layouts/Layout.astro"
 
     .montage-link img {
       /* On small screens the copy sits above and below the collage. */
-      mask-image: linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent);
+      mask-image: linear-gradient(
+        to bottom,
+        transparent,
+        #000 4%,
+        #000 96%,
+        transparent
+      );
     }
 
     .artoria-closing {

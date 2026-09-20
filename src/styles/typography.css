@@ -6,6 +6,11 @@
   --step-2: clamp(1.2656rem, 1.1346rem + 0.6392vw, 1.62rem);
   --step-3: clamp(1.4238rem, 1.2315rem + 0.9383vw, 1.944rem);
 
+  --text-page-title: var(--step-3);
+  --text-section: var(--step-1);
+  --text-meta: 0.8125rem;
+  --text-caption: 0.75rem;
+
   --font-weight-normal: 400;
   --font-weight-medium: 450;
 
@@ -16,6 +21,7 @@
   --prose-marker:     color-mix(in oklab, var(--foreground) 30%, transparent);
 
   --measure: 40rem;
+  --measure-overview: 54rem;
 }
 
 *,

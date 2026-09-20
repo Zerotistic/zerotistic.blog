@@ -159,10 +159,8 @@ const poses = [
 
 <style>
   .work-jumping {
-    position: absolute;
-    inset-block-start: -2.5rem;
-    inset-inline-end: 0.35rem;
-    inline-size: min(var(--cheer-size, 10rem), 8.5rem);
+    position: relative;
+    inline-size: 100%;
     isolation: isolate;
   }
   .jump-button {
@@ -317,23 +315,10 @@ const poses = [
       transform: scaleX(1);
     }
   }
-  @media (width < 64rem) {
-    .work-jumping {
-      inset-block-start: 0.8rem;
-    }
-  }
   @media (width < 40rem) {
-    .work-jumping {
-      inset-block-start: 1.25rem;
-      inset-inline-end: 0;
-      inline-size: calc(var(--cheer-size) + 1rem);
-    }
     figcaption {
-      inset-block-end: auto;
-      inset-block-start: calc(100% - 0.05rem);
       inset-inline-end: 0;
       font-size: 0.6875rem;
-      border-radius: 0.75rem 0.25rem 0.75rem 0.75rem;
     }
     .jump-visitor {
       inline-size: 17px;
