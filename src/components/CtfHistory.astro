@@ -3,12 +3,14 @@ import { Image } from "astro:assets"
 import idekLogo from "@/assets/about/teams/idek.png"
 import sekaiLogo from "@/assets/about/teams/project-sekai.png"
 import { ctfTimeline } from "@/data/ctf-history"
+import { isExternalLink } from "@/lib/utils"
 
 const teamLogos = { idek: idekLogo, "Project Sekai": sekaiLogo }
 const timelineRows = ctfTimeline.map((entry, index) => ({
   entry,
   year: entry.date.slice(0, 4),
   startsYear: index === 0 || ctfTimeline[index - 1].date.slice(0, 4) !== entry.date.slice(0, 4),
+  linkExternal: entry.kind === "competition" && !!entry.link && isExternalLink(entry.link.href),
 }))
 ---
 
@@ -26,7 +28,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
       </div>
     </li>
 
-    {timelineRows.map(({ entry, year, startsYear }) => (
+    {timelineRows.map(({ entry, year, startsYear, linkExternal }) => (
       <li class:list={[
         "timeline-entry",
         entry.kind === "competition" && entry.highlight && `highlight-${entry.highlight}`,
@@ -129,9 +131,14 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
                 {entry.link && (
                   <>
                     {" "}
-                    <a class="event-link" href={entry.link.href} target="_blank" rel="noopener noreferrer">
-                      {entry.link.label}<span aria-hidden="true">↗</span>
-                      <span class="sr-only"> (opens in a new tab)</span>
+                    <a
+                      class="event-link"
+                      href={entry.link.href}
+                      target={linkExternal ? "_blank" : undefined}
+                      rel={linkExternal ? "noopener noreferrer" : undefined}
+                    >
+                      {entry.link.label}<span aria-hidden="true">{linkExternal ? "↗" : "→"}</span>
+                      {linkExternal && <span class="sr-only"> (opens in a new tab)</span>}
                     </a>
                   </>
                 )}

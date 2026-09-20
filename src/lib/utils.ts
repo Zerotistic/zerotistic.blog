@@ -25,3 +25,16 @@ export const normalizePath = (pathname: string) => {
 }
 
 export const hashId = (hash: string) => decodeURIComponent(hash.slice(1))
+
+export function isExternalLink(href: string): boolean {
+  const site = new URL("https://zerotistic.blog")
+  try {
+    const url = new URL(href, site)
+    return (
+      ["http:", "https:"].includes(url.protocol) &&
+      url.hostname.replace(/^www\./, "") !== site.hostname
+    )
+  } catch {
+    return false
+  }
+}
