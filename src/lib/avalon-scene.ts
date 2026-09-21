@@ -1,6 +1,6 @@
 import { motionRunning, observeMotion } from "./ambient-motion"
 
-// Fixed, repeatable variation keeps the meadow stable through resizes.
+// Fixed, repeatable variation keeps the particles stable through resizes.
 const noise = (seed: number) => {
   const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453
   return value - Math.floor(value)
@@ -41,13 +41,6 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   let nextVisit = remainingVisitDelay()
   let visitorStart = -100
   let pixelRatio = 0
-  let blades: {
-    x: number
-    root: number
-    length: number
-    bend: number
-    flower: boolean
-  }[] = []
   // Reuse one glow texture instead of constructing a gradient for every
   // firefly on every frame. Opacity still follows the day/night crossfade.
   const glow = document.createElement("canvas")
@@ -99,71 +92,11 @@ export function initAvalon(canvas: HTMLCanvasElement) {
         : width >= 1024
           ? 28
           : 12
-    const count = width < 1024 ? 5 : 19
-    const reach = width < 1024 ? 15 : Math.min(edge * 0.75, 120)
-    blades = [-1, 1].flatMap((side) =>
-      Array.from({ length: count }, (_, i) => {
-        const seed = i + (side === 1 ? 75 : 0)
-        const root = noise(seed + 2) * reach
-        return {
-          x: side < 0 ? root : width - root,
-          root,
-          length:
-            (width < 1024 ? 20 : 38) +
-            noise(seed + 5) * (width < 1024 ? 30 : 72),
-          bend: (noise(seed + 8) - 0.5) * 24,
-          flower: i % 4 === 0,
-        }
-      }),
-    )
   }
   const theme = () => {
     const preference = document.documentElement.dataset.theme
     targetNight =
       preference === "dark" || (!preference && themeQuery.matches) ? 1 : 0
-  }
-
-  function grass() {
-    for (const { x, root, length, bend: restingBend, flower } of blades) {
-      const sway =
-        Math.sin(time * 0.6 + root * 0.024) * 5 + Math.sin(time * 0.21) * 7
-      const bend = restingBend + sway
-      const tipX = x + bend
-      const tipY = height - length
-      ctx.fillStyle =
-        night > 0.5 ? "rgba(133,154,137,0.13)" : "rgba(132,145,104,0.22)"
-      ctx.beginPath()
-      ctx.moveTo(x - 0.8, height + 3)
-      ctx.quadraticCurveTo(x + bend * 0.15, height - length * 0.6, tipX, tipY)
-      ctx.quadraticCurveTo(
-        x + bend * 0.4 + 1,
-        height - length * 0.5,
-        x + 1.3,
-        height + 3,
-      )
-      ctx.fill()
-      if (flower) {
-        ctx.save()
-        ctx.translate(tipX, tipY)
-        ctx.rotate(bend * 0.018)
-        ctx.fillStyle =
-          night > 0.5 ? "rgba(176,172,140,0.16)" : "rgba(159,139,94,0.25)"
-        for (let j = 0; j < 4; j++) {
-          ctx.beginPath()
-          ctx.ellipse(
-            (j % 2 ? 1 : -1) * 1.5,
-            j * 3,
-            1.5,
-            3.3,
-            j % 2 ? 0.5 : -0.5,
-            0,
-            tau,
-          )
-          ctx.fill()
-        }
-        ctx.restore()
-      }
-    }
   }
 
   function motes() {
@@ -245,7 +178,6 @@ export function initAvalon(canvas: HTMLCanvasElement) {
     const strip = Math.min(width / 2, Math.ceil(edge + 32))
     ctx.clearRect(0, 0, strip, height)
     ctx.clearRect(width - strip, 0, strip, height)
-    grass()
     motes()
     visitor()
     if (time >= nextVisit) {
