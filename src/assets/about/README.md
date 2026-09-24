@@ -2,6 +2,16 @@
 
 The shooting-range Saber sticker and its final generation prompt are documented in [saber-range.md](saber-range.md).
 
+## VTuber favorites
+
+Official transparent character artwork downloaded on 2026-09-24. These are identification illustrations for the owner's favorites, not generated artwork or an indication of endorsement. Copyright remains with the respective rights holders. The source files are preserved without edits; Astro serves local, responsive WebP thumbnails. CSS accounts for the different transparent margins, and hover movement translates each entire illustration without deforming it.
+
+- [Amanogawa Shiina](vtubers/shiina.png) — [source image](https://phase-connect.com/wp-content/uploads/2022/08/Shiina-Character.png), from [Phase Connect's ALiAS roster](https://phase-connect.com/phase-02-alias/).
+- [Mari Mari](vtubers/mari-mari.png) — [source image](https://phase-connect.com/wp-content/uploads/2025/06/Mari_01.png), from [Phase Connect's Invaders roster](https://phase-connect.com/phase-invaders/).
+- [Nakiri Ayame](vtubers/ayame.webp) — [source image](https://hololive.hololivepro.com/wp-content/uploads/2020/06/Nakiri-Ayame_pr-img_01.webp), from [her official hololive profile](https://hololive.hololivepro.com/en/talents/nakiri-ayame/).
+
+Each illustration links to the talent's YouTube channel. No embeds, live-status polling, or third-party image requests are added to the page.
+
 ## CTF team logos
 
 Small identifying logos beside the team-joining milestones, downloaded from the teams' own websites on 2026-09-21. The original PNGs are preserved and served as locally optimized 24/48px thumbnails. They are not generated artwork; the logos belong to the respective teams.

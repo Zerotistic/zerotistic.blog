@@ -4,6 +4,7 @@ import blackCat from "@/assets/about/black-cat.png"
 import rangeSaber from "@/assets/about/saber-range.png"
 import Artoria from "@/components/Artoria.astro"
 import RangeAndMusic from "@/components/RangeAndMusic.astro"
+import VtuberFavorites from "@/components/VtuberFavorites.astro"
 import { favoriteShelves } from "@/data/favorites"
 ---
 
@@ -112,6 +113,10 @@ import { favoriteShelves } from "@/data/favorites"
     ))}
   </div>
 
+  <div class="vtuber-favorites">
+    <VtuberFavorites />
+  </div>
+
   <div class="extra-interests">
     <RangeAndMusic saber={rangeSaber} />
   </div>
@@ -126,6 +131,7 @@ import { favoriteShelves } from "@/data/favorites"
       "heading heading"
       "notes notes"
       "reader favorites"
+      "vtubers vtubers"
       "extras extras";
     align-items: start;
     gap: var(--space-m) var(--space-l);
@@ -194,6 +200,11 @@ import { favoriteShelves } from "@/data/favorites"
     grid-area: favorites;
     display: grid;
     gap: var(--space-m);
+    min-inline-size: 0;
+  }
+
+  .vtuber-favorites {
+    grid-area: vtubers;
     min-inline-size: 0;
   }
 
@@ -358,6 +369,7 @@ import { favoriteShelves } from "@/data/favorites"
         "heading reader"
         "notes notes"
         "favorites favorites"
+        "vtubers vtubers"
         "extras extras";
       gap: var(--space-m) var(--space-s);
     }

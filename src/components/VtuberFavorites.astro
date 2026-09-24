@@ -1,0 +1,259 @@
+---
+import { Image } from "astro:assets"
+import ayame from "@/assets/about/vtubers/ayame.webp"
+import mari from "@/assets/about/vtubers/mari-mari.png"
+import shiina from "@/assets/about/vtubers/shiina.png"
+
+const favorites = [
+  {
+    id: "shiina",
+    name: "Shiina",
+    fullName: "Amanogawa Shiina",
+    agency: "Phase Connect",
+    portrait: shiina,
+    href: "https://www.youtube.com/@AmanogawaShiina",
+  },
+  {
+    id: "mari",
+    name: "Mari Mari",
+    fullName: "Mari Mari",
+    agency: "Phase Connect",
+    portrait: mari,
+    href: "https://www.youtube.com/@MARIMARI_EN",
+  },
+  {
+    id: "ayame",
+    name: "Ayame",
+    fullName: "Nakiri Ayame",
+    agency: "hololive",
+    portrait: ayame,
+    href: "https://www.youtube.com/channel/UC7fk0CB07ly8oSl0aqKkqFg",
+  },
+]
+---
+
+<section class="vtubers" id="vtubers" aria-labelledby="vtubers-heading">
+  <div class="vtuber-intro">
+    <h3 id="vtubers-heading">vtubers</h3>
+    <p>
+      More anime girls. You knew this was coming. I watch VTubers too, and I'm
+      especially fond of these three.
+    </p>
+  </div>
+
+  <ul class="vtuber-lineup" role="list">
+    {favorites.map(({ id, name, fullName, agency, portrait, href }) => (
+      <li class={"vtuber " + id}>
+        <a
+          class="vtuber-link"
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={fullName + " — " + agency + " on YouTube (opens in a new tab)"}
+        >
+          <span class="portrait-stage">
+            <span class="portrait-motion">
+              <Image
+                class="portrait"
+                src={portrait}
+                width={256}
+                widths={[128, 256, 512]}
+                sizes="(max-width: 767px) 192px, 256px"
+                format="webp"
+                quality={85}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </span>
+          </span>
+          <span class="vtuber-caption">
+            <span class="vtuber-name">{name}<span class="channel-arrow" aria-hidden="true">↗</span></span>
+            <span class="vtuber-agency">{agency}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .vtubers {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-s) var(--space-l);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid var(--border);
+    scroll-margin-block-start: var(--space-xl);
+  }
+
+  h3 {
+    margin-block-end: var(--space-2xs);
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  .vtuber-intro p {
+    color: var(--prose-foreground);
+    font-size: var(--text-meta);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .vtuber-lineup {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xs);
+    padding: 0;
+    list-style: none;
+  }
+
+  .vtuber {
+    min-inline-size: 0;
+  }
+
+  /* Account for the transparent margins in the unedited official artwork. */
+  .shiina {
+    --portrait-scale: 128.95%;
+    --portrait-bottom: -2.39%;
+    --talent-color: light-dark(#716090, #b9a6dc);
+  }
+
+  .mari {
+    --portrait-scale: 102.95%;
+    --portrait-bottom: -1.58%;
+    --talent-color: light-dark(#ac651e, #edb35e);
+  }
+
+  .ayame {
+    --portrait-scale: 106.95%;
+    --portrait-bottom: -2.51%;
+    --talent-color: light-dark(#ac4459, #ed8fa3);
+  }
+
+  .vtuber-link {
+    display: block;
+    color: var(--foreground);
+    text-align: center;
+    text-decoration: none;
+    --underline: transparent;
+  }
+
+  .vtuber-link:focus-visible {
+    outline: 2px solid var(--talent-color);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  .portrait-stage {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    max-block-size: 14.5rem;
+    /* Clip only empty image margins; keep all three figures inside their links. */
+    overflow: clip;
+  }
+
+  .portrait-stage::before {
+    content: "";
+    position: absolute;
+    inset-inline: 8%;
+    inset-block-end: 0;
+    block-size: 2.5rem;
+    background: radial-gradient(
+      ellipse,
+      color-mix(in oklab, var(--talent-color) 18%, transparent),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .portrait-motion {
+    position: absolute;
+    inset: 0.5rem 0 0.25rem;
+    transition: transform 180ms ease;
+    pointer-events: none;
+  }
+
+  .portrait {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-end: var(--portrait-bottom);
+    display: block;
+    inline-size: auto;
+    max-inline-size: none;
+    block-size: var(--portrait-scale);
+    transform: translateX(-50%);
+  }
+
+  .vtuber-caption {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-xs);
+    font-size: var(--text-meta);
+    line-height: 1.4;
+  }
+
+  .vtuber-name {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--talent-color) 45%, transparent);
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+  }
+
+  .channel-arrow {
+    margin-inline-start: 0.3em;
+    color: var(--talent-color);
+    font-size: 0.85em;
+  }
+
+  .vtuber-agency {
+    color: var(--muted-foreground);
+    font-size: var(--text-caption);
+  }
+
+  .vtuber-link:focus-visible .vtuber-name {
+    text-decoration-color: var(--talent-color);
+  }
+
+  @media (hover: hover) {
+    .vtuber-link:hover .portrait-motion {
+      transform: translateY(-4px);
+    }
+
+    .vtuber-link:hover .vtuber-name {
+      text-decoration-color: var(--talent-color);
+    }
+  }
+
+  @media (width < 48rem) {
+    .vtubers {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .portrait-stage {
+      max-block-size: 12rem;
+    }
+
+    .vtuber-lineup {
+      gap: var(--space-2xs);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portrait-motion {
+      transition: none;
+    }
+
+    .vtuber-link:hover .portrait-motion {
+      transform: none;
+    }
+  }
+</style>
