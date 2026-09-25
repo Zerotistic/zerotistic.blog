@@ -72,9 +72,9 @@ html {
     }
   }
 
-  @media (width < 30rem) {
+  @media (width < 40rem) {
     --bar-nav-height: calc(
-      1.5 * var(--step-0) + 2.75rem + 2 * var(--space-2xs) + 8px
+      2rem + 2.75rem + 2 * var(--space-2xs) + 2px
     );
   }
 
