@@ -1,0 +1,322 @@
+---
+import { Image } from "astro:assets"
+import ayame from "@/assets/about/collection/ayame-plush.webp"
+import boysAbyss from "@/assets/about/collection/boys-abyss.jpg"
+import goodbyeEri from "@/assets/about/collection/goodbye-eri.webp"
+import saber from "@/assets/about/collection/saber-last-episode.webp"
+
+const collectionUrl = "https://weeb.zerotistic.blog/"
+const pieces = [
+  { kind: "book abyss", image: boysAbyss, name: "Boy's Abyss", detail: "manga" },
+  { kind: "book eri", image: goodbyeEri, name: "Goodbye, Eri", detail: "manga" },
+  { kind: "photo saber", image: saber, name: "Artoria: Last Episode", detail: "1/8 figure" },
+  { kind: "photo ayame", image: ayame, name: "Nakiri Ayame", detail: "hololive friends with u plush" },
+]
+---
+
+<section class="collection" id="collection" aria-labelledby="collection-heading">
+  <div class="collection-copy">
+    <p class="eyebrow">the collection</p>
+    <h3 id="collection-heading">this is where the shelf space went.</h3>
+    <p class="description">
+      Manga, light novels, figures, and merch. I made a separate site to keep
+      track of it all.
+    </p>
+    <a class="collection-link" href={collectionUrl}>
+      Browse my collection <span aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <figure class="collection-display">
+    <ul class="display-shelf" role="list" aria-label="A few items from my collection">
+      {pieces.map(({ kind, image, name, detail }) => (
+        <li class={"shelf-piece " + kind}>
+          <a class="item-link" href={collectionUrl} aria-label={"Browse my collection — pictured: " + name + ", " + detail}>
+            <span class="item-art">
+              <Image
+                src={image}
+                width={160}
+                widths={[96, 160, 320]}
+                sizes="(max-width: 479px) 96px, 160px"
+                format="webp"
+                quality={85}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </span>
+            <span class="item-label" aria-hidden="true">
+              {name}<span class="item-detail"> · {detail}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <figcaption>a few things from my shelves</figcaption>
+  </figure>
+</section>
+
+<style>
+  .collection {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: var(--space-m) var(--space-l);
+    scroll-margin-block-start: calc(var(--bar-nav-height) + var(--space-m));
+  }
+
+  .collection-copy {
+    min-inline-size: 0;
+  }
+
+  .eyebrow {
+    margin-block-end: var(--space-xs);
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.5;
+  }
+
+  h3 {
+    max-inline-size: 23ch;
+    color: var(--foreground);
+    font-size: var(--step-1);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.35;
+    letter-spacing: -0.025em;
+  }
+
+  .description {
+    max-inline-size: 36ch;
+    margin-block-start: var(--space-xs);
+    color: var(--prose-foreground);
+    font-size: var(--step--1);
+    line-height: 1.6;
+  }
+
+  .collection-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-block-size: 2.75rem;
+    margin-block-start: var(--space-2xs);
+    color: var(--foreground);
+    font-size: var(--step--1);
+    --underline: var(--border);
+  }
+
+  .collection-link span {
+    color: var(--accent);
+    transition: transform 180ms ease;
+  }
+
+  .collection-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .collection-display {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 28rem;
+    min-inline-size: 0;
+    justify-self: end;
+  }
+
+  .display-shelf {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.8fr 0.76fr 1.32fr 1fr;
+    align-items: end;
+    block-size: 14rem;
+    padding: 1.5rem 1rem 3.5rem;
+    list-style: none;
+    isolation: isolate;
+  }
+
+  .display-shelf::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 3.4rem;
+    block-size: 3px;
+    border-radius: 50%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--accent) 35%, var(--border)) 12% 88%,
+      transparent
+    );
+    box-shadow: 0 5px 9px light-dark(rgb(61 45 29 / 0.09), rgb(0 0 0 / 0.25));
+    pointer-events: none;
+  }
+
+  .shelf-piece {
+    min-inline-size: 0;
+    --tilt: 0deg;
+    --lift: 0px;
+  }
+
+  .abyss {
+    --tilt: -7deg;
+    padding-inline-end: 0.1rem;
+  }
+
+  .eri {
+    --tilt: 3deg;
+    margin-inline-start: -0.4rem;
+    padding-inline-end: 0.5rem;
+  }
+
+  .saber {
+    --tilt: -3deg;
+    margin-inline: -0.4rem -0.3rem;
+  }
+
+  .ayame {
+    --tilt: 6deg;
+    margin-inline-start: -0.65rem;
+  }
+
+  .item-link {
+    display: block;
+    color: var(--foreground);
+    text-decoration: none;
+    --underline: transparent;
+  }
+
+  .item-art {
+    position: relative;
+    display: block;
+    transform: translateY(var(--lift)) rotate(var(--tilt));
+    transform-origin: center bottom;
+    transition: transform 180ms ease;
+    border-radius: 1px;
+    box-shadow: 2px 3px 7px rgb(0 0 0 / 0.18);
+  }
+
+  .item-art img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: inherit;
+  }
+
+  .book .item-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-inline-start: 2px solid rgb(255 255 255 / 0.3);
+    box-shadow: inset 4px 0 3px rgb(0 0 0 / 0.13);
+    pointer-events: none;
+  }
+
+  .photo .item-art {
+    padding: 3px;
+    background: light-dark(#fffaf2, #e3ded4);
+  }
+
+  .item-label,
+  figcaption {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: grid;
+    align-content: center;
+    min-block-size: 2.5rem;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .item-label {
+    display: block;
+    padding-block-start: 0.3rem;
+    opacity: 0;
+  }
+
+  figcaption,
+  .item-detail {
+    color: var(--muted-foreground);
+  }
+
+  figcaption {
+    font-style: italic;
+  }
+
+  .item-link:focus-visible {
+    outline: none;
+    --lift: -5px;
+  }
+
+  .item-link:focus-visible .item-art {
+    z-index: 1;
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .item-link:focus-visible .item-label {
+    opacity: 1;
+  }
+
+  .collection-display:has(.item-link:focus-visible) figcaption {
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    .item-link:hover {
+      --lift: -5px;
+    }
+
+    .item-link:hover .item-art {
+      z-index: 1;
+    }
+
+    .item-link:hover .item-label {
+      opacity: 1;
+    }
+
+    .collection-display:has(.item-link:hover) figcaption,
+    .display-shelf:has(.item-link:hover) .item-link:not(:hover) .item-label {
+      opacity: 0;
+    }
+
+    .collection-link:hover span {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (width < 48rem) {
+    .collection {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xs);
+    }
+
+    .collection-display {
+      grid-row: 1;
+      justify-self: center;
+      max-inline-size: 24rem;
+    }
+
+    .display-shelf {
+      block-size: clamp(11.5rem, 28vw, 14rem);
+    }
+
+    .description {
+      max-inline-size: 48ch;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .item-art,
+    .collection-link span {
+      transition: none;
+      transform: rotate(var(--tilt, 0deg));
+    }
+
+    .collection-link:hover span {
+      transform: none;
+    }
+  }
+</style>

@@ -2,6 +2,17 @@
 
 The shooting-range Saber sticker and its final generation prompt are documented in [saber-range.md](saber-range.md).
 
+## Collection shelf
+
+Four images copied from the owner's [collection site](https://weeb.zerotistic.blog/) on 2026-09-25. All four entries were marked as owned in its public inventory. These are the existing cover/product images and owner's plush photo, not generated illustrations. Source files are preserved without edits; Astro produces local responsive WebP thumbnails. Copyright remains with the respective rights holders.
+
+- [Boy's Abyss](collection/boys-abyss.jpg) — [source image](https://weeb.zerotistic.blog/assets/covers/boys-abyss.jpg).
+- [Goodbye, Eri](collection/goodbye-eri.webp) — [source image](https://weeb.zerotistic.blog/assets/covers/goodbye-eri.webp).
+- [Artoria Pendragon: Last Episode](collection/saber-last-episode.webp) — [source image](https://weeb.zerotistic.blog/assets/covers/saber-last-episode.webp).
+- [Nakiri Ayame: hololive friends with u](collection/ayame-plush.webp) — [source image](https://weeb.zerotistic.blog/assets/covers/ayame-plush-owned.webp).
+
+The compact shelf sits below the anime/manga favorites and above the VTubers, without a separator above it. It uses the original images, with CSS book edges and photograph borders. Hover/focus lifts each whole image and displays its title below the shelf. Reduced-motion preferences disable the lift. The images and browse link lead to the collection homepage in the same tab; the collection does not currently expose individual-item URLs. No live inventory requests or third-party image loads are added to About.
+
 ## VTuber favorites
 
 Official transparent character artwork downloaded on 2026-09-24. These are identification illustrations for the owner's favorites, not generated artwork or an indication of endorsement. Copyright remains with the respective rights holders. The source files are preserved without edits; Astro serves local, responsive WebP thumbnails. CSS accounts for the different transparent margins, and hover movement translates each entire illustration without deforming it.

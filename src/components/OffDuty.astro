@@ -3,6 +3,7 @@ import { Image } from "astro:assets"
 import blackCat from "@/assets/about/black-cat.png"
 import rangeSaber from "@/assets/about/saber-range.png"
 import Artoria from "@/components/Artoria.astro"
+import CollectionShelf from "@/components/CollectionShelf.astro"
 import RangeAndMusic from "@/components/RangeAndMusic.astro"
 import VtuberFavorites from "@/components/VtuberFavorites.astro"
 import { favoriteShelves } from "@/data/favorites"
@@ -113,6 +114,10 @@ import { favoriteShelves } from "@/data/favorites"
     ))}
   </div>
 
+  <div class="collection-shelf">
+    <CollectionShelf />
+  </div>
+
   <div class="vtuber-favorites">
     <VtuberFavorites />
   </div>
@@ -131,6 +136,7 @@ import { favoriteShelves } from "@/data/favorites"
       "heading heading"
       "notes notes"
       "reader favorites"
+      "collection collection"
       "vtubers vtubers"
       "extras extras";
     align-items: start;
@@ -210,6 +216,11 @@ import { favoriteShelves } from "@/data/favorites"
 
   .extra-interests {
     grid-area: extras;
+    min-inline-size: 0;
+  }
+
+  .collection-shelf {
+    grid-area: collection;
     min-inline-size: 0;
   }
 
@@ -369,6 +380,7 @@ import { favoriteShelves } from "@/data/favorites"
         "heading reader"
         "notes notes"
         "favorites favorites"
+        "collection collection"
         "vtubers vtubers"
         "extras extras";
       gap: var(--space-m) var(--space-s);
