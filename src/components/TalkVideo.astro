@@ -1,0 +1,164 @@
+---
+import { Image } from "astro:assets"
+import type { ImageMetadata } from "astro"
+
+type Props = {
+  videoId: string
+  title: string
+  poster: ImageMetadata
+  duration: string
+}
+
+const { videoId, title, poster, duration } = Astro.props
+const href = `https://www.youtube.com/watch?v=${videoId}`
+---
+
+<div class="video-shell" data-talk-video data-video-id={videoId} data-video-title={title}>
+  <a
+    class="video-preview"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`Watch ${title} on YouTube (opens in a new tab)`}
+  >
+    <Image
+      class="video-poster"
+      src={poster}
+      width={480}
+      widths={[320, 480, 640, 960, 1280]}
+      sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 1023px) 48vw, 432px"
+      alt=""
+      loading="eager"
+      decoding="async"
+      quality={85}
+    />
+    <span class="play-symbol" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="25" height="25" fill="currentColor">
+        <path d="m9 5 11 7-11 7Z" />
+      </svg>
+    </span>
+    <span class="preview-caption" aria-hidden="true">
+      <span>Play recording</span>
+      <span class="duration">{duration}</span>
+    </span>
+  </a>
+</div>
+
+<script>
+  // Keep a regular YouTube link as the no-JavaScript fallback, then enhance it
+  // into a button. Neither the player nor its third-party requests load early.
+  document.querySelectorAll<HTMLElement>("[data-talk-video]").forEach((shell) => {
+    const preview = shell.querySelector<HTMLAnchorElement>("a.video-preview")
+    const { videoId, videoTitle } = shell.dataset
+    if (!preview || !videoId || !videoTitle) return
+
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "video-preview"
+    button.setAttribute("aria-label", `Play ${videoTitle} (loads YouTube player)`)
+    button.append(...preview.childNodes)
+    preview.replaceWith(button)
+
+    button.addEventListener("click", () => {
+      const player = document.createElement("iframe")
+      player.title = videoTitle
+      player.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1`
+      player.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"
+      player.allowFullscreen = true
+      player.referrerPolicy = "strict-origin-when-cross-origin"
+      shell.replaceChildren(player)
+      player.focus()
+    }, { once: true })
+  })
+</script>
+
+<style>
+  .video-shell {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+
+  .video-shell :global(.video-preview) {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .video-shell :global(.video-preview:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 5px;
+  }
+
+  .video-poster {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+  }
+
+  .play-symbol {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    display: grid;
+    place-items: center;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    border: 1px solid rgb(255 255 255 / 0.75);
+    border-radius: 50%;
+    background: rgb(0 0 0 / 0.7);
+    transform: translate(-50%, -50%);
+    transition: background-color 160ms ease;
+  }
+
+  .video-shell :global(.video-preview:is(:hover, :focus-visible)) .play-symbol {
+    background: #111;
+  }
+
+  .preview-caption {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-xs);
+    padding: var(--space-l) var(--space-xs) var(--space-xs);
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.85));
+    font-size: var(--text-meta);
+    line-height: 1.4;
+  }
+
+  .duration {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .video-shell :global(iframe) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+    border-radius: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .play-symbol {
+      transition: none;
+    }
+  }
+</style>

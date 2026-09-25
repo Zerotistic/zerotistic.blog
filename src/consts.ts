@@ -44,6 +44,7 @@ export const NAVIGATION = [
   { href: "/posts", label: "posts" },
   { href: "/about", label: "about" },
   { href: "/work", label: "work" },
+  { href: "/talks", label: "talks" },
   { href: "/cves", label: "cves" },
   { href: "/mentions", label: "mentions" },
 ]
