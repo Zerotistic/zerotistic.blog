@@ -76,6 +76,20 @@ const productData: Product[] = [
     context: "Headless content management system",
     findings: [
       {
+        id: "GHSA-2qw6-cm49-277x",
+        title: "Access-control bypass in Payload Jobs",
+        summary:
+          "An authenticated user could access or modify job records beyond the permissions configured for Payload Jobs.",
+        published: "2026-10-06",
+        score: "8.7",
+        cvss: "4.0",
+        severity: "high",
+        advisory: {
+          label: "GitHub advisory",
+          href: "https://github.com/payloadcms/payload/security/advisories/GHSA-2qw6-cm49-277x",
+        },
+      },
+      {
         id: "GHSA-r488-j9vj-wx3q",
         title: "Remote code execution in Payload Form Builder",
         summary:
