@@ -10,7 +10,7 @@ import OffDuty from "@/components/OffDuty.astro"
 import Layout from "@/layouts/Layout.astro"
 ---
 
-<Layout wide showArtoria={false}>
+<Layout wide showArtoria={false} footerSocials={false}>
   <MetaPage
     slot="head"
     title="About me"
@@ -342,15 +342,18 @@ import Layout from "@/layouts/Layout.astro"
     outline-offset: 5px;
   }
 
+  /* Emphasis, not a link, so a highlighter stroke instead of an underline. */
   .her-site {
     white-space: nowrap;
-    text-decoration-line: underline;
-    text-decoration-color: light-dark(
-      rgb(163 68 75 / 0.6),
-      rgb(199 110 118 / 0.75)
+    padding-inline: 0.15em;
+    margin-inline: -0.15em;
+    background: linear-gradient(
+      transparent 58%,
+      light-dark(rgb(163 68 75 / 0.18), rgb(199 110 118 / 0.24)) 58% 92%,
+      transparent 92%
     );
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.22em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   .margin-note {

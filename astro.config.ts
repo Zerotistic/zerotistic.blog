@@ -10,6 +10,7 @@ import { calloutDirective } from "./src/lib/callout"
 import { externalLinks } from "./src/lib/external-links"
 import { headingNamespace } from "./src/lib/heading-namespace"
 import { headingAnchors } from "./src/lib/heading-anchors"
+import { imageCaptions } from "./src/lib/image-captions"
 
 export default defineConfig({
   site: "https://zerotistic.blog",
@@ -40,6 +41,7 @@ export default defineConfig({
       mdastPlugins: [calloutDirective, inlineExpressiveCode, temmlMath],
       hastPlugins: [
         externalLinks,
+        imageCaptions,
         blockExpressiveCode,
         headingNamespace,
         headingAnchors,

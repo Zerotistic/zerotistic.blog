@@ -1,6 +1,6 @@
 ---
-title: "RealWorldCTF 2024: Let's Party in the House"
-description: "A pwn writeup for the RealWorldCTF 2024 'Let's party in the house' challenge: exploiting a buffer overflow in libjansson to get RCE on a Synology BC500 camera."
+title: "RealWorldCTF 2024: Let’s Party in the House"
+description: "A pwn writeup for the RealWorldCTF 2024 ‘Let’s party in the house’ challenge: exploiting a buffer overflow in libjansson to get RCE on a Synology BC500 camera."
 date: 2024-01-30
 authors:
   - zerotistic

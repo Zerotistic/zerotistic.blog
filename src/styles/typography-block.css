@@ -29,17 +29,24 @@ prose-content {
     }
   }
 
-  /* Captions: the italic line immediately following an image. */
-  p > img:only-child + em,
-  p > .image-enlarge:only-child + em,
-  p:has(> .image-enlarge:only-child) + p > em:only-child,
-  p:has(> img:only-child) + p > em:only-child {
-    display: block;
-    margin-block-start: var(--space-2xs);
-    font-size: var(--step--1);
-    font-style: normal;
-    text-align: center;
-    color: var(--muted-foreground);
+  /* Built by lib/image-captions from an image with an italic line under it. */
+  figure.captioned {
+    margin-block: 0 1em;
+
+    :is(img, .image-enlarge) {
+      display: block;
+      margin-inline: auto;
+    }
+
+    figcaption {
+      max-inline-size: 34rem;
+      margin: var(--space-2xs) auto 0;
+      font-size: var(--step--1);
+      line-height: 1.5;
+      text-align: center;
+      text-wrap: balance;
+      color: var(--muted-foreground);
+    }
   }
 
   .siri-phone-illustration {
@@ -122,7 +129,7 @@ prose-content {
     padding: var(--space-m) var(--space-s);
     background: var(--sand-2);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     overflow-x: auto;
 
     svg {
@@ -178,7 +185,6 @@ prose-content {
 
     .frame.is-terminal .header {
       font-weight: var(--font-weight-normal);
-      letter-spacing: var(--tracking-tight);
     }
 
     .frame.has-title:not(.is-terminal) .header {

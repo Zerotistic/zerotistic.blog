@@ -1,0 +1,91 @@
+<script>
+  // Jumping within a page (contents, a link to another section) glides
+  // there instead of cutting; the glide itself shows where you went.
+  // Arriving from somewhere else (continue reading, a link or search result
+  // with a #section) has no such trail, so the heading you land on is
+  // briefly tinted instead. Heading "#" links and the skip link keep their
+  // default behavior; with reduced motion the jump is instant.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)")
+
+  const land = (target: Element) => {
+    const glow = () => {
+      target.removeAttribute("data-landed")
+      void (target as HTMLElement).offsetWidth
+      target.setAttribute("data-landed", "")
+      setTimeout(() => target.removeAttribute("data-landed"), 1600)
+    }
+    if (reduced.matches || !("onscrollend" in window)) return glow()
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      glow()
+    }
+    addEventListener("scrollend", finish, { once: true })
+    // Already in place means no scroll, so no scrollend either.
+    setTimeout(finish, 900)
+  }
+
+  document.addEventListener("click", (event) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return
+    const link = (event.target as Element).closest?.<HTMLAnchorElement>(
+      "a[href^='#']",
+    )
+    if (
+      !link ||
+      link.hash.length < 2 ||
+      link.matches("[data-heading-anchor], .skip-link") ||
+      !link.closest("page-toc, prose-content")
+    )
+      return
+    let target: HTMLElement | null = null
+    try {
+      target = document.getElementById(decodeURIComponent(link.hash.slice(1)))
+    } catch {}
+    if (!target) return
+    event.preventDefault()
+    history.pushState(null, "", link.hash)
+    target.scrollIntoView({
+      behavior: reduced.matches ? "auto" : "smooth",
+      block: "start",
+    })
+  })
+
+  // Arriving on this page at a #section.
+  if (location.hash.length > 1) {
+    let target: HTMLElement | null = null
+    try {
+      target = document.getElementById(
+        decodeURIComponent(location.hash.slice(1)),
+      )
+    } catch {}
+    if (target?.matches("h1, h2, h3, h4, h5, h6")) land(target)
+  }
+
+  // Shared with "continue reading" (ResumeReading).
+  addEventListener("site:land", (event) => {
+    const target = (event as CustomEvent<Element>).detail
+    if (target) land(target)
+  })
+</script>
+
+<style is:global>
+  [data-landed] {
+    animation: landed 1.4s ease-out;
+  }
+
+  @keyframes landed {
+    from,
+    30% {
+      color: var(--accent);
+    }
+  }
+</style>

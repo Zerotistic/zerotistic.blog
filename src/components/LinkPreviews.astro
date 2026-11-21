@@ -1,5 +1,8 @@
 <dialog id="link-preview" aria-labelledby="link-preview-title">
-  <button class="preview-close" type="button" aria-label="Close link preview">×</button>
+  <span class="preview-handle" aria-hidden="true"></span>
+  <button class="preview-close" type="button" aria-label="Close link preview">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8m0-8-8 8" /></svg>
+  </button>
   <img class="preview-image" alt="" hidden width="640" height="360" />
   <div class="preview-copy">
     <p class="preview-site"></p>
@@ -10,6 +13,7 @@
 
 <script>
   import type { LinkPreview } from "@/lib/link-previews"
+  import { closeOnBack } from "@/lib/overlay-history"
 
   const panel = document.querySelector<HTMLDialogElement>("#link-preview")!
   const heading = panel.querySelector<HTMLElement>("h2")!
@@ -36,7 +40,10 @@
       document.documentElement.style.overflow = savedOverflow
       savedOverflow = undefined
     }
-    image.removeAttribute("src")
+    // Let the exit animation finish before the image goes blank.
+    setTimeout(() => {
+      if (!panel.open) image.removeAttribute("src")
+    }, 250)
   }
   const hide = () => {
     cancelTimers()
@@ -46,6 +53,8 @@
   panel.addEventListener("close", () => {
     if (!panel.open) cleanup()
   })
+  // On touch the sheet is modal; the back gesture closes it.
+  const back = closeOnBack(panel, hide)
   panel.querySelector("button")!.addEventListener("click", hide)
   panel.addEventListener("click", (event) => {
     if (event.target !== panel) return
@@ -103,16 +112,26 @@
     button.setAttribute("aria-expanded", "true")
     if (touch.matches) {
       panel.showModal()
+      back.opened()
       savedOverflow = document.documentElement.style.overflow
       document.documentElement.style.overflow = "hidden"
+      // Short sheets drag from anywhere; long ones scroll and drag by the handle.
+      panel.style.touchAction = panel.scrollHeight > panel.clientHeight ? "" : "none"
     } else {
       const focus = document.activeElement as HTMLElement | null
       panel.show()
       const rect = anchor.getBoundingClientRect()
-      const height = panel.getBoundingClientRect().height
-      const width = panel.getBoundingClientRect().width
-      panel.style.left = `${Math.max(12, Math.min(rect.left, innerWidth - width - 12))}px`
-      panel.style.top = `${Math.max(12, rect.bottom + height + 12 < innerHeight ? rect.bottom + 10 : rect.top - height - 10)}px`
+      // Layout size, not the box mid scale animation.
+      const height = panel.offsetHeight
+      const width = panel.offsetWidth
+      const left = Math.max(12, Math.min(rect.left, innerWidth - width - 12))
+      const below = rect.bottom + height + 12 < innerHeight
+      const top = Math.max(12, below ? rect.bottom + 10 : rect.top - height - 10)
+      panel.style.left = `${left}px`
+      panel.style.top = `${top}px`
+      // Grow out of the link that opened it.
+      const originX = Math.min(Math.max(rect.left + rect.width / 2 - left, 0), width)
+      panel.style.transformOrigin = `${originX}px ${below ? 0 : height}px`
       if (!explicit) {
         if (focus && focus !== document.body) focus.focus({ preventScroll: true })
         else (document.activeElement as HTMLElement | null)?.blur()
@@ -120,7 +139,54 @@
     }
   }
 
-  openLink.addEventListener("click", hide)
+  openLink.addEventListener("click", () => {
+    back.forget()
+    hide()
+  })
+
+  // Touch: the sheet follows a downward drag and closes when thrown or pulled
+  // past a third of its height; otherwise it springs back.
+  let drag: { id: number; y: number; t: number; dy: number; v: number } | undefined
+  let dragged = false
+  panel.addEventListener("pointerdown", (event) => {
+    if (!touch.matches || event.pointerType === "mouse" || !panel.open) return
+    const onHandle = (event.target as Element).closest(".preview-handle")
+    if (!onHandle && panel.scrollTop > 0) return
+    drag = { id: event.pointerId, y: event.clientY, t: event.timeStamp, dy: 0, v: 0 }
+    dragged = false
+  })
+  panel.addEventListener("pointermove", (event) => {
+    if (!drag || event.pointerId !== drag.id) return
+    const dy = event.clientY - drag.y
+    if (!dragged && dy < 6) return
+    if (!dragged) panel.setPointerCapture(drag.id)
+    dragged = true
+    const dt = Math.max(1, event.timeStamp - drag.t)
+    drag.v = (dy - drag.dy) / dt
+    drag.dy = dy
+    drag.t = event.timeStamp
+    // Resist pulling up past the resting position.
+    panel.style.translate = `0 ${dy > 0 ? dy : dy / 4}px`
+    panel.dataset.dragging = ""
+  })
+  const release = (event: PointerEvent) => {
+    if (!drag || event.pointerId !== drag.id) return
+    const { dy, v } = drag
+    drag = undefined
+    delete panel.dataset.dragging
+    if (!dragged) return
+    if (dy > panel.offsetHeight / 3 || v > 0.5) hide()
+    panel.style.translate = ""
+  }
+  panel.addEventListener("pointerup", release)
+  panel.addEventListener("pointercancel", release)
+  // A drag is not a tap on the link underneath.
+  panel.addEventListener("click", (event) => {
+    if (!dragged) return
+    dragged = false
+    event.preventDefault()
+    event.stopPropagation()
+  }, true)
 
   document.querySelectorAll<HTMLElement>("article[data-link-previews]").forEach((article) => {
     const previews: Record<string, LinkPreview> = JSON.parse(article.dataset.linkPreviews || "{}")
@@ -156,29 +222,49 @@
         })
         element.addEventListener("pointerleave", scheduleClose)
       }
+      // Without a pointer the trigger is hidden, so keyboard focus on the
+      // link behaves like hovering it.
+      anchor.addEventListener("focus", () => {
+        if (touch.matches || !anchor.matches(":focus-visible")) return
+        cancelTimers()
+        if (current === button && panel.open) return
+        hoverTimer = setTimeout(() => show(anchor, button, data, false), 500)
+      })
+      anchor.addEventListener("blur", scheduleClose)
     })
   })
 </script>
 
 <style is:global>
+  /* Touch only: a marker hugging the link and whatever punctuation follows.
+     Negative margins keep a 24px target without opening a visible gap or
+     growing the line box. */
   .link-preview-trigger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    vertical-align: -0.15em;
-    width: 1.2em;
-    height: 1.2em;
-    margin-inline: 0.1em;
+    vertical-align: middle;
+    width: 24px;
+    height: 24px;
+    margin-block: -6px;
+    margin-inline: -3px -5px;
     padding: 0;
     border: 0;
-    border-radius: 3px;
+    border-radius: var(--radius-md);
     background: transparent;
     color: var(--muted-foreground);
     cursor: pointer;
     font-size: inherit;
 
     svg { width: 0.8em; height: 0.8em; fill: none; stroke: currentColor; stroke-width: 1.2; }
-    &:hover, &[aria-expanded="true"] { color: var(--foreground); background: var(--muted); }
+    transition: scale var(--dur-press) var(--ease-out);
+    &[aria-expanded="true"] { color: var(--foreground); }
+    &:active { scale: 0.88; }
+  }
+
+  /* With a mouse the preview opens on hover, keep the prose clean. */
+  @media (hover: hover) and (pointer: fine) and (width >= 40rem) {
+    .link-preview-trigger { display: none; }
   }
 
   #link-preview {
@@ -192,12 +278,38 @@
     max-height: calc(100dvh - 24px);
     overflow: auto;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     background: var(--background);
     color: var(--foreground);
-    box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+    box-shadow: var(--shadow-lg);
     font-family: var(--font-sans);
     line-height: 1.5;
+
+    /* Enter from the link, leave faster and quieter than it arrived. */
+    opacity: 0;
+    scale: 0.96;
+    transition:
+      opacity 100ms ease,
+      scale 100ms ease,
+      display 100ms allow-discrete,
+      overlay 100ms allow-discrete;
+
+    &[open] {
+      opacity: 1;
+      scale: 1;
+      transition:
+        opacity var(--dur-hover) var(--ease-out),
+        scale var(--dur-hover) var(--ease-out);
+
+      @starting-style {
+        opacity: 0;
+        scale: 0.96;
+      }
+    }
+
+    .preview-handle {
+      display: none;
+    }
 
     .preview-close {
       position: absolute;
@@ -206,12 +318,17 @@
       right: 8px;
       width: 32px;
       height: 32px;
+      display: grid;
+      place-items: center;
       border: 1px solid var(--border);
       border-radius: 50%;
       background: var(--background);
       color: var(--foreground);
-      font-size: 23px;
       cursor: pointer;
+      transition: scale var(--dur-press) var(--ease-out);
+
+      svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+      &:active { scale: 0.92; }
     }
 
     .preview-image { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
@@ -232,16 +349,74 @@
     &::backdrop { background: rgb(0 0 0 / 0.4); }
   }
 
+  /* On touch it's a bottom sheet: it slides up, the backdrop fades, and it
+     can be dragged back down. */
   @media (hover: none), (pointer: coarse), (width < 40rem) {
-    .link-preview-trigger { width: 24px; height: 24px; }
     #link-preview {
       inset: auto 0 0 !important;
       width: 100%;
       max-height: 80dvh;
-      border-radius: 16px 16px 0 0;
+      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
       padding-bottom: env(safe-area-inset-bottom);
+      opacity: 1;
+      scale: 1;
+      translate: 0 100%;
+      transition:
+        translate 200ms var(--ease-in),
+        display 200ms allow-discrete,
+        overlay 200ms allow-discrete;
+
+      &[open] {
+        translate: 0 0;
+        transition: translate 320ms var(--ease-out);
+
+        @starting-style {
+          translate: 0 100%;
+        }
+      }
+
+      &[data-dragging] {
+        transition: none;
+      }
+
+      &::backdrop {
+        opacity: 0;
+        transition:
+          opacity 200ms ease,
+          display 200ms allow-discrete,
+          overlay 200ms allow-discrete;
+      }
+
+      &[open]::backdrop {
+        opacity: 1;
+
+        @starting-style {
+          opacity: 0;
+        }
+      }
+
+      .preview-handle {
+        position: absolute;
+        z-index: 2;
+        inset: 0 3.5rem auto;
+        display: block;
+        block-size: 24px;
+        touch-action: none;
+
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 8px auto auto 50%;
+          inline-size: 36px;
+          block-size: 4px;
+          border-radius: var(--radius-full);
+          background: color-mix(in oklab, var(--foreground) 25%, transparent);
+          translate: -50% 0;
+        }
+      }
+
       .preview-copy { padding: 24px; }
-      .preview-close { width: 40px; height: 40px; }
+      .preview-close { width: 44px; height: 44px; }
     }
   }
 </style>

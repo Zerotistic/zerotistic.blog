@@ -22,7 +22,7 @@ linkPreviews:
     description: "A POC||GTFO PDF cited in the comparison with earlier ELF research. The related-work section explains where this post differs."
   "https://compilepeace.medium.com/malware-engineering-part-0x1-that-magical-elf-5be3556ecb2b":
     title: "Malware Engineering Part 0x1 — That Magical ELF"
-    description: "Abhinav Thakur's earlier ELF write-up, included in the related-work comparison. Hosted on Medium."
+    description: "Abhinav Thakur’s earlier ELF write-up, included in the related-work comparison. Hosted on Medium."
   "https://reviews.llvm.org/D67482":
     title: "LLVM review D67482"
     description: "A toolchain discussion cited for legitimate uses of overlapping ranges on embedded targets. Background for the loader edge case, rather than an obfuscation technique."

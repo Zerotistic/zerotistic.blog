@@ -40,6 +40,7 @@ prose-content {
 
       svg:last-child {
         margin-inline-start: auto;
+        transition: rotate var(--dur-state) var(--ease-out);
       }
 
       > span {

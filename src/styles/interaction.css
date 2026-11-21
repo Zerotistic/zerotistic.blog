@@ -1,11 +1,33 @@
 @media (any-pointer: coarse) {
+  /* Radios in a segmented control already show their own moving
+     highlight; a tint on top reads as a second box. */
   :is(
       a[href],
-      button:enabled,
+      button:enabled:not([role="radio"]),
       summary,
       label:has(> input[type="checkbox"])
     ):is([data-pressed], :where(:focus-visible:active)) {
     background-color: var(--accent-muted);
     transition: none;
+  }
+}
+
+/* Disclosures open and close with a short height animation instead of
+   snapping. CVE findings animate in JS (finding-disclosure) and opt out. */
+@supports selector(::details-content) {
+  details:not(.finding-details) {
+    interpolate-size: allow-keywords;
+
+    &::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size var(--dur-state) var(--ease-out),
+        content-visibility var(--dur-state) allow-discrete;
+    }
+
+    &[open]::details-content {
+      block-size: auto;
+    }
   }
 }

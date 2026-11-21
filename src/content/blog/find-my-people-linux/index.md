@@ -1,6 +1,6 @@
 ---
 title: "Reverse-engineering Find My People to stalk ~~my ex~~ a friend, cause I can"
-description: "How I registered a Linux machine with Apple's private services, received an existing Find My People key over IDS, and decrypted the live location without a Mac."
+description: "How I registered a Linux machine with Apple’s private services, received an existing Find My People key over IDS, and decrypted the live location without a Mac."
 date: 2026-08-19
 authors:
   - zerotistic
@@ -15,7 +15,7 @@ facts:
 linkPreviews:
   "https://theapplewiki.com/wiki/Grand_Slam_Authentication":
     title: "GrandSlam authentication"
-    description: "The Apple Wiki's notes on Apple Account authentication. This is the account-login part of the Find My client, separate from fetching location reports."
+    description: "The Apple Wiki’s notes on Apple Account authentication. This is the account-login part of the Find My client, separate from fetching location reports."
 ---
 
 As it can often be, I was bored. I wanted to look into a complex system, and had no idea which. Me and a friend have been sharing our locations to each other's through Apple's "Find My". I asked if he was okay with me piping it into some dumb automations. He said yes, so the plan was to draw a few geofences around places he goes and make Discord announce whenever he arrived or left.

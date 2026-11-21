@@ -78,7 +78,7 @@ const href = `https://www.youtube.com/watch?v=${videoId}`
     aspect-ratio: 16 / 9;
     background: #111;
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: var(--radius-md);
   }
 
   .video-shell :global(.video-preview) {
@@ -121,11 +121,23 @@ const href = `https://www.youtube.com/watch?v=${videoId}`
     border-radius: 50%;
     background: rgb(0 0 0 / 0.7);
     transform: translate(-50%, -50%);
-    transition: background-color 160ms ease;
+    transition:
+      background-color var(--dur-hover) ease,
+      scale var(--dur-press) var(--ease-out);
   }
 
-  .video-shell :global(.video-preview:is(:hover, :focus-visible)) .play-symbol {
+  .video-shell :global(.video-preview:focus-visible) .play-symbol {
     background: #111;
+  }
+
+  .video-shell :global(.video-preview:active) .play-symbol {
+    scale: 0.92;
+  }
+
+  @media (hover: hover) {
+    .video-shell :global(.video-preview:hover) .play-symbol {
+      background: #111;
+    }
   }
 
   .preview-caption {

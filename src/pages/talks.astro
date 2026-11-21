@@ -29,7 +29,7 @@ import Layout from "@/layouts/Layout.astro"
                 <span class="talk-event">
                   {talk.eventHref ? (
                     <a href={talk.eventHref} target="_blank" rel="noopener noreferrer">
-                      {talk.event}<span class="link-arrow" aria-hidden="true"> ↗</span>
+                      {talk.event}<span class="link-arrow external" aria-hidden="true"> ↗</span>
                       <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                   ) : talk.event}
@@ -37,8 +37,11 @@ import Layout from "@/layouts/Layout.astro"
                 <time datetime={talk.date}>{talk.dateLabel}</time>
                 <span>{talk.location}</span>
                 <span class="talk-languages">
-                  {talk.languages.map(({ flag, label }) => (
-                    <span role="img" aria-label={label} title={label}>{flag}</span>
+                  {talk.languages.map(({ code, label }) => (
+                    <span class="language" data-tooltip={label}>
+                      <span aria-hidden="true">{code}</span>
+                      <span class="visually-hidden">{label}</span>
+                    </span>
                   ))}
                 </span>
               </div>
@@ -77,8 +80,8 @@ import Layout from "@/layouts/Layout.astro"
                         <rect x="2" y="5" width="20" height="14" rx="4" />
                         <path d="m10 9 5 3-5 3Z" />
                       </svg>
-                      <span>Watch on YouTube</span>
-                      <span class="link-arrow" aria-hidden="true">↗</span>
+                      <span class="link-label">Watch on YouTube</span>
+                      <span class="link-arrow external" aria-hidden="true">↗</span>
                       <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                   ) : (
@@ -87,7 +90,7 @@ import Layout from "@/layouts/Layout.astro"
                         <path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z" />
                         <path d="M14 3v5h5M9 12h6m-6 4h6" />
                       </svg>
-                      <span>Slides &amp; notes</span>
+                      <span class="link-label">Slides &amp; notes</span>
                       <span class="link-arrow" aria-hidden="true">→</span>
                     </a>
                   )}
@@ -138,9 +141,16 @@ import Layout from "@/layouts/Layout.astro"
 
   .talk-languages {
     display: inline-flex;
-    gap: var(--space-2xs);
-    font-size: 1rem;
-    line-height: 1;
+    gap: var(--space-3xs);
+  }
+
+  .language {
+    padding: 0.05rem 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--muted-foreground);
+    font-size: var(--text-caption);
+    line-height: 1.4;
   }
 
   h2 {
@@ -165,9 +175,9 @@ import Layout from "@/layouts/Layout.astro"
     aspect-ratio: 16 / 9;
     overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: var(--radius-md);
     background: #000;
-    transition: border-color 160ms ease;
+    transition: border-color var(--dur-hover) ease;
   }
 
   .slide-preview img {
@@ -177,8 +187,10 @@ import Layout from "@/layouts/Layout.astro"
     object-fit: contain;
   }
 
-  .slide-preview:hover {
-    border-color: var(--accent);
+  @media (hover: hover) {
+    .slide-preview:hover {
+      border-color: var(--accent);
+    }
   }
 
   .slide-preview:focus-visible {
@@ -211,27 +223,11 @@ import Layout from "@/layouts/Layout.astro"
     gap: var(--space-2xs);
     min-block-size: 2.75rem;
     color: var(--foreground);
-    text-decoration-color: var(--border);
-  }
-
-  .talk-links a:hover {
-    text-decoration-color: var(--accent);
   }
 
   .talk-links svg {
     flex: none;
     color: var(--muted-foreground);
-  }
-
-  .visually-hidden {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
   }
 
   @media (width < 40rem) {

@@ -3,8 +3,8 @@ import SocialIcons from "@/components/SocialIcons.astro"
 import Artoria from "@/components/Artoria.astro"
 import { SITE, SOCIALS } from "@/consts"
 
-type Props = { showArtoria?: boolean }
-const { showArtoria = true } = Astro.props
+type Props = { showArtoria?: boolean; showSocials?: boolean }
+const { showArtoria = true, showSocials = true } = Astro.props
 ---
 
 {showArtoria && <Artoria placement="footer" />}
@@ -12,7 +12,7 @@ const { showArtoria = true } = Astro.props
   <p>
     &copy; {new Date().getFullYear()} {SITE.title} · <a href="/rss.xml">rss</a>
   </p>
-  <SocialIcons links={SOCIALS} />
+  {showSocials && <SocialIcons links={SOCIALS} />}
 </footer>
 
 <style>
@@ -32,6 +32,12 @@ const { showArtoria = true } = Astro.props
       font-size: var(--text-meta);
       letter-spacing: 0;
       color: var(--muted-foreground);
+    }
+
+    /* Inline padding grows the target without moving the text. */
+    p a {
+      padding: 0.75rem 0.375rem;
+      margin-inline: -0.375rem;
     }
   }
 </style>

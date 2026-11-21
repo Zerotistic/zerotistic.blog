@@ -235,11 +235,13 @@ const findingAnchor = (id: string, product: string) =>
       color: var(--muted-foreground);
       text-decoration: none;
       font-size: var(--text-meta);
-      transition: background-color 0.15s ease;
+      transition: background-color var(--dur-hover) ease;
 
-      &:hover {
-        color: var(--foreground);
-        background-color: var(--row-hover);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+          background-color: var(--row-hover);
+        }
       }
 
       &[aria-current] {
@@ -526,8 +528,13 @@ const findingAnchor = (id: string, product: string) =>
     })
 
     const updateActiveProject = () => {
-      const offset =
-        (mobile.matches ? pickerBar.getBoundingClientRect().height : 0) + 32
+      // A project is current once its heading passes a line a third of the
+      // way down, so the index never names a section that has left the
+      // screen while the next one fills it.
+      const offset = Math.max(
+        (mobile.matches ? pickerBar.getBoundingClientRect().height : 0) + 32,
+        innerHeight * 0.35,
+      )
       let active = sections[0]
       for (const entry of sections) {
         if (entry.section.getBoundingClientRect().top <= offset) active = entry

@@ -45,8 +45,13 @@
   &:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 0.25rem;
-    border-radius: var(--radius-sm);
   }
+}
+
+/* Outlines follow each element's own radius. Only bare links, which have
+   no box to reshape, get a rounded ring. */
+:where(a:focus-visible) {
+  border-radius: var(--radius-sm);
 }
 
 ::selection {
@@ -54,16 +59,50 @@
   color: var(--foreground);
 }
 
+/* Code gets selected to be copied, so the exact range should be obvious:
+   a stronger tint, and syntax colors kept. */
+:is(pre, code)::selection,
+:is(pre, code) ::selection {
+  background-color: color-mix(in oklab, var(--accent) 38%, transparent);
+  color: inherit;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body {
-    transition: none;
+/* A theme change lands in one frame. ThemeToggle sets this attribute for
+   the switch; only the landscape keeps its slow crossfade (it's scenery)
+   and the toggle icon its swap. */
+:root[data-theme-switching] *:not(.avalon-landscape, light-icon, dark-icon),
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+  transition: none !important;
+}
+
+/* Dark mode should emit as little light as possible: photos, screenshots
+   and the companions are dimmed a little. SVG diagrams stay as drawn. */
+:root[data-theme="dark"] {
+  --image-dim: brightness(0.85) contrast(1.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --image-dim: brightness(0.85) contrast(1.05);
   }
+}
+
+:where(
+  prose-content :is(img:not([src$=".svg"]), video),
+  post-banner img,
+  .video-poster,
+  :is(.artoria, .mention-companion, .work-cheer, .work-jumping) > button,
+  .range-saber,
+  .cat-sticker,
+  .favorite-cover,
+  .vtuber-lineup img,
+  .collection-display img
+) {
+  filter: var(--image-dim, none);
 }

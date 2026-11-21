@@ -13,7 +13,8 @@ prose-content {
 
   :is(h2, h3, h4, h5, h6) {
     [data-heading-anchor] {
-      margin-inline-start: 0.5ch;
+      margin-inline-start: 0.25ch;
+      padding-inline: 0.25ch;
       color: var(--muted-foreground);
       text-decoration-line: none;
       opacity: 0;
@@ -22,13 +23,21 @@ prose-content {
         content: "#";
       }
 
-      &:hover {
-        color: var(--foreground);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
     }
 
-    &:is(:hover, :target, :focus-within) [data-heading-anchor] {
+    &:is(:target, :focus-within) [data-heading-anchor] {
       opacity: 1;
+    }
+
+    @media (hover: hover) {
+      &:hover [data-heading-anchor] {
+        opacity: 1;
+      }
     }
 
     @media (hover: none) {

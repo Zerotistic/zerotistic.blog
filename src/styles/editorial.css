@@ -10,32 +10,102 @@
 .editorial-row {
   margin-inline: calc(-1 * var(--row-inset));
   padding: var(--row-padding-block) var(--row-inset);
-  transition: background-color 160ms ease;
+  transition: background-color var(--dur-hover) ease;
 }
 
-.editorial-row:is(:hover, :focus-within) {
+/* Keyboard focus and real hover only. A tap leaves no sticky tint, and a
+   tapped summary keeping focus doesn't count as keyboard focus. */
+.editorial-row:has(:focus-visible) {
   background-color: var(--row-hover);
 }
 
-.editorial-row :is(a, summary):is(:hover, :focus-visible) {
+.editorial-row :is(a, summary):focus-visible {
   text-decoration-color: var(--accent);
 }
 
-.editorial-row:is(:hover, :focus-within) .row-title {
+.editorial-row:has(:focus-visible) .row-title {
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
 }
 
+@media (hover: hover) {
+  .editorial-row:hover {
+    background-color: var(--row-hover);
+  }
+
+  .editorial-row :is(a, summary):hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .editorial-row:hover .row-title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* Every arrow behaves the same: it lights up and nudges the way it points
+   (→ right, ↗ up and right, ← left). */
 .link-arrow {
   display: inline-block;
   flex-shrink: 0;
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  transition: color 160ms ease;
+  text-decoration: none;
+  transition:
+    color var(--dur-hover) ease,
+    translate var(--dur-state) var(--ease-out);
+
+  --nudge: 3px 0;
+
+  &.external {
+    --nudge: 2px -2px;
+  }
+
+  &.back {
+    --nudge: -3px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    --nudge: 0 0;
+  }
 }
 
-:is(a:hover, a:focus-visible, .editorial-row:hover, .editorial-row:focus-within) .link-arrow {
+:is(a:focus-visible, .editorial-row:has(:focus-visible)) .link-arrow {
   color: var(--accent);
+  translate: var(--nudge);
+}
+
+@media (hover: hover) {
+  :is(a:hover, .editorial-row:hover) .link-arrow {
+    color: var(--accent);
+    translate: var(--nudge);
+  }
+}
+
+/* Links laid out as icon, label and arrow: only the words are underlined,
+   never the gap or the arrow. Quiet by default, accent when pointed at. */
+a:has(> .link-label) {
+  text-decoration-line: none;
+}
+
+.link-label {
+  text-decoration-line: underline;
+  text-decoration-color: var(--label-underline, var(--border));
+  text-decoration-thickness: max(1px, 0.0625em);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--dur-hover) ease;
+}
+
+a:focus-visible > .link-label {
+  text-decoration-color: var(--accent);
+}
+
+@media (hover: hover) {
+  a:hover > .link-label {
+    text-decoration-color: var(--accent);
+  }
 }

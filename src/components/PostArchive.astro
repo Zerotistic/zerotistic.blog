@@ -39,10 +39,17 @@ const years = Map.groupBy(entries, ({ post }) =>
   section {
     display: block;
 
+    /* The year stays in view while you scroll through its posts. */
     h2 {
-      margin-block-end: var(--space-xs);
+      position: sticky;
+      top: var(--bar-nav-height, 0px);
+      z-index: 1;
+      margin-block: calc(-1 * var(--space-2xs))
+        calc(var(--space-xs) - var(--space-2xs));
+      padding-block: var(--space-2xs);
       font-variant-numeric: tabular-nums;
       color: var(--foreground);
+      background-color: var(--background);
     }
   }
 

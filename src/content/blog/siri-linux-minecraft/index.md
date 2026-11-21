@@ -1,6 +1,6 @@
 ---
 title: "Hey Siri, welcome to my Minecraft server"
-description: "A Minecraft chat command became a trip through Apple's ACE protocol, ARM64 emulation, and Siri's surprisingly complicated way of returning an answer."
+description: "A Minecraft chat command became a trip through Apple’s ACE protocol, ARM64 emulation, and Siri’s surprisingly complicated way of returning an answer."
 date: 2026-09-04
 authors:
   - zerotistic
@@ -16,15 +16,15 @@ facts:
 linkPreviews:
   "/posts/find-my-people-linux/":
     title: "The Find My People project"
-    description: "The Apple rabbit hole before this one. I'd hoped to reuse that client, but Siri ended up using a different protocol."
+    description: "The Apple rabbit hole before this one. I’d hoped to reuse that client, but Siri ended up using a different protocol."
   "https://theapplewiki.com/wiki/Siri_Protocol":
     title: "ACE: the old Siri protocol notes"
     description: "Where I found the ACE method name and compressed binary plists. Useful as a starting point, but the modern object format and authentication needed more work."
   "https://github.com/applidium/Cracking-Siri":
-    title: "Applidium's original Siri research"
-    description: "The 2011 work behind those protocol notes, from the iPhone 4S days. Don't expect it to connect to current Siri unchanged."
+    title: "Applidium’s original Siri research"
+    description: "The 2011 work behind those protocol notes, from the iPhone 4S days. Don’t expect it to connect to current Siri unchanged."
   "https://github.com/blacktop/ipsw":
-    title: "ipsw — extracting Apple's frameworks"
+    title: "ipsw — extracting Apple’s frameworks"
     description: "What I used to pull SiriCore out of the dyld shared cache and dump its Objective-C metadata. The method names made the reversing much less miserable."
 ---
 

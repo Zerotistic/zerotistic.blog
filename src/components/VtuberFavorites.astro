@@ -36,7 +36,7 @@ const favorites = [
   <div class="vtuber-intro">
     <h3 id="vtubers-heading">vtubers</h3>
     <p>
-      More anime girls. You knew this was coming. I watch VTubers too, and I'm
+      More anime girls. You knew this was coming. I watch VTubers too, and I’m
       especially fond of these three.
     </p>
   </div>
@@ -68,7 +68,7 @@ const favorites = [
             </span>
           </span>
           <span class="vtuber-caption">
-            <span class="vtuber-name">{name}<span class="channel-arrow" aria-hidden="true">↗</span></span>
+            <span class="vtuber-name">{name}<span class="channel-arrow link-arrow external" aria-hidden="true">↗</span></span>
             <span class="vtuber-agency">{agency}</span>
           </span>
         </a>
@@ -100,7 +100,7 @@ const favorites = [
 
   .vtuber-intro p {
     color: var(--prose-foreground);
-    font-size: var(--text-meta);
+    font-size: var(--step--1);
     line-height: 1.6;
     text-wrap: pretty;
   }
@@ -147,7 +147,7 @@ const favorites = [
   .vtuber-link:focus-visible {
     outline: 2px solid var(--talent-color);
     outline-offset: 6px;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
   }
 
   .portrait-stage {
@@ -177,7 +177,7 @@ const favorites = [
   .portrait-motion {
     position: absolute;
     inset: 0.5rem 0 0.25rem;
-    transition: transform 180ms ease;
+    transition: transform var(--dur-state) var(--ease-out);
     pointer-events: none;
   }
 
@@ -204,7 +204,7 @@ const favorites = [
   .vtuber-name {
     text-decoration: underline;
     text-decoration-color: color-mix(in oklab, var(--talent-color) 45%, transparent);
-    text-underline-offset: 0.3em;
+    text-underline-offset: 0.2em;
     text-decoration-thickness: 1px;
   }
 

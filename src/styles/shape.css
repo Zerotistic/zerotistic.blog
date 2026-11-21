@@ -18,4 +18,22 @@
   --blur-3xl: 64px;
 
   --aspect-video: 16 / 9;
+
+  /* One light source, straight above. Bigger blur and offset means higher.
+     Warm neutral instead of black; in dark mode overlays also get a faint
+     ring because a black shadow disappears on a near black page. */
+  --shadow-tint: light-dark(rgb(41 33 20 / 0.1), rgb(0 0 0 / 0.3));
+  --shadow-tint-strong: light-dark(rgb(41 33 20 / 0.16), rgb(0 0 0 / 0.45));
+  --shadow-sm: 0 1px 2px var(--shadow-tint);
+  --shadow-md:
+    0 1px 2px var(--shadow-tint),
+    0 4px 8px var(--shadow-tint);
+  --shadow-lg:
+    0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.06)),
+    0 2px 4px var(--shadow-tint),
+    0 12px 32px var(--shadow-tint-strong);
+
+  /* For cut out art, where a box shadow would outline the bounding box. */
+  --drop-sm: drop-shadow(0 1px 2px var(--shadow-tint));
+  --drop-md: drop-shadow(0 3px 4px var(--shadow-tint-strong));
 }

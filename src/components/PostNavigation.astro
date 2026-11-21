@@ -14,13 +14,13 @@ const { prev, next } = Astro.props
   <nav class="post-navigation" aria-label="More posts">
     {prev && (
       <a href={`/posts/${prev.id}`} rel="prev" class="older">
-        <span class="direction"><span aria-hidden="true">←</span> Older post</span>
+        <span class="direction"><span class="link-arrow back" aria-hidden="true">←</span> Older post</span>
         <span class="post-title" set:html={titleHtml(prev.data.title)} />
       </a>
     )}
     {next && (
       <a href={`/posts/${next.id}`} rel="next" class="newer">
-        <span class="direction">Newer post <span aria-hidden="true">→</span></span>
+        <span class="direction">Newer post <span class="link-arrow" aria-hidden="true">→</span></span>
         <span class="post-title" set:html={titleHtml(next.data.title)} />
       </a>
     )}
@@ -44,10 +44,18 @@ const { prev, next } = Astro.props
     min-block-size: 2.75rem;
     text-decoration: none;
 
-    &:is(:hover, :focus-visible) .post-title {
+    &:focus-visible .post-title {
       text-decoration: underline;
       text-decoration-color: var(--accent);
       text-underline-offset: 0.2em;
+    }
+
+    @media (hover: hover) {
+      &:hover .post-title {
+        text-decoration: underline;
+        text-decoration-color: var(--accent);
+        text-underline-offset: 0.2em;
+      }
     }
   }
 

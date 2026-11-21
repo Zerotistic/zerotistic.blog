@@ -163,7 +163,7 @@ const productData: Product[] = [
         id: "GHSA-9qpg-3cf8-w33x",
         title: "Stored cross-site scripting through XML uploads",
         summary:
-          "Uploaded XML files could execute JavaScript in the application's origin when opened, exposing users to stored cross-site scripting.",
+          "Uploaded XML files could execute JavaScript in the application’s origin when opened, exposing users to stored cross-site scripting.",
         published: "2026-09-18",
         score: "8.6",
         cvss: "4.0",
@@ -240,7 +240,7 @@ const productData: Product[] = [
         id: "CVE-2026-79721",
         title: "Arbitrary code execution through malicious model artifacts",
         summary:
-          "Loading a maliciously crafted model artifact could execute arbitrary code on an end user's system.",
+          "Loading a maliciously crafted model artifact could execute arbitrary code on an end user’s system.",
         published: "2026-09-08",
         score: "8.6",
         cvss: "4.0",
@@ -545,9 +545,9 @@ const productData: Product[] = [
     context: "Design-token build system",
     findings: [
       {
-        id: "CVE-2026-XXXX",
+        id: "GHSA-xmr7-549p-98w3",
         title:
-          "Prototype Pollution via constructor.prototype Bypasses CVE-2026-54639 Patch",
+          "Prototype pollution via constructor.prototype bypasses the CVE-2026-54639 patch",
         summary:
           "An attacker could exploit maliciously crafted token data to pollute object prototypes, potentially altering application behavior or data.",
         published: "2026-08-06",

@@ -295,7 +295,7 @@ const source = (name: string) => images[`/src/assets/optimized/newspaper/${name}
     inset-block-start: -0.6rem;
     padding: 0.4rem 0.65rem;
     border: 1px solid var(--border);
-    border-radius: 0.8rem 0.8rem 0.25rem 0.8rem;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-xl);
     background: var(--sand-2);
     color: var(--accent);
     font-family: var(--font-mono);
@@ -336,7 +336,7 @@ const source = (name: string) => images[`/src/assets/optimized/newspaper/${name}
     display: block;
     inline-size: 100%;
     overflow: visible;
-    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+    filter: var(--drop-sm);
   }
   .news-wing {
     fill: currentColor;

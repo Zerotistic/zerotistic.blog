@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "@/components/ThemeToggle.astro"
+import Search from "@/components/Search.astro"
 import Artoria from "@/components/Artoria.astro"
 import ScrollEdges from "@/components/ScrollEdges.astro"
 import { NAVIGATION, SITE } from "@/consts"
@@ -12,8 +13,10 @@ type Props = {
 
 const { crumbs = [], showArtoria = true } = Astro.props
 const pathname = normalizePath(Astro.url.pathname) || "/"
+// Tags have no index of their own, they live under posts.
+const sectionPath = pathname.startsWith("/tags/") ? "/posts/tags" : pathname
 const section = NAVIGATION.find(
-  ({ href }) => pathname === href || pathname.startsWith(`${href}/`),
+  ({ href }) => sectionPath === href || sectionPath.startsWith(`${href}/`),
 )
 ---
 
@@ -37,7 +40,12 @@ const section = NAVIGATION.find(
                       : undefined
                 }
               >
-                {item.label}
+                <span class="nav-label">
+                  {item.label}
+                  {item === section && (
+                    <span class="nav-marker" aria-hidden="true" />
+                  )}
+                </span>
               </a>
               {item === section && crumbs.length > 0 && pathname !== item.href && (
                 <ul>
@@ -74,6 +82,7 @@ const section = NAVIGATION.find(
     {showArtoria && <Artoria placement="sidebar" />}
   </sidebar-inner>
   <sidebar-toggle>
+    <Search />
     <ThemeToggle />
     <slot name="actions" />
   </sidebar-toggle>
@@ -153,10 +162,16 @@ const section = NAVIGATION.find(
         translate: 0 0.12em;
         background-color: var(--accent);
         animation: cursor-intro 1.2s steps(1) 2;
+
+        :global(:root[data-intro-played]) & {
+          animation: none;
+        }
       }
 
-      &:hover cursor-block {
-        animation: cursor-blink 1s steps(1) infinite;
+      @media (hover: hover) {
+        &:hover cursor-block {
+          animation: cursor-blink 1s steps(1) infinite;
+        }
       }
     }
 
@@ -203,23 +218,48 @@ const section = NAVIGATION.find(
   nav ul {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3xs);
 
+    /* Padding instead of a gap: no dead space between links. */
     a {
       display: block;
+      padding-block: calc(var(--space-3xs) / 2);
       font-family: var(--font-mono);
       font-size: var(--step--1);
       letter-spacing: 0;
       color: var(--muted-foreground);
 
-      &:hover,
       &[aria-current] {
         color: var(--foreground);
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
 
       &[aria-current] {
         text-decoration-color: var(--accent);
       }
+
+      /* The section's underline is a real element so it can travel to the
+         next section's link when the page changes. */
+      &:has(.nav-marker) {
+        text-decoration-color: transparent;
+      }
+    }
+
+    .nav-label {
+      position: relative;
+    }
+
+    .nav-marker {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0.02em;
+      block-size: max(1px, 0.0625em);
+      background: var(--accent);
+      view-transition-name: nav-marker;
     }
 
     li[data-depth="1"] a {
@@ -290,14 +330,17 @@ const section = NAVIGATION.find(
   }
 
   sidebar-toggle {
+    /* Pull the first icon's padding out so the glyph lines up with text. */
+    --icon-inset: calc((1rem - var(--icon-button-size)) / 2);
+
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    margin-inline-start: -0.5rem;
+    margin-inline-start: var(--icon-inset);
 
     @media (width < 64rem) {
       margin-inline-start: 0;
-      margin-inline-end: -0.5rem;
+      margin-inline-end: var(--icon-inset);
     }
 
     @media (width < 40rem) {

@@ -15,7 +15,7 @@ const { links } = Astro.props
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          title={label}
+          data-tooltip
         >
           <Icon aria-hidden="true" />
         </a>
@@ -26,14 +26,16 @@ const { links } = Astro.props
 <style>
   ul {
     display: flex;
-    margin-inline: -0.5rem;
+    margin-inline: calc((1.125rem - var(--icon-button-size)) / 2);
 
     li a {
       color: var(--muted-foreground);
       text-decoration: none;
 
-      &:hover {
-        color: var(--foreground);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
 
       svg {

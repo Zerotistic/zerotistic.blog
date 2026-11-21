@@ -14,7 +14,11 @@
   --font-weight-normal: 400;
   --font-weight-medium: 450;
 
-  --tracking-tight: -0.015em;
+  /* Tight tracking is for display sizes only. Body, mono and small text
+     keep the font's own spacing; small uppercase labels open up. */
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
+  --tracking-label: 0.06em;
   --leading-offset: 0.65rem;
 
   --prose-foreground: color-mix(in oklab, var(--foreground) 80%, transparent);
@@ -24,12 +28,9 @@
   --measure-overview: 54rem;
 }
 
-*,
-::before,
-::after,
-::backdrop,
-::file-selector-button {
-  letter-spacing: var(--tracking-tight);
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -37,23 +38,51 @@ body {
   text-wrap: pretty;
 }
 
+/* Plex Mono ships 400 and 500 only; never fake a bold or an italic. */
+:where(code, kbd, samp, pre) {
+  font-synthesis: none;
+}
+
+/* A struck phrase in a title is one joke; keep it on one line. */
+del {
+  white-space: nowrap;
+}
+
 :where(h1, h2, h3, h4, h5, h6) {
   text-wrap: balance;
+}
+
+:where(h1, h2) {
+  letter-spacing: var(--tracking-display);
+}
+
+:where(h3) {
+  letter-spacing: var(--tracking-heading);
 }
 
 a {
   text-decoration: underline;
   text-decoration-color: var(--underline, transparent);
   text-decoration-thickness: max(1px, 0.0625em);
-  text-decoration-skip-ink: none;
-  text-underline-position: under;
-  text-underline-offset: -0.06em;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 0.2em;
   transition:
-    text-decoration-color 0.15s ease,
-    color 0.15s ease;
+    text-decoration-color var(--dur-hover) ease,
+    color var(--dur-hover) ease;
 
-  &:hover {
-    text-decoration-color: currentColor;
+  /* A link inside running text needs a visible underline. UI links (rows,
+     nav, tabs, tags) carry their affordance another way and leave it off. */
+  p & {
+    text-decoration-color: var(
+      --underline,
+      color-mix(in oklab, currentColor 40%, transparent)
+    );
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-color: currentColor;
+    }
   }
 }
 

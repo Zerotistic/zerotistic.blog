@@ -24,6 +24,10 @@ export const titleHtml = (title: string) =>
     .replaceAll("'", "&#39;")
     .replace(titleStrikethrough, "<del>$1</del>")
 
+/** A post's title keeps one view-transition-name from list to article. */
+export const titleTransition = (id: string) =>
+  `view-transition-name: post-${id.replace(/[^a-z0-9-]/gi, "-")}`
+
 export const pageTitle = (title: string) =>
   `${titleText(title)} | ${SITE.title}`
 

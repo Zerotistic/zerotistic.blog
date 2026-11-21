@@ -12,7 +12,7 @@ export function initMentionNavigation(root: HTMLElement) {
     frame = 0
     const top = mobile.matches ? header.getBoundingClientRect().height : 0
     root.style.setProperty("--mentions-sticky-top", `${top}px`)
-    const threshold = top + nav.offsetHeight + 48
+    const threshold = Math.max(top + nav.offsetHeight + 48, innerHeight * 0.35)
     let selected = 0
     sections.forEach((section, index) => {
       if (section.getBoundingClientRect().top <= threshold) selected = index
@@ -24,6 +24,12 @@ export function initMentionNavigation(root: HTMLElement) {
       if (index === selected) link.setAttribute("aria-current", "location")
       else link.removeAttribute("aria-current")
     })
+    const current = links[selected]
+    nav.style.setProperty("--tab-x", `${current.offsetLeft}px`)
+    nav.style.setProperty("--tab-width", `${current.offsetWidth}px`)
+    // Place it first, then let later changes slide.
+    if (!nav.hasAttribute("data-ready"))
+      requestAnimationFrame(() => nav.setAttribute("data-ready", ""))
   }
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(update)

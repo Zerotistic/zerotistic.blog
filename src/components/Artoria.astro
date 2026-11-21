@@ -33,7 +33,7 @@ const investigating = pose.name === "investigating"
       ? `Say hello to Artoria: ${pose.name}`
       : "Say hello to Artoria"}
     aria-describedby={remarks.length ? `${id}-remark` : undefined}
-    title="Say hello to Artoria"
+    data-tooltip="Say hello to Artoria"
     disabled
   >
     {placement === "inline" ? (
@@ -204,7 +204,7 @@ const investigating = pose.name === "investigating"
     display: block;
     inline-size: 100%;
     overflow: visible;
-    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+    filter: var(--drop-sm);
   }
 
   .wing {
@@ -260,7 +260,8 @@ const investigating = pose.name === "investigating"
     margin-inline: auto;
     padding: 0.5rem 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 0.9rem 0.9rem 0.9rem 0.15rem;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl)
+      var(--radius-sm);
     background: var(--background);
     color: var(--muted-foreground);
     font-size: var(--step--1);

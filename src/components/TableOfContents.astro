@@ -1,5 +1,6 @@
 ---
 import ChevronIcon from "@/assets/icons/callouts/alt-arrow-down.svg"
+import DepthDial from "@/components/DepthDial.astro"
 import { titleHtml } from "@/lib/content"
 import type { MarkdownHeading } from "astro"
 
@@ -15,17 +16,29 @@ const { title, sections } = Astro.props
 ---
 
 <nav aria-label="Table of contents">
-  <p class="toc-kicker">On this page</p>
-  <label data-bar>
-    <input type="checkbox" aria-label="Toggle table of contents">
+  <button
+    class="toc-toggle"
+    type="button"
+    data-bar
+    aria-expanded="false"
+    aria-controls="toc-panel"
+  >
     <svg viewBox="0 0 16 16" aria-hidden="true">
       <circle cx="8" cy="8" r="6.5" />
       <circle cx="8" cy="8" r="6.5" transform="rotate(-90 8 8)" />
     </svg>
+    <span class="visually-hidden">Contents, current section: </span>
     <toc-current set:html={titleHtml(title)} />
+    <span class="toc-depth" hidden></span>
     <ChevronIcon aria-hidden="true" />
-  </label>
-  <ul data-bar>
+  </button>
+  <!-- The sticky column on desktop, the dropdown under the bar on phones. -->
+  <div class="toc-panel" id="toc-panel" data-bar>
+    <DepthDial />
+    <p class="toc-kicker">On this page</p>
+    <ul class="toc-list">
+    <li class="toc-indicator" aria-hidden="true"></li>
+    <li data-depth="2"><a href="#introduction">Introduction</a></li>
     {sections.map(({ id, label, open, headings }) =>
         id ? (
           <li data-group>
@@ -55,7 +68,8 @@ const { title, sections } = Astro.props
           ))
         ),
       )}
-  </ul>
+    </ul>
+  </div>
 </nav>
 
 <style>
@@ -63,7 +77,7 @@ const { title, sections } = Astro.props
     margin-block: 0 var(--space-s);
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    letter-spacing: 0.07em;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--muted-foreground);
 
@@ -91,20 +105,20 @@ const { title, sections } = Astro.props
     }
   }
 
-  label {
+  .toc-toggle {
     display: none;
 
     @media (width < 64rem) {
       display: flex;
+      inline-size: 100%;
       min-block-size: 2.75rem;
       align-items: center;
       gap: var(--space-2xs);
       cursor: pointer;
+      text-align: start;
 
-      input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
+      &:focus-visible {
+        outline-offset: -2px;
       }
 
       > svg:first-of-type {
@@ -126,6 +140,12 @@ const { title, sections } = Astro.props
               var(--circumference) *
               (1 - var(--progress, 0))
             );
+
+            /* Reading progress straight from the page scroll, no listener. */
+            @supports (animation-timeline: scroll()) {
+              animation: toc-progress linear both;
+              animation-timeline: scroll(root);
+            }
           }
         }
       }
@@ -139,6 +159,13 @@ const { title, sections } = Astro.props
         color: var(--muted-foreground);
       }
 
+      /* Says the post is folded, so a short page isn't a surprise. */
+      .toc-depth:not([hidden]) {
+        flex: none;
+        color: var(--accent);
+        font: var(--text-meta) / 1.4 var(--font-mono);
+      }
+
       > svg:last-of-type {
         flex-shrink: 0;
         inline-size: 1em;
@@ -148,20 +175,76 @@ const { title, sections } = Astro.props
     }
   }
 
-  nav:has(input:focus-visible) label {
-    @media (width < 64rem) {
-      outline: 2px solid var(--ring);
-      outline-offset: -2px;
+  @keyframes toc-progress {
+    from {
+      stroke-dashoffset: var(--circumference);
+    }
+    to {
+      stroke-dashoffset: 0;
     }
   }
 
-  nav:has(input:checked) label > svg:last-of-type {
+  .toc-toggle[aria-expanded="true"] > svg:last-of-type {
     @media (width < 64rem) {
       rotate: 180deg;
     }
   }
 
-  nav > ul {
+  /* One marker that slides to the current section, so it reads as the
+     same thing moving instead of bars blinking in and out. */
+  .toc-indicator {
+    display: none;
+
+    @media (width >= 64rem) {
+      display: block;
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: 0;
+      inline-size: 2px;
+      block-size: var(--indicator-size, 0px);
+      border-radius: var(--radius-full);
+      background: var(--accent);
+      opacity: 0;
+      translate: 0 var(--indicator-offset, 0px);
+      pointer-events: none;
+
+      &[data-placed] {
+        opacity: 1;
+      }
+
+      &[data-moving] {
+        transition:
+          translate var(--dur-state) var(--ease-out),
+          block-size var(--dur-state) var(--ease-out);
+      }
+    }
+  }
+
+  .toc-panel {
+    /* On desktop its children sit straight in the sticky column. */
+    display: contents;
+
+    @media (width < 64rem) {
+      display: none;
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      flex-direction: column;
+      max-block-size: 70svh;
+      /* A dropdown over text needs to be opaque, the blurred bar isn't. */
+      background-color: var(--background);
+      box-shadow: var(--shadow-lg);
+    }
+  }
+
+  nav:has(.toc-toggle[aria-expanded="true"]) .toc-panel {
+    @media (width < 64rem) {
+      display: flex;
+    }
+  }
+
+  .toc-list {
+    position: relative;
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -173,22 +256,12 @@ const { title, sections } = Astro.props
       padding-block: 2px;
     }
 
+    @media (width < 64rem) {
+      padding-block-end: var(--space-2xs);
+    }
+
     &::-webkit-scrollbar {
       display: none;
-    }
-
-    @media (width < 64rem) {
-      display: none;
-      position: absolute;
-      inset-block-start: 100%;
-      inset-inline: 0;
-      max-block-size: 30svh;
-    }
-  }
-
-  nav:has(input:checked) > ul {
-    @media (width < 64rem) {
-      display: flex;
     }
   }
 
@@ -200,32 +273,23 @@ const { title, sections } = Astro.props
     a {
       color: var(--muted-foreground);
       display: block;
-      position: relative;
       padding-block: 0.3rem;
       line-height: 1.45;
       text-decoration: none;
 
       @media (width >= 64rem) {
         padding-inline: 16px 6px;
-
-        &[aria-current="location"] {
-          font-weight: 550;
-
-          &::before {
-            content: "";
-            position: absolute;
-            inset-inline-start: 0;
-            inset-block: 0.35rem;
-            width: 2px;
-            border-radius: 2px;
-            background: var(--accent);
-          }
-        }
       }
 
-      &:hover,
+      /* Color only: a weight change widens the line and can rewrap it. */
       &[data-active] {
         color: var(--foreground);
+      }
+
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
     }
 
@@ -257,10 +321,13 @@ const { title, sections } = Astro.props
           inline-size: 1em;
           block-size: 1em;
           color: var(--muted-foreground);
+          transition: rotate var(--dur-state) var(--ease-out);
         }
 
-        &:hover svg {
-          color: var(--foreground);
+        @media (hover: hover) {
+          &:hover svg {
+            color: var(--foreground);
+          }
         }
       }
 
@@ -304,19 +371,22 @@ const { title, sections } = Astro.props
     const nav = document.querySelector<HTMLElement>("page-toc nav")
     if (!nav) return
 
-    const ring = nav.querySelector<SVGElement>("label svg")
+    const ring = nav.querySelector<SVGElement>(".toc-toggle svg")
     const mobile = matchMedia("(width < 64rem)")
-    const progress = () => {
-      if (!ring || !mobile.matches) return
-      const max = document.documentElement.scrollHeight - innerHeight
-      ring.style.setProperty(
-        "--progress",
-        String(max > 0 ? Math.min(scrollY / max, 1) : 0),
-      )
+    // Browsers with scroll-driven animations draw the ring in CSS.
+    if (!CSS.supports("animation-timeline: scroll()")) {
+      const progress = () => {
+        if (!ring || !mobile.matches) return
+        const max = document.documentElement.scrollHeight - innerHeight
+        ring.style.setProperty(
+          "--progress",
+          String(max > 0 ? Math.min(scrollY / max, 1) : 0),
+        )
+      }
+      addEventListener("scroll", progress, { passive: true })
+      mobile.addEventListener("change", progress)
+      progress()
     }
-    addEventListener("scroll", progress, { passive: true })
-    mobile.addEventListener("change", progress)
-    progress()
 
     const links = new Map(
       [...nav.querySelectorAll<HTMLAnchorElement>("a[href^='#']")].map((a) => [
@@ -325,10 +395,34 @@ const { title, sections } = Astro.props
       ]),
     )
     const articles = document.querySelectorAll("main article")
-    const list = nav.querySelector(":scope > ul")
+    const list = nav.querySelector<HTMLElement>(".toc-list")
+    const panel = nav.querySelector<HTMLElement>(".toc-panel")
     const currentLabel = nav.querySelector("toc-current")
-    const toggle = nav.querySelector<HTMLInputElement>("input")
+    const toggle = nav.querySelector<HTMLButtonElement>(".toc-toggle")
+    const indicator = nav.querySelector<HTMLElement>(".toc-indicator")
     if (articles.length === 0 || !list || links.size === 0) return
+
+    const isOpen = () => toggle?.getAttribute("aria-expanded") === "true"
+    const setOpen = (open: boolean) =>
+      toggle?.setAttribute("aria-expanded", String(open))
+
+    // Measured against the list so it scrolls along with it. The first
+    // placement jumps; after that it slides.
+    const placeIndicator = (link?: HTMLAnchorElement) => {
+      if (!indicator || mobile.matches) return
+      if (!link || !link.checkVisibility()) {
+        indicator.removeAttribute("data-placed")
+        return
+      }
+      const listTop = list.getBoundingClientRect().top - list.scrollTop
+      const box = link.getBoundingClientRect()
+      const inset = parseFloat(getComputedStyle(link).paddingBlockStart) * 0.5
+      indicator.style.setProperty("--indicator-offset", `${box.top - listTop + inset}px`)
+      indicator.style.setProperty("--indicator-size", `${box.height - 2 * inset}px`)
+      if (indicator.hasAttribute("data-placed")) indicator.setAttribute("data-moving", "")
+      else requestAnimationFrame(() => indicator.setAttribute("data-moving", ""))
+      indicator.setAttribute("data-placed", "")
+    }
 
     const fallback = currentLabel?.textContent ?? ""
 
@@ -383,17 +477,14 @@ const { title, sections } = Astro.props
       })
     }
 
-    toggle?.addEventListener("change", () => {
-      if (toggle.checked) center()
+    toggle?.addEventListener("click", () => {
+      setOpen(!isOpen())
+      if (isOpen()) center()
     })
 
     document.addEventListener("pointerdown", (event) => {
-      if (
-        mobile.matches &&
-        toggle?.checked &&
-        !event.composedPath().includes(nav)
-      ) {
-        toggle.checked = false
+      if (mobile.matches && isOpen() && !event.composedPath().includes(nav)) {
+        setOpen(false)
       }
     })
     document.addEventListener("keydown", (event) => {
@@ -401,22 +492,27 @@ const { title, sections } = Astro.props
         event.key !== "Escape" ||
         event.defaultPrevented ||
         !mobile.matches ||
-        !toggle?.checked
+        !isOpen()
       )
         return
       event.preventDefault()
-      toggle.checked = false
-      toggle.focus({ preventScroll: true })
+      setOpen(false)
+      toggle?.focus({ preventScroll: true })
     })
     mobile.addEventListener("change", () => {
-      if (!mobile.matches && toggle) toggle.checked = false
+      if (!mobile.matches) setOpen(false)
+      placeIndicator(list.querySelector<HTMLAnchorElement>("a[aria-current]") ?? undefined)
     })
 
-    list.addEventListener("click", (event) => {
-      if (toggle && (event.target as Element).closest?.("a")) {
-        toggle.checked = false
-      }
+    // Picking a section or a depth closes the dropdown so you see it apply.
+    panel?.addEventListener("click", (event) => {
+      if ((event.target as Element).closest?.("a, [data-level]")) setOpen(false)
     })
+
+    // Opening or closing a group moves the links below it.
+    list.addEventListener("toggle", () =>
+      placeIndicator(list.querySelector<HTMLAnchorElement>("a[aria-current]") ?? undefined),
+    true)
 
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -453,7 +549,9 @@ const { title, sections } = Astro.props
       firstActive?.setAttribute("aria-current", "location")
 
       if (currentLabel) {
-        const label = firstActive?.textContent?.trim() || fallback
+        // Before the first heading the bar keeps showing the post title.
+        const intro = firstActive?.hash === "#introduction"
+        const label = (!intro && firstActive?.textContent?.trim()) || fallback
         if (currentLabel.textContent !== label) currentLabel.textContent = label
       }
 
@@ -474,6 +572,7 @@ const { title, sections } = Astro.props
       }
       prevActive = activeIds
       if (grew) center()
+      placeIndicator(firstActive)
     })
 
     for (const block of sectionOf.keys()) observer.observe(block)

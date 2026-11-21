@@ -1,4 +1,11 @@
 <script>
+  import { haptic } from "@/lib/haptics"
+
+  document.addEventListener("click", (event) => {
+    if (event.target instanceof Element && event.target.closest(".expressive-code .copy button"))
+      haptic("success")
+  })
+
   type CodeBlock = { pre: HTMLElement; scroll: HTMLElement; visible: boolean }
   const blocks = new Map<Element, CodeBlock>()
   const pending = new Set<CodeBlock>()
@@ -10,12 +17,14 @@
     // blocks under content-visibility; reading their size would force layout.
     const measurements = [...pending].filter((block) => block.visible).map((block) => {
       const { scrollLeft, scrollWidth, clientWidth, scrollHeight, clientHeight } = block.pre
-      return { ...block, start: scrollLeft > 1, end: scrollWidth - clientWidth - scrollLeft > 1, overflowing: scrollWidth > clientWidth + 1 || scrollHeight > clientHeight + 1 }
+      const { scrollTop } = block.pre
+      return { ...block, start: scrollLeft > 1, end: scrollWidth - clientWidth - scrollLeft > 1, bottom: scrollHeight - clientHeight - scrollTop > 1, overflowing: scrollWidth > clientWidth + 1 || scrollHeight > clientHeight + 1 }
     })
     pending.clear()
-    for (const { pre, scroll, start, end, overflowing } of measurements) {
+    for (const { pre, scroll, start, end, bottom, overflowing } of measurements) {
       scroll.toggleAttribute("data-overflow-start", start)
       scroll.toggleAttribute("data-overflow-end", end)
+      scroll.toggleAttribute("data-overflow-bottom", bottom)
       pre.tabIndex = overflowing ? 0 : -1
       if (overflowing) pre.setAttribute("aria-label", "Scrollable code block")
       else pre.removeAttribute("aria-label")
@@ -76,34 +85,45 @@
 <style is:global>
   prose-content .expressive-code {
     .code-scroll {
-      position: relative;
       display: block;
       min-inline-size: 0;
+    }
 
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        inset-block: 1px;
-        inline-size: 1.25rem;
-        z-index: 1;
-        pointer-events: none;
-        opacity: 0;
+    /* Fade whichever edges hide more code. A mask fades the code itself,
+       so it works over the translucent code background. */
+    .code-scroll:is([data-overflow-start], [data-overflow-end], [data-overflow-bottom]) pre {
+      --fade: 1.5rem;
+      mask-image:
+        linear-gradient(
+          to right,
+          transparent,
+          #000 var(--fade-start, 0px),
+          #000 calc(100% - var(--fade-end, 0px)),
+          transparent
+        ),
+        linear-gradient(to bottom, #000 calc(100% - var(--fade-bottom, 0px)), transparent);
+      mask-composite: intersect;
+    }
+
+    .code-scroll[data-overflow-start] pre { --fade-start: var(--fade); }
+    .code-scroll[data-overflow-end] pre { --fade-end: var(--fade); }
+    .code-scroll[data-overflow-bottom] pre { --fade-bottom: calc(2 * var(--fade)); }
+
+    /* On a phone, wrapping splits identifiers mid token. Scroll sideways
+       instead, and give the line numbers' width back to the code. */
+    @media (width < 40rem) {
+      pre.wrap .ec-line .code {
+        white-space: pre;
+        padding-inline-start: var(--ec-codePadInl);
+        text-indent: 0;
       }
 
-      &::before {
-        inset-inline-start: 1px;
-        background: linear-gradient(to right, var(--background), transparent);
+      .ec-line .gutter {
+        display: none;
       }
 
-      &::after {
-        inset-inline-end: 1px;
-        background: linear-gradient(to left, var(--background), transparent);
-      }
-
-      &[data-overflow-start]::before,
-      &[data-overflow-end]::after {
-        opacity: 1;
+      .ec-line .gutter ~ .code {
+        --ecLineBrdCol: transparent;
       }
     }
 
@@ -130,10 +150,37 @@
       opacity: 1;
     }
 
+    /* Copying turns the icon into a check right where you clicked. The
+       "Copied" text stays in the live region for screen readers only. */
     .copy .feedback {
-      --tooltip-bg: var(--foreground);
-      color: var(--background);
-      font-family: var(--font-mono);
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .copy:has(.feedback.show) button {
+      opacity: 1;
+
+      &::after {
+        background-color: var(--foreground);
+        -webkit-mask-image: var(--check-icon);
+        mask-image: var(--check-icon);
+        animation: copy-confirm var(--dur-state) var(--ease-out);
+      }
+    }
+
+    .copy button {
+      --check-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+
+      transition-property: opacity, background, border-color, scale;
+
+      &:active {
+        scale: 0.92;
+      }
     }
 
     @media (any-pointer: coarse), (hover: none) {

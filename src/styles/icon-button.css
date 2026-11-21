@@ -1,18 +1,73 @@
+:root {
+  --icon-button-size: 2rem;
+
+  /* Fingers need a real 44px target. */
+  @media (any-pointer: coarse) {
+    --icon-button-size: 2.75rem;
+  }
+}
+
 [data-icon-button] {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: var(--icon-button-size);
+  height: var(--icon-button-size);
   border-radius: var(--radius-md);
   cursor: pointer;
+  transition:
+    background-color var(--dur-hover) ease,
+    scale var(--dur-press) var(--ease-out);
 
-  &:hover {
-    background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+  /* Taller hit area with a mouse. Neighbors sit side by side, so it only
+     grows vertically and never overlaps them. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+    }
+  }
+
+  &:active {
+    scale: 0.94;
   }
 
   svg {
     width: 1rem;
     height: 1rem;
+  }
+}
+
+/* Two icons sharing one cell: the second replaces the first with a cross
+   fade (scale up from 0.25, unblur) when [data-swapped] is set. */
+[data-icon-swap] {
+  display: inline-grid;
+  place-items: center;
+
+  > svg {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dur-state) var(--ease-out),
+      scale var(--dur-state) var(--ease-out),
+      filter var(--dur-state) var(--ease-out);
+  }
+
+  > svg:last-child,
+  &[data-swapped] > svg:first-child {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+
+  &[data-swapped] > svg:last-child {
+    opacity: 1;
+    scale: 1;
+    filter: none;
   }
 }

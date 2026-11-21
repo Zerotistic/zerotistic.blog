@@ -1,0 +1,33 @@
+/* Moving between pages: the sidebar and the scenery stay put, the nav's
+   underline travels to the new section, a post's title moves from the list
+   into the article heading, and the rest crossfades. Browsers without cross
+   document view transitions navigate as before. */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+page-nav {
+  view-transition-name: site-nav;
+}
+
+.avalon-scene {
+  view-transition-name: scenery;
+}
+
+::view-transition-group(*) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-group(nav-marker) {
+  animation-duration: 380ms;
+}
+
+/* Everything else: a quick crossfade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}

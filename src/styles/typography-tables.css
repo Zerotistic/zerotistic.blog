@@ -11,6 +11,7 @@ prose-content {
     margin-inline: auto;
     overflow-x: auto;
     font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
 
     thead {
       border-block-end: 1.5px solid var(--table-border);
@@ -29,7 +30,7 @@ prose-content {
     }
 
     :is(th, td) {
-      min-width: 10rem;
+      min-width: 7ch;
       max-width: 22rem;
     }
 

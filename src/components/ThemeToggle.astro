@@ -3,7 +3,7 @@ import MoonIcon from "@/assets/icons/moon.svg"
 import SunIcon from "@/assets/icons/sun.svg"
 ---
 
-<button id="theme-toggle" data-icon-button aria-label="Toggle theme">
+<button id="theme-toggle" data-icon-button data-tooltip aria-label="Switch theme">
   <light-icon><SunIcon /></light-icon>
   <dark-icon><MoonIcon /></dark-icon>
 </button>
@@ -17,45 +17,109 @@ import SunIcon from "@/assets/icons/sun.svg"
     color-scheme: dark;
   }
 
-  dark-icon {
-    display: none;
+  #theme-toggle {
+    display: inline-grid;
+
+    /* Both icons share one cell and cross fade, so the swap reads as one
+       icon changing instead of a hard cut. */
+    > * {
+      grid-area: 1 / 1;
+      display: grid;
+      place-items: center;
+      transition:
+        opacity var(--dur-state) var(--ease-out),
+        scale var(--dur-state) var(--ease-out),
+        filter var(--dur-state) var(--ease-out);
+    }
   }
 
-  :root[data-theme="dark"] {
-    light-icon {
-      display: none;
-    }
+  dark-icon,
+  :root[data-theme="dark"] light-icon {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
 
-    dark-icon {
-      display: inline;
-    }
+  :root[data-theme="dark"] dark-icon {
+    opacity: 1;
+    scale: 1;
+    filter: none;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
       light-icon {
-        display: none;
+        opacity: 0;
+        scale: 0.25;
+        filter: blur(4px);
       }
 
       dark-icon {
-        display: inline;
+        opacity: 1;
+        scale: 1;
+        filter: none;
       }
     }
   }
 </style>
 
 <script>
-  const toggleTheme = () => {
-    const root = document.documentElement
-    const dark =
-      root.dataset.theme === "dark" ||
-      (!root.dataset.theme &&
-        matchMedia("(prefers-color-scheme: dark)").matches)
-    const theme = dark ? "light" : "dark"
-    root.dataset.theme = theme
-    try { localStorage.theme = theme } catch {}
+  import { haptic } from "@/lib/haptics"
+
+  const root = document.documentElement
+  const system = matchMedia("(prefers-color-scheme: dark)")
+  const button = document.getElementById("theme-toggle")
+
+  const isDark = () =>
+    root.dataset.theme === "dark" || (!root.dataset.theme && system.matches)
+
+  const label = () =>
+    button?.setAttribute(
+      "aria-label",
+      isDark() ? "Switch to light theme" : "Switch to dark theme",
+    )
+
+  // Swap colors in a single frame: no element gets to transition its own
+  // color at its own speed while the theme changes.
+  const withoutTransitions = (change: () => void) => {
+    root.setAttribute("data-theme-switching", "")
+    change()
+    void getComputedStyle(root).color
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => root.removeAttribute("data-theme-switching")),
+    )
   }
 
-  const button = document.getElementById("theme-toggle")
-  if (button) button.onclick = toggleTheme
+  // `null` follows the operating system again.
+  const apply = (theme: "light" | "dark" | null) =>
+    withoutTransitions(() => {
+      if (theme) root.dataset.theme = theme
+      else delete root.dataset.theme
+      label()
+    })
+
+  button?.addEventListener("click", () => {
+    haptic("light")
+    const next = isDark() ? "light" : "dark"
+    // Picking what the OS already asks for means "follow the OS" again,
+    // so a later system change still applies.
+    const matchesSystem = (next === "dark") === system.matches
+    try {
+      if (matchesSystem) localStorage.removeItem("theme")
+      else localStorage.theme = next
+    } catch {}
+    apply(matchesSystem ? null : next)
+  })
+
+  addEventListener("storage", (event) => {
+    if (event.key !== "theme") return
+    const theme = event.newValue
+    apply(theme === "light" || theme === "dark" ? theme : null)
+  })
+
+  system.addEventListener("change", () => {
+    if (!root.dataset.theme) withoutTransitions(label)
+  })
+
+  label()
 </script>

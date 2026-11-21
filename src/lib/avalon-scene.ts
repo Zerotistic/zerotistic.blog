@@ -1,4 +1,4 @@
-import { motionRunning, observeMotion } from "./ambient-motion"
+import { motionRunning, observeMotion, readerBusy } from "./ambient-motion"
 
 // Fixed, repeatable variation keeps the particles stable through resizes.
 const noise = (seed: number) => {
@@ -7,6 +7,20 @@ const noise = (seed: number) => {
 }
 const tau = Math.PI * 2
 const visitorClockKey = "avalon-visitor-remaining"
+const sceneClockKey = "avalon-scene-clock"
+
+// The motes are a function of the scene's clock. Carrying the clock from
+// page to page keeps them where they were, so moving around the site never
+// resets the world in the margins.
+function savedSceneTime() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(sceneClockKey) ?? "null")
+    const elapsed = (Date.now() - saved?.at) / 1000
+    if (Number.isFinite(saved?.time) && elapsed >= 0 && elapsed < 60)
+      return saved.time + elapsed
+  } catch {}
+  return 0
+}
 
 // Count visible browsing time across pages, independently of the scene's clock.
 function remainingVisitDelay() {
@@ -26,19 +40,30 @@ function remainingVisitDelay() {
   return 10
 }
 
-export function initAvalon(canvas: HTMLCanvasElement) {
-  const context = canvas.getContext("2d")
-  if (!context) return
-  const ctx = context
+// The scene only ever draws in the two margins beside the content, so it
+// gets one canvas per margin instead of a full viewport backing store.
+export function initAvalon(
+  scene: HTMLElement,
+  leftCanvas: HTMLCanvasElement,
+  rightCanvas: HTMLCanvasElement,
+) {
+  const leftContext = leftCanvas.getContext("2d")
+  const rightContext = rightCanvas.getContext("2d")
+  if (!leftContext || !rightContext) return
+  // Re-bound so the hoisted drawing functions below see them as non-null.
+  const left = leftContext
+  const right = rightContext
   let width = 0
   let height = 0
   let edge = 0
-  let time = 0
+  let strip = 0
+  let time = savedSceneTime()
   let lastFrame = 0
   let raf = 0
+  let timer = 0
   let night = 0
   let targetNight = 0
-  let nextVisit = remainingVisitDelay()
+  let nextVisit = time + remainingVisitDelay()
   let visitorStart = -100
   let pixelRatio = 0
   // Reuse one glow texture instead of constructing a gradient for every
@@ -75,23 +100,38 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   }))
 
   const resize = () => {
-    const nextWidth = canvas.clientWidth
-    const nextHeight = canvas.clientHeight
+    const nextWidth = scene.clientWidth
+    const nextHeight = scene.clientHeight
     const ratio = Math.min(devicePixelRatio || 1, 2)
     if (width === nextWidth && height === nextHeight && pixelRatio === ratio)
       return
     width = nextWidth
     height = nextHeight
     pixelRatio = ratio
-    canvas.width = Math.round(width * ratio)
-    canvas.height = Math.round(height * ratio)
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
     edge =
       width >= 1280
         ? Math.max(70, (width - 1215) / 2 + 85)
         : width >= 1024
           ? 28
           : 12
+    strip = Math.min(width / 2, Math.ceil(edge + 32))
+    scene.style.setProperty("--avalon-strip", `${strip}px`)
+    for (const canvas of [leftCanvas, rightCanvas]) {
+      canvas.width = Math.round(strip * ratio)
+      canvas.height = Math.round(height * ratio)
+    }
+    // Both draw in page coordinates; the right one is shifted into place.
+    left.setTransform(ratio, 0, 0, ratio, 0, 0)
+    right.setTransform(ratio, 0, 0, ratio, -(width - strip) * ratio, 0)
+    update()
+  }
+  const clear = () => {
+    for (const ctx of [left, right]) {
+      ctx.save()
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      ctx.restore()
+    }
   }
   const theme = () => {
     const preference = document.documentElement.dataset.theme
@@ -100,17 +140,17 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   }
 
   function motes() {
-    const count = width < 1024 ? 6 : particles.length
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < particles.length; i++) {
       const p = particles[i]
       const drift =
         Math.sin(time * 0.16 * p.speed + p.phase) * Math.min(18, edge / 3)
       const rawX = 4 + p.x * Math.max(1, edge - 12) + drift
       const x = p.side < 0 ? rawX : width - rawX
+      const ctx = p.side < 0 ? left : right
       const y = height * (0.26 + ((p.y + time * 0.003 * p.speed) % 0.74))
       const pulse = Math.pow((Math.sin(time * p.speed + p.phase) + 1) / 2, 2)
       const alpha = 0.12 + pulse * 0.38
-      ctx.globalAlpha = alpha * (width < 1024 ? 0.6 : 1)
+      ctx.globalAlpha = alpha
       if (night > 0.01) {
         const opacity = ctx.globalAlpha
         const radius = p.size * 4.5
@@ -130,8 +170,8 @@ export function initAvalon(canvas: HTMLCanvasElement) {
         tau,
       )
       ctx.fill()
+      ctx.globalAlpha = 1
     }
-    ctx.globalAlpha = 1
   }
 
   // A visitor for pages without a visible companion.
@@ -145,6 +185,7 @@ export function initAvalon(canvas: HTMLCanvasElement) {
       Math.sin(progress * Math.PI) * 130 +
       Math.sin(time * 2) * 4
     const flap = 0.25 + Math.abs(Math.sin(time * 13)) * 0.75
+    const ctx = left
     ctx.save()
     ctx.translate(x, y)
     ctx.rotate(Math.sin(time * 1.3) * 0.25)
@@ -167,35 +208,47 @@ export function initAvalon(canvas: HTMLCanvasElement) {
     ctx.restore()
   }
 
+  // 30 frames a second is plenty for drifting motes. A timer between frames
+  // means a 120Hz display isn't woken 120 times a second to skip most of them.
   const frame = (now: number) => {
-    raf = requestAnimationFrame(frame)
-    if (now - lastFrame < 1000 / 30) return
+    raf = 0
     const dt = lastFrame ? Math.min((now - lastFrame) / 1000, 0.1) : 0
     lastFrame = now
     time += dt
     night += (targetNight - night) * Math.min(1, dt * 2)
-    // All moving details stay at the edges. Leave the empty center untouched.
-    const strip = Math.min(width / 2, Math.ceil(edge + 32))
-    ctx.clearRect(0, 0, strip, height)
-    ctx.clearRect(width - strip, 0, strip, height)
+    clear()
     motes()
     visitor()
     if (time >= nextVisit) {
-      const event = new CustomEvent("avalon-visit", { cancelable: true })
-      if (document.dispatchEvent(event)) visitorStart = time
+      // Someone deep in an article doesn't need a butterfly in the margin.
+      if (!readerBusy()) {
+        const event = new CustomEvent("avalon-visit", { cancelable: true })
+        if (document.dispatchEvent(event)) visitorStart = time
+      }
       scheduleNextVisit()
     }
+    timer = window.setTimeout(
+      () => {
+        timer = 0
+        raf = requestAnimationFrame(frame)
+      },
+      Math.max(0, 1000 / 30 - (performance.now() - now)),
+    )
   }
 
-  const update = () => {
-    if (motionRunning() && !raf) {
+  // Below 1024px the margins are 12px wide: not worth a running loop.
+  const running = () => motionRunning() && width >= 1024
+  function update() {
+    if (running() && !raf && !timer) {
       lastFrame = 0
       raf = requestAnimationFrame(frame)
-    } else if (!motionRunning()) {
+    } else if (!running()) {
       saveVisitDelay()
       cancelAnimationFrame(raf)
+      clearTimeout(timer)
       raf = 0
-      ctx.clearRect(0, 0, width, height)
+      timer = 0
+      clear()
     }
   }
 
@@ -203,7 +256,7 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   theme()
   night = targetNight
   const resizeObserver = new ResizeObserver(resize)
-  resizeObserver.observe(canvas)
+  resizeObserver.observe(scene)
   const themeObserver = new MutationObserver(theme)
   themeObserver.observe(document.documentElement, {
     attributes: true,
@@ -212,6 +265,14 @@ export function initAvalon(canvas: HTMLCanvasElement) {
   themeQuery.addEventListener("change", theme)
   document.addEventListener("avalon-visitor-started", scheduleNextVisit)
   addEventListener("pagehide", saveVisitDelay)
+  addEventListener("pagehide", () => {
+    try {
+      sessionStorage.setItem(
+        sceneClockKey,
+        JSON.stringify({ time, at: Date.now() }),
+      )
+    } catch {}
+  })
   addEventListener("pageshow", (event) => {
     if (!event.persisted) return
     nextVisit = time + remainingVisitDelay()

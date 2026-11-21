@@ -14,7 +14,7 @@ import { SOCIALS } from "@/consts"
       >
         <Icon class="contact-logo" aria-hidden="true" />
         <span class="contact-platform">
-          {label} <span class="contact-arrow" aria-hidden="true">↗</span>
+          {label} <span class="contact-arrow link-arrow external" aria-hidden="true">↗</span>
         </span>
         <span class="contact-handle">{handle}</span>
       </a>
@@ -46,18 +46,28 @@ import { SOCIALS } from "@/consts"
     padding-block: 0.125rem;
     color: var(--foreground);
     text-decoration: none;
-    transition: color 160ms ease;
+    transition: color var(--dur-hover) ease;
 
-    &:hover,
     &:focus-visible {
       color: var(--accent);
     }
 
-    &:hover .contact-platform,
     &:focus-visible .contact-platform {
       text-decoration: underline;
       text-decoration-thickness: 1px;
-      text-underline-offset: 0.25em;
+      text-underline-offset: 0.2em;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--accent);
+      }
+
+      &:hover .contact-platform {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.2em;
+      }
     }
 
     &:focus-visible {
@@ -90,11 +100,6 @@ import { SOCIALS } from "@/consts"
     color: var(--muted-foreground);
     font-size: 0.75rem;
     line-height: 1;
-  }
-
-  .contact-link:hover .contact-arrow,
-  .contact-link:focus-visible .contact-arrow {
-    color: var(--accent);
   }
 
   .contact-handle {

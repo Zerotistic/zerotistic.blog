@@ -11,3 +11,13 @@ export function observeMotion(callback: () => void) {
     document.removeEventListener("visibilitychange", callback)
   }
 }
+
+/**
+ * On an article, once the reader is past its header, unprompted motion
+ * (visitors, idle plays) waits. Things still answer when poked.
+ */
+export const readerBusy = () => {
+  if (!document.querySelector("page-grid.reading")) return false
+  const header = document.querySelector("main article header")
+  return !!header && header.getBoundingClientRect().bottom < 0
+}

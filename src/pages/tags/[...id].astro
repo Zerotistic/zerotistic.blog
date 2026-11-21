@@ -20,13 +20,7 @@ const { tag, posts } = Astro.props
 const series = await getSubposts()
 ---
 
-<Layout
-  wide
-  crumbs={[
-    { label: "Tags", href: "/tags" },
-    { label: `#${tag}`, href: `/tags/${tag}` },
-  ]}
->
+<Layout wide crumbs={[{ label: `#${tag}`, href: `/tags/${tag}` }]}>
   <MetaPage
     slot="head"
     title={`Posts tagged "${tag}"`}

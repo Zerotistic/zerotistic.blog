@@ -27,7 +27,7 @@ export const ecOptions: SatteriExpressiveCodeOptions = {
     codeFontFamily: "var(--font-mono)",
     codeBackground: "color-mix(in oklab, var(--muted) 25%, transparent)",
     borderColor: "var(--border)",
-    borderRadius: "0",
+    borderRadius: "0.375rem",
     uiFontFamily: "var(--font-sans)",
     lineNumbers: {
       foreground: "var(--muted-foreground)",

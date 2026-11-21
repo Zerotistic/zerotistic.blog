@@ -55,7 +55,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
         <p class="entry-date">
           {entry.kind === "team" && <span class="date-qualifier">around</span>}
           <time datetime={entry.date}>
-            <span class={startsYear ? "entry-year year-marker" : "sr-only"}>{year}{!startsYear && " "}</span>
+            <span class={startsYear ? "entry-year year-marker" : "visually-hidden"}>{year}{!startsYear && " "}</span>
             {entry.month && <span class="entry-month">{entry.month}</span>}
           </time>
         </p>
@@ -133,7 +133,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={entry.title + " " + entry.date.slice(0, 4) + ": " + entry.result + ". Results (opens in a new tab)"}
-                >{entry.result}<span aria-hidden="true">↗</span></a>
+                ><span class="link-label">{entry.result}</span><span class="link-arrow external" aria-hidden="true">↗</span></a>
               </div>
               <p class="event-meta">
                 <span class="event-context">
@@ -149,8 +149,8 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
                       target={linkExternal ? "_blank" : undefined}
                       rel={linkExternal ? "noopener noreferrer" : undefined}
                     >
-                      {entry.link.label}<span aria-hidden="true">{linkExternal ? "↗" : "→"}</span>
-                      {linkExternal && <span class="sr-only"> (opens in a new tab)</span>}
+                      <span class="link-label">{entry.link.label}</span><span class:list={["link-arrow", { external: linkExternal }]} aria-hidden="true">{linkExternal ? "↗" : "→"}</span>
+                      {linkExternal && <span class="visually-hidden"> (opens in a new tab)</span>}
                     </a>
                   </>
                 )}
@@ -349,7 +349,7 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
     inline-size: 1.5rem;
     block-size: 1.5rem;
     object-fit: contain;
-    border-radius: 0.125rem;
+    border-radius: var(--radius-xs);
   }
 
   .event-note,
@@ -401,6 +401,11 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
 
   .event-result,
   .event-link {
+    --label-underline: var(
+      --underline,
+      color-mix(in oklab, currentColor 40%, transparent)
+    );
+
     display: inline-flex;
     align-items: center;
     gap: var(--space-3xs);
@@ -467,16 +472,6 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
     color: var(--muted-foreground);
     font-size: var(--text-meta);
     line-height: 1.5;
-  }
-
-  .sr-only {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   @media (width < 40rem) {

@@ -92,7 +92,7 @@ const { saber } = Astro.props
 
   .music-art {
     block-size: auto;
-    filter: drop-shadow(1px 4px 3px rgb(0 0 0 / 0.12));
+    filter: var(--drop-md);
   }
 
   .record-sleeve {
@@ -129,10 +129,10 @@ const { saber } = Astro.props
   }
 
   h3 {
-    margin-block-end: var(--space-xs);
+    margin-block-end: var(--space-2xs);
     color: var(--muted-foreground);
     font-family: var(--font-mono);
-    font-size: var(--step--1);
+    font-size: var(--text-caption);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
     letter-spacing: 0;
@@ -140,7 +140,7 @@ const { saber } = Astro.props
 
   p {
     color: var(--prose-foreground);
-    font-size: var(--step-0);
+    font-size: var(--step--1);
     line-height: 1.6;
   }
 

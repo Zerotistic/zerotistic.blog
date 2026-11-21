@@ -1,17 +1,53 @@
 <dialog class="image-viewer" aria-label="Enlarged image">
-  <button type="button" class="image-viewer-close" aria-label="Close enlarged image" autofocus>×</button>
+  <button type="button" class="image-viewer-close" aria-label="Close enlarged image" autofocus>
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8m0-8-8 8" /></svg>
+  </button>
   <img alt="" />
 </dialog>
 
 <script>
+  import { closeOnBack } from "@/lib/overlay-history"
+
   const viewer = document.querySelector<HTMLDialogElement>(".image-viewer")!
   const enlarged = viewer.querySelector("img")!
   const close = viewer.querySelector("button")!
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
   let previousOverflow = ""
+  let source: HTMLImageElement | undefined
 
-  close.addEventListener("click", () => viewer.close())
+  // The enlarged image grows out of the one in the article and shrinks back
+  // into it, so it's clear where it came from and where it went.
+  const morph = (update: () => void | Promise<void>, from?: HTMLImageElement, to?: HTMLImageElement) => {
+    if (!document.startViewTransition || reducedMotion.matches || !from || !to) {
+      void update()
+      return
+    }
+    from.style.viewTransitionName = "enlarged-image"
+    const transition = document.startViewTransition(async () => {
+      from.style.viewTransitionName = ""
+      to.style.viewTransitionName = "enlarged-image"
+      await update()
+    })
+    transition.finished.finally(() => {
+      to.style.viewTransitionName = ""
+    })
+  }
+
+  const shut = () => {
+    if (!viewer.open) return
+    morph(() => viewer.close(), enlarged, source)
+  }
+
+  const back = closeOnBack(viewer, shut)
+
+  // Clicking anywhere, the picture included, puts it back.
   viewer.addEventListener("click", (event) => {
-    if (event.target === viewer) viewer.close()
+    if (event.target !== close && !close.contains(event.target as Node)) shut()
+  })
+  close.addEventListener("click", shut)
+  viewer.addEventListener("cancel", (event) => {
+    event.preventDefault()
+    shut()
   })
   viewer.addEventListener("close", () => {
     document.documentElement.style.overflow = previousOverflow
@@ -21,8 +57,8 @@
   document.querySelectorAll<HTMLImageElement>("prose-content img").forEach((img) => {
     // Keep links, diagrams, and decorative illustrations behaving as authored.
     if (img.closest("a, button, .siri-demo, .siri-phone-illustration")) return
-    const source = decodeURIComponent(img.currentSrc || img.src)
-    if (/\.svg(?:[?&#]|$)/i.test(source)) return
+    const src = decodeURIComponent(img.currentSrc || img.src)
+    if (/\.svg(?:[?&#]|$)/i.test(src)) return
     const trigger = document.createElement("button")
     trigger.type = "button"
     trigger.className = "image-enlarge"
@@ -30,11 +66,16 @@
     img.before(trigger)
     trigger.append(img)
     trigger.addEventListener("click", () => {
-      enlarged.src = img.currentSrc || img.src
+      source = img
       enlarged.alt = img.alt
-      previousOverflow = document.documentElement.style.overflow
-      viewer.showModal()
-      document.documentElement.style.overflow = "hidden"
+      morph(async () => {
+        enlarged.src = img.currentSrc || img.src
+        previousOverflow = document.documentElement.style.overflow
+        viewer.showModal()
+        document.documentElement.style.overflow = "hidden"
+        back.opened()
+        await enlarged.decode().catch(() => {})
+      }, img, enlarged)
     })
   })
 </script>
@@ -72,6 +113,7 @@
     background: rgb(10 11 14 / 0.95);
     color: white;
     overflow: auto;
+    cursor: zoom-out;
   }
 
   .image-viewer[open] {
@@ -91,17 +133,37 @@
     object-fit: contain;
   }
 
+  ::view-transition-group(enlarged-image) {
+    animation-duration: 320ms;
+    animation-timing-function: var(--ease-out);
+  }
+
   .image-viewer-close {
     position: fixed;
     top: 12px;
     right: 16px;
+    display: grid;
+    place-items: center;
     width: 44px;
     height: 44px;
     border: 1px solid #646770;
     border-radius: 50%;
     background: #24262c;
     color: white;
-    font-size: 30px;
     cursor: pointer;
+    transition: scale var(--dur-press) var(--ease-out);
+
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+    }
+
+    &:active {
+      scale: 0.92;
+    }
   }
 </style>

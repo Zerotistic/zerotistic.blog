@@ -39,6 +39,12 @@ const primaryLink = writeup
           external: true,
         }
       : undefined
+// Browsers break lines after hyphens, which splits IDs like CVE-2026-54639.
+const keepIdsWhole = (text: string) =>
+  text.split(/(CVE-\d{4}-\d+|GHSA(?:-[\da-z]{4}){3})/i).map((part, i) => ({
+    text: part,
+    id: i % 2 === 1,
+  }))
 const pendingLabel = finding.id.includes("XXXX")
   ? "ID pending"
   : finding.id.startsWith("GHSA-")
@@ -51,15 +57,25 @@ const pendingLabel = finding.id.includes("XXXX")
   class="cve-finding editorial-row"
   aria-labelledby={`${anchor}-title`}
 >
+  <!-- A summary is a button to assistive tech, which flattens any heading
+       inside it. The heading lives outside for navigation; the summary
+       shows the title and takes its name from it. -->
+  <Heading class="visually-hidden" id={`${anchor}-title`}
+    >{finding.title}</Heading
+  >
   <details class="finding-details">
-    <summary>
-      <Heading id={`${anchor}-title`}>{finding.title}</Heading>
+    <summary aria-labelledby={`${anchor}-title ${anchor}-severity`}>
+      <span class="finding-title"
+        >{keepIdsWhole(finding.title).map(({ text, id }) =>
+        id ? <span class="nowrap">{text}</span> : text,
+      )}</span
+      >
       {finding.score && finding.severity ? (
-        <span class="severity" data-severity={finding.severity}>
+        <span class="severity" id={`${anchor}-severity`} data-severity={finding.severity}>
           <span>{finding.severity}</span><span aria-hidden="true">·</span>{finding.score}
         </span>
       ) : (
-        <span class="severity">{writeup ? "Duplicate" : "Score pending"}</span>
+        <span class="severity" id={`${anchor}-severity`}>{writeup ? "Duplicate" : "Score pending"}</span>
       )}
       <svg
         class="disclosure"
@@ -74,7 +90,11 @@ const pendingLabel = finding.id.includes("XXXX")
     </summary>
 
     <div class="record-details">
-      <p>{finding.summary}</p>
+      <p>
+        {keepIdsWhole(finding.summary).map(({ text, id }) =>
+        id ? <span class="nowrap">{text}</span> : text,
+      )}
+      </p>
       <div class="record-context">
         {finding.published ? (
           <time datetime={finding.published}>{finding.published}</time>
@@ -83,12 +103,12 @@ const pendingLabel = finding.id.includes("XXXX")
         {!finding.url && <span>{pendingLabel}</span>}
         {finding.url && primaryLink?.href !== finding.url && (
           <a href={finding.url} target="_blank" rel="noopener noreferrer">
-            CVE record <span class="link-arrow" aria-hidden="true">↗</span>
+            <span class="link-label">CVE record</span><span class="link-arrow external" aria-hidden="true">↗</span>
           </a>
         )}
         {note && (
           <a href={note} target="_blank" rel="noopener noreferrer">
-            Original note <span class="link-arrow" aria-hidden="true">↗</span>
+            <span class="link-label">Original note</span><span class="link-arrow external" aria-hidden="true">↗</span>
           </a>
         )}
       </div>
@@ -104,9 +124,8 @@ const pendingLabel = finding.id.includes("XXXX")
         target={primaryLink.external ? "_blank" : undefined}
         rel={primaryLink.external ? "noopener noreferrer" : undefined}
         aria-label={`${primaryLink.name}: ${finding.title}`}
-        title={primaryLink.name}
       >
-        {primaryLink.label}<span class="link-arrow" aria-hidden="true">{primaryLink.external ? "↗" : "→"}</span>
+        <span class="link-label">{primaryLink.label}</span><span class:list={["link-arrow", { external: primaryLink.external }]} aria-hidden="true">{primaryLink.external ? "↗" : "→"}</span>
       </a>
     )}
   </footer>
@@ -139,17 +158,22 @@ const pendingLabel = finding.id.includes("XXXX")
       display: none;
     }
 
-    h3,
-    h4 {
+    .finding-title {
       font-size: var(--step-0);
       font-weight: var(--font-weight-medium);
       line-height: 1.4;
       text-wrap: pretty;
     }
 
-    &:hover .disclosure {
-      color: var(--accent);
+    @media (hover: hover) {
+      &:hover .disclosure {
+        color: var(--accent);
+      }
     }
+  }
+
+  .nowrap {
+    white-space: nowrap;
   }
 
   .severity {
@@ -184,7 +208,7 @@ const pendingLabel = finding.id.includes("XXXX")
     inline-size: 1rem;
     block-size: 1rem;
     color: var(--muted-foreground);
-    transition: rotate 0.15s ease;
+    transition: rotate var(--dur-state) var(--ease-out);
   }
 
   details[open] .disclosure {
@@ -224,13 +248,11 @@ const pendingLabel = finding.id.includes("XXXX")
       align-items: center;
       gap: 0.5ch;
       min-block-size: 2rem;
-      text-decoration: underline;
-      text-decoration-color: var(--border);
-      text-underline-offset: 0.2em;
 
-      &:hover {
-        color: var(--foreground);
-        text-decoration-color: currentColor;
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
     }
   }
@@ -252,13 +274,11 @@ const pendingLabel = finding.id.includes("XXXX")
     color: var(--muted-foreground);
     font: var(--text-meta) / 1.5 var(--font-mono);
     letter-spacing: 0;
-    text-decoration: underline;
-    text-decoration-color: var(--border);
-    text-underline-offset: 0.2em;
 
-    &:hover {
-      color: var(--foreground);
-      text-decoration-color: var(--accent);
+    @media (hover: hover) {
+      &:hover {
+        color: var(--foreground);
+      }
     }
   }
 

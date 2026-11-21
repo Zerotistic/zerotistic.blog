@@ -277,7 +277,7 @@ import { favoriteShelves } from "@/data/favorites"
   .favorite-link:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 6px;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
   }
 
   .cover-wrap {
@@ -287,8 +287,8 @@ import { favoriteShelves } from "@/data/favorites"
     block-size: 6rem;
     transform: rotate(var(--cover-tilt));
     transform-origin: center bottom;
-    filter: drop-shadow(1px 3px 3px rgb(0 0 0 / 0.2));
-    transition: transform 180ms ease;
+    filter: var(--drop-md);
+    transition: transform var(--dur-state) var(--ease-out);
   }
 
   .favorite-cover {
@@ -369,7 +369,7 @@ import { favoriteShelves } from "@/data/favorites"
     .favorite-link:hover .favorite-title {
       text-decoration: underline;
       text-decoration-color: var(--border);
-      text-underline-offset: 3px;
+      text-underline-offset: 0.2em;
     }
   }
 

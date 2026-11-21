@@ -1,0 +1,52 @@
+<script>
+  import { copyText } from "@/lib/clipboard"
+  import { haptic } from "@/lib/haptics"
+
+  // Clicking a heading's "#" still jumps there and updates the address bar,
+  // and also copies the link, confirmed by a check in place of the "#".
+  const status = document.createElement("span")
+  status.className = "visually-hidden"
+  status.setAttribute("role", "status")
+  document.body.append(status)
+  const timers = new WeakMap<Element, ReturnType<typeof setTimeout>>()
+
+  document.addEventListener("click", (event) => {
+    const anchor =
+      event.target instanceof Element
+        ? event.target.closest<HTMLAnchorElement>("[data-heading-anchor]")
+        : null
+    if (!anchor) return
+    haptic("success")
+    void copyText(anchor.href).then((copied) => {
+      if (!copied) return
+      clearTimeout(timers.get(anchor))
+      anchor.setAttribute("data-copied", "")
+      status.textContent = "Link copied"
+      timers.set(
+        anchor,
+        setTimeout(() => {
+          anchor.removeAttribute("data-copied")
+          status.textContent = ""
+        }, 1500),
+      )
+    })
+  })
+</script>
+
+<style is:global>
+  prose-content [data-heading-anchor][data-copied] {
+    opacity: 1;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      inline-size: 0.6em;
+      block-size: 0.6em;
+      background-color: currentColor;
+      mask:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+      animation: copy-confirm var(--dur-state) var(--ease-out);
+    }
+  }
+</style>

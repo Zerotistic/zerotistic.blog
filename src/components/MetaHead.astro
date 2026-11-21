@@ -59,6 +59,12 @@ import { SITE } from "@/consts"
       const sources = document.currentScript.dataset
       const root = document.documentElement
       root.dataset.js = ""
+      // The logo's cursor greets once per visit, not on every page.
+      try {
+        if (sessionStorage.getItem("cursor-intro")) root.dataset.introPlayed = ""
+        else sessionStorage.setItem("cursor-intro", "1")
+      } catch {}
+
       try {
         const theme = localStorage.theme
         if (theme === "light" || theme === "dark") root.dataset.theme = theme
@@ -75,6 +81,18 @@ import { SITE } from "@/consts"
         root.style.setProperty(`--avalon-${dark ? "night" : "day"}-image`, supportsImageSet ? candidates : `url("${fallback}")`)
         return { src: supportsImageSet ? src : fallback, type: supportsImageSet ? "image/avif" : "image/webp" }
       }
+      // The two theme-color metas follow the OS. When the reader picks a
+      // theme, both report it so the browser toolbar matches the page.
+      const themeColors = document.querySelectorAll('meta[name="theme-color"]')
+      const themeColor = () => {
+        const theme = root.dataset.theme
+        for (const meta of themeColors) {
+          const own = meta.media.includes("dark") ? "#111110" : "#fdfdfc"
+          meta.content = theme ? (theme === "dark" ? "#111110" : "#fdfdfc") : own
+        }
+      }
+      themeColor()
+      new MutationObserver(themeColor).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       const preload = document.createElement("link")
       preload.rel = "preload"
       preload.as = "image"

@@ -2,6 +2,7 @@
 import "@/styles/reset.css"
 import "@/styles/fonts.css"
 import "@/styles/color.css"
+import "@/styles/motion.css"
 import "@/styles/typography.css"
 import "@/styles/layout.css"
 import "@/styles/icon-button.css"
@@ -9,12 +10,15 @@ import "@/styles/bar.css"
 import "@/styles/shape.css"
 import "@/styles/interaction.css"
 import "@/styles/editorial.css"
+import "@/styles/transitions.css"
 
 import Footer from "@/components/Footer.astro"
 import AvalonBackground from "@/components/AvalonBackground.astro"
 import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
 import TouchFeedback from "@/components/TouchFeedback.astro"
+import Tooltips from "@/components/Tooltips.astro"
+import AnchorGlide from "@/components/AnchorGlide.astro"
 import { SITE } from "@/consts"
 
 type Props = {
@@ -23,6 +27,8 @@ type Props = {
   wide?: boolean
   reading?: boolean
   narrowToc?: boolean
+  /** Pages that already list the profiles can drop the footer icons. */
+  footerSocials?: boolean
 }
 
 const {
@@ -31,6 +37,7 @@ const {
   wide = false,
   reading = false,
   narrowToc = false,
+  footerSocials = true,
 } = Astro.props
 ---
 
@@ -56,11 +63,15 @@ const {
       </page-header>
       <page-content class:list={{ wide }}>
         <main id="main-content" tabindex="-1"><slot /></main>
-        <page-footer><Footer showArtoria={showArtoria} /></page-footer>
+        <page-footer>
+          <Footer showArtoria={showArtoria} showSocials={footerSocials} />
+        </page-footer>
       </page-content>
     </page-grid>
 
     <TouchFeedback />
+    <Tooltips />
+    <AnchorGlide />
 
     <script is:inline>
       console.log(
@@ -166,6 +177,11 @@ const {
 
     main {
       flex: 1;
+
+      /* A focus target for the skip link and scroll to top, not a control. */
+      &:focus {
+        outline: none;
+      }
     }
 
     page-footer {

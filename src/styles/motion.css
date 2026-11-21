@@ -1,0 +1,20 @@
+/* One set of curves and durations for the whole site. Similar elements
+   use identical timing; transforms ease out, never the default `ease`. */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-press: 120ms;
+  --dur-hover: 150ms;
+  --dur-state: 200ms;
+}
+
+/* A confirmation icon (copied, done) arriving in place of another. */
+@keyframes copy-confirm {
+  from {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+}

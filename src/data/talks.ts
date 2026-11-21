@@ -10,7 +10,7 @@ type Talk = {
   event: string
   eventHref?: string
   location: string
-  languages: { flag: string; label: string }[]
+  languages: { code: string; label: string }[]
   description: string
   preview: ImageMetadata
   href: string
@@ -29,7 +29,7 @@ export const talks: Talk[] = [
     event: "MaltaCTF",
     eventHref: "https://luma.com/x12lbhyf",
     location: "Malta",
-    languages: [{ flag: "🇬🇧", label: "Talk in English" }],
+    languages: [{ code: "EN", label: "Talk in English" }],
     description:
       "My approach to automating vulnerability discovery in ML frameworks and finding bugs at scale.",
     preview: maltaCtf,
@@ -46,11 +46,11 @@ export const talks: Talk[] = [
     event: "HackTheBox meetup",
     location: "Paris",
     languages: [
-      { flag: "🇫🇷", label: "Slides in French" },
-      { flag: "🇬🇧", label: "Notes in English" },
+      { code: "FR", label: "Slides in French" },
+      { code: "EN", label: "Notes in English" },
     ],
     description:
-      "A lightning talk on Binary Ninja's API, intermediate languages, and practical uses in reverse engineering. The slides include my annotations.",
+      "A lightning talk on Binary Ninja’s API, intermediate languages, and practical uses in reverse engineering. The slides include my annotations.",
     preview: binaryNinja,
     kind: "slides",
     href: "/posts/binary-ninja-rump/",

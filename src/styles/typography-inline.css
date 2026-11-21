@@ -2,11 +2,15 @@ prose-content {
   a {
     --underline: color-mix(in oklab, var(--foreground) 55%, transparent);
     color: var(--foreground);
-    text-underline-offset: 0.15em;
 
-    &:hover,
     &:focus-visible {
       --underline: var(--foreground);
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        --underline: var(--foreground);
+      }
     }
   }
 
@@ -25,6 +29,8 @@ prose-content {
     padding: 0.1em 0.3em;
     border-radius: var(--radius-sm);
     background-color: color-mix(in oklab, var(--muted) 60%, transparent);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 
     &[data-ec] :where(span[style^="--"]:not([class])) {
       color: light-dark(var(--0, inherit), var(--1, inherit));

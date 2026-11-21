@@ -1,6 +1,6 @@
 ---
 title: "Part 2: The UI Tour"
-description: "A tour of Binary Ninja's UI: the *LIL levels, SSA form, the stack view and tags."
+description: "A tour of Binary Ninja’s UI: the *LIL levels, SSA form, the stack view and tags."
 date: 2023-09-26
 order: 2
 authors:

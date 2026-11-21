@@ -7,7 +7,7 @@ import saber from "@/assets/about/collection/saber-last-episode.webp"
 
 const collectionUrl = "https://weeb.zerotistic.blog/"
 const pieces = [
-  { kind: "book abyss", image: boysAbyss, name: "Boy's Abyss", detail: "manga" },
+  { kind: "book abyss", image: boysAbyss, name: "Boy’s Abyss", detail: "manga" },
   { kind: "book eri", image: goodbyeEri, name: "Goodbye, Eri", detail: "manga" },
   { kind: "photo saber", image: saber, name: "Artoria: Last Episode", detail: "1/8 figure" },
   { kind: "photo ayame", image: ayame, name: "Nakiri Ayame", detail: "hololive friends with u plush" },
@@ -16,14 +16,13 @@ const pieces = [
 
 <section class="collection" id="collection" aria-labelledby="collection-heading">
   <div class="collection-copy">
-    <p class="eyebrow">the collection</p>
-    <h3 id="collection-heading">this is where the shelf space went.</h3>
+    <h3 class="eyebrow" id="collection-heading">the collection</h3>
     <p class="description">
-      Manga, light novels, figures, and merch. I made a separate site to keep
-      track of it all.
+      This is where the shelf space went: manga, light novels, figures, and
+      merch. I made a separate site to keep track of it all.
     </p>
     <a class="collection-link" href={collectionUrl}>
-      Browse my collection <span aria-hidden="true">→</span>
+      <span class="link-label">Browse my collection</span><span class="link-arrow" aria-hidden="true">→</span>
     </a>
   </div>
 
@@ -70,25 +69,16 @@ const pieces = [
   }
 
   .eyebrow {
-    margin-block-end: var(--space-xs);
+    margin-block-end: var(--space-2xs);
     color: var(--muted-foreground);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
+    font-weight: var(--font-weight-medium);
     line-height: 1.5;
   }
 
-  h3 {
-    max-inline-size: 23ch;
-    color: var(--foreground);
-    font-size: var(--step-1);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.35;
-    letter-spacing: -0.025em;
-  }
-
   .description {
-    max-inline-size: 36ch;
-    margin-block-start: var(--space-xs);
+    max-inline-size: 40ch;
     color: var(--prose-foreground);
     font-size: var(--step--1);
     line-height: 1.6;
@@ -105,9 +95,8 @@ const pieces = [
     --underline: var(--border);
   }
 
-  .collection-link span {
+  .collection-link .link-arrow {
     color: var(--accent);
-    transition: transform 180ms ease;
   }
 
   .collection-link:focus-visible {
@@ -147,7 +136,7 @@ const pieces = [
       color-mix(in oklab, var(--accent) 35%, var(--border)) 12% 88%,
       transparent
     );
-    box-shadow: 0 5px 9px light-dark(rgb(61 45 29 / 0.09), rgb(0 0 0 / 0.25));
+    box-shadow: var(--shadow-md);
     pointer-events: none;
   }
 
@@ -190,9 +179,9 @@ const pieces = [
     display: block;
     transform: translateY(var(--lift)) rotate(var(--tilt));
     transform-origin: center bottom;
-    transition: transform 180ms ease;
+    transition: transform var(--dur-state) var(--ease-out);
     border-radius: 1px;
-    box-shadow: 2px 3px 7px rgb(0 0 0 / 0.18);
+    box-shadow: var(--shadow-md);
   }
 
   .item-art img {
@@ -282,9 +271,6 @@ const pieces = [
       opacity: 0;
     }
 
-    .collection-link:hover span {
-      transform: translateX(3px);
-    }
   }
 
   @media (width < 48rem) {
@@ -309,14 +295,9 @@ const pieces = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .item-art,
-    .collection-link span {
+    .item-art {
       transition: none;
       transform: rotate(var(--tilt, 0deg));
-    }
-
-    .collection-link:hover span {
-      transform: none;
     }
   }
 </style>

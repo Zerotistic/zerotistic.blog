@@ -20,7 +20,7 @@ const groups = mentionGroups.map((group) => ({
   <MetaPage
     slot="head"
     title="Mentions"
-    description="Selected press coverage, academic citations, and technical references to zerotistic's research."
+    description="Selected press coverage, academic citations, and technical references to zerotistic’s research."
   />
 
   <div class="mentions-page">
@@ -46,9 +46,9 @@ const groups = mentionGroups.map((group) => ({
           <header class="group-heading">
             <h2 class="section-title" id={`${group.id}-heading`}>{group.title}</h2>
             <div class="related-research">
-              <span>Research</span>
+              <span>about</span>
               {group.research.map((research) => (
-                <a href={research.href}>{research.label} <span class="link-arrow" aria-hidden="true">→</span></a>
+                <a href={research.href}><span class="link-label">{research.label}</span> <span class="link-arrow" aria-hidden="true">→</span></a>
               ))}
             </div>
           </header>
@@ -66,7 +66,7 @@ const groups = mentionGroups.map((group) => ({
                     <div class="mention-body">
                       <div class="mention-source">
                         <h3><a class="row-title" href={mention.href} target="_blank" rel="noopener noreferrer" aria-describedby={`${group.id}-${index}-context`}>
-                          {mention.name}<span class="external-arrow link-arrow" aria-hidden="true">↗</span>
+                          {mention.name}<span class="external-arrow link-arrow external" aria-hidden="true">↗</span>
                           <span class="visually-hidden"> (opens in a new tab)</span>
                         </a></h3>
                         <span class="mention-year">{mention.year}</span>
@@ -100,6 +100,22 @@ const groups = mentionGroups.map((group) => ({
   .heading-companion {
     inline-size: clamp(8rem, 13vw, 9rem);
   }
+  /* One underline that slides to the current tab; labels never move. */
+  .mention-nav::after {
+    content: "";
+    position: absolute;
+    inset-block-end: -1px;
+    inset-inline-start: 0;
+    inline-size: var(--tab-width, 0px);
+    block-size: 2px;
+    background: var(--accent);
+    translate: var(--tab-x, 0px) 0;
+  }
+  .mention-nav[data-ready]::after {
+    transition:
+      translate 250ms var(--ease-out),
+      inline-size 250ms var(--ease-out);
+  }
   .mention-nav {
     position: sticky;
     inset-block-start: var(--mentions-sticky-top);
@@ -121,37 +137,28 @@ const groups = mentionGroups.map((group) => ({
       padding-inline: var(--space-2xs);
       color: var(--muted-foreground);
       text-decoration: none;
-      transition: color 180ms ease;
-      &::after {
-        content: "";
-        position: absolute;
-        inset: auto 0 -1px;
-        block-size: 2px;
-        background: var(--accent);
-        opacity: 0;
-        transform: scaleX(0.65);
-        transition:
-          opacity 180ms ease,
-          transform 220ms ease;
+      transition:
+        color var(--dur-hover) ease,
+        scale var(--dur-press) var(--ease-out);
+      &:active {
+        scale: 0.97;
       }
       &[aria-current] {
         color: var(--foreground);
-        &::after {
-          opacity: 1;
-          transform: scaleX(1);
-        }
         .index-count {
           color: var(--accent);
           background: var(--accent-muted);
         }
       }
-      &:hover {
-        color: var(--foreground);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
       &:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: -3px;
-        border-radius: 3px;
+        border-radius: var(--radius-sm);
       }
     }
   }
@@ -160,13 +167,13 @@ const groups = mentionGroups.map((group) => ({
     place-items: center;
     min-inline-size: 1.75rem;
     padding: 0.12rem 0.3rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: var(--text-caption);
     font-variant-numeric: tabular-nums;
     line-height: 1.5;
     transition:
-      background-color 180ms ease,
-      color 180ms ease;
+      background-color var(--dur-hover) ease,
+      color var(--dur-hover) ease;
   }
   .mention-groups {
     display: grid;
@@ -202,14 +209,16 @@ const groups = mentionGroups.map((group) => ({
       span {
         margin-inline-start: 0.2em;
       }
-      &:hover {
-        color: var(--foreground);
-        text-decoration-color: var(--accent);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+          text-decoration-color: var(--accent);
+        }
       }
       &:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 4px;
-        border-radius: 2px;
+        border-radius: var(--radius-sm);
       }
     }
   }
@@ -237,7 +246,7 @@ const groups = mentionGroups.map((group) => ({
     color: var(--muted-foreground);
     background: color-mix(in oklab, var(--sand-3) 65%, transparent);
     border: 1px solid var(--border);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-lg);
     margin-block-start: 0.05rem;
   }
   .mention-body {
@@ -298,14 +307,6 @@ const groups = mentionGroups.map((group) => ({
     margin-block-start: var(--space-xs);
     font-size: var(--text-caption);
   }
-  .visually-hidden {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
   @media (width < 64rem) {
     .mentions-page {
       --mentions-sticky-top: var(--bar-nav-height);
@@ -326,7 +327,7 @@ const groups = mentionGroups.map((group) => ({
     .mention-symbol {
       inline-size: 1.875rem;
       block-size: 1.875rem;
-      border-radius: 0.375rem;
+      border-radius: var(--radius-md);
       svg {
         inline-size: 19px;
         block-size: 19px;

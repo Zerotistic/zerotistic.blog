@@ -3,7 +3,7 @@
     class="work-cheer-button"
     type="button"
     aria-label="Say hello to Artoria"
-    title="Say hello to Artoria"
+    data-tooltip="Say hello to Artoria"
     disabled
   >
     <svg
@@ -181,7 +181,7 @@
     inset-inline-end: 0;
     padding: 0.5em 0.75em;
     border: 1px solid var(--border);
-    border-radius: 0.75rem 0.75rem 0.25rem 0.75rem;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-xl);
     background: var(--sand-2);
     color: var(--accent);
     font-family: var(--font-mono);
@@ -207,7 +207,7 @@
     display: block;
     inline-size: 100%;
     overflow: visible;
-    filter: drop-shadow(0 1px 2px rgb(77 69 35 / 0.12));
+    filter: var(--drop-sm);
   }
 
   .wing {
@@ -267,7 +267,7 @@
     figcaption {
       inset-block-start: calc(100% + 0.25rem);
       inset-block-end: auto;
-      border-radius: 0.75rem 0.25rem 0.75rem 0.75rem;
+      border-radius: var(--radius-xl) var(--radius-sm) var(--radius-xl) var(--radius-xl);
       font-size: 0.6875rem;
       padding: 0.4em 0.6em;
     }

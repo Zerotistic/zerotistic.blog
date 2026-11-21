@@ -9,6 +9,7 @@ const { floating } = Astro.props
 <button
   data-icon-button
   data-scroll-top
+  data-tooltip
   data-floating={floating || undefined}
   aria-label="Scroll to top"
 >
@@ -18,10 +19,19 @@ const { floating } = Astro.props
 <style>
   button {
     color: var(--foreground);
+    opacity: 0;
     visibility: hidden;
+    transition:
+      opacity var(--dur-hover) ease,
+      scale var(--dur-state) var(--ease-out),
+      visibility 0s linear var(--dur-hover);
 
     &[data-visible] {
+      opacity: 1;
       visibility: visible;
+      transition:
+        opacity var(--dur-hover) ease,
+        scale var(--dur-state) var(--ease-out);
     }
   }
 
@@ -36,12 +46,21 @@ const { floating } = Astro.props
     inset-block-end: var(--grid-gutter);
     inset-inline-end: var(--grid-gutter);
     z-index: 10;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: max(2.5rem, var(--icon-button-size));
+    height: max(2.5rem, var(--icon-button-size));
+    scale: 0.9;
     background-color: color-mix(in oklab, var(--background) 90%, transparent);
     backdrop-filter: blur(var(--blur-sm));
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
+
+    &[data-visible] {
+      scale: 1;
+    }
+
+    &[data-visible]:active {
+      scale: 0.94;
+    }
 
     @media (width >= 64rem) {
       display: none;
@@ -53,17 +72,33 @@ const { floating } = Astro.props
   const buttons = [
     ...document.querySelectorAll<HTMLElement>("[data-scroll-top]"),
   ]
+  const main = document.getElementById("main-content")
+  let lastY = scrollY
 
+  // The floating button covers the ends of lines, so it only shows while
+  // the reader is heading back up. The sidebar one shows once past the fold.
   const update = () => {
-    const past = scrollY > innerHeight * 0.5
-    for (const button of buttons) button.toggleAttribute("data-visible", past)
+    const y = scrollY
+    const past = y > innerHeight * 0.5
+    const up = y < lastY - 4
+    const down = y > lastY + 4
+    for (const button of buttons) {
+      if (!past) button.removeAttribute("data-visible")
+      else if (!button.hasAttribute("data-floating"))
+        button.setAttribute("data-visible", "")
+      else if (up) button.setAttribute("data-visible", "")
+      else if (down) button.removeAttribute("data-visible")
+    }
+    if (up || down) lastY = y
   }
 
   addEventListener("scroll", update, { passive: true })
   update()
 
   document.addEventListener("click", (event) => {
-    if ((event.target as Element).closest("[data-scroll-top]"))
-      window.scrollTo({ top: 0 })
+    if (!(event.target as Element).closest("[data-scroll-top]")) return
+    window.scrollTo({ top: 0 })
+    // Keep keyboard users at the top too, not on a button at the bottom.
+    main?.focus({ preventScroll: true })
   })
 </script>

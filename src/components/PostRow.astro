@@ -1,6 +1,6 @@
 ---
 import { formatDate } from "@/lib/utils"
-import { titleHtml } from "@/lib/content"
+import { titleHtml, titleTransition } from "@/lib/content"
 import type { CollectionEntry } from "astro:content"
 
 type Props = {
@@ -23,7 +23,11 @@ const { post, partCount, tags, showYear = true } = Astro.props
         {formatDate(post.data.date, showYear)}
       </time>
       <row-title>
-        <span class="row-title" set:html={titleHtml(post.data.title)} />
+        <span
+          class="row-title"
+          style={titleTransition(post.id)}
+          set:html={titleHtml(post.data.title)}
+        />
         {partCount > 0 && (
           <series-badge>series · {partCount} parts</series-badge>
         )}
@@ -103,6 +107,8 @@ const { post, partCount, tags, showYear = true } = Astro.props
       color: var(--foreground);
 
       > span {
+        /* A transition name can't sit on a box that wraps across lines. */
+        display: inline-block;
         text-wrap: balance;
       }
     }
@@ -141,8 +147,10 @@ const { post, partCount, tags, showYear = true } = Astro.props
       color: var(--muted-foreground);
       text-decoration-color: transparent;
 
-      &:hover {
-        color: var(--foreground);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--foreground);
+        }
       }
     }
   }

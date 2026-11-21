@@ -116,10 +116,39 @@ export function initArtoriaFrames(element: HTMLElement) {
       update()
     })
 
+  // The bubble's line blurs out and the next one blurs in, so it reads as
+  // her saying something new instead of the text flickering.
+  const say = (text: string) => {
+    if (!remark) return
+    for (const animation of remark.getAnimations()) animation.cancel()
+    if (!motionRunning()) {
+      remark.textContent = text
+      return
+    }
+    const out = remark.animate(
+      [
+        { opacity: 1, filter: "blur(0)" },
+        { opacity: 0, filter: "blur(3px)" },
+      ],
+      { duration: 110, easing: "ease-in", fill: "forwards" },
+    )
+    out.onfinish = () => {
+      remark.textContent = text
+      out.cancel()
+      remark.animate(
+        [
+          { opacity: 0, filter: "blur(3px)" },
+          { opacity: 1, filter: "blur(0)" },
+        ],
+        { duration: 220, easing: "cubic-bezier(.22,1,.36,1)" },
+      )
+    }
+  }
+
   button.addEventListener("click", () => {
     if (remark && remarks.length > 1) {
       remarkIndex = (remarkIndex + 1) % remarks.length
-      remark.textContent = remarks[remarkIndex]
+      say(remarks[remarkIndex])
     }
     play(true)
   })
