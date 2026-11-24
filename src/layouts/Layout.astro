@@ -11,6 +11,7 @@ import "@/styles/shape.css"
 import "@/styles/interaction.css"
 import "@/styles/editorial.css"
 import "@/styles/transitions.css"
+import "@/styles/print.css"
 
 import Footer from "@/components/Footer.astro"
 import AvalonBackground from "@/components/AvalonBackground.astro"
@@ -20,6 +21,7 @@ import TouchFeedback from "@/components/TouchFeedback.astro"
 import Tooltips from "@/components/Tooltips.astro"
 import AnchorGlide from "@/components/AnchorGlide.astro"
 import { SITE } from "@/consts"
+import { artoriaForPath } from "@/lib/artoria"
 
 type Props = {
   crumbs?: { label: string; href: string }[]
@@ -39,10 +41,12 @@ const {
   narrowToc = false,
   footerSocials = true,
 } = Astro.props
+const pose = artoriaForPath(Astro.url.pathname)
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
   <MetaHead>
+    {showArtoria && <link rel="preload" as="image" href={pose.src} />}
     <slot name="head" />
   </MetaHead>
   <body>
@@ -117,7 +121,9 @@ const {
     @media (width < 64rem) {
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr;
-      padding-block-start: 0;
+      /* The status bar is glass over the page; the first bar still starts
+         below it. */
+      padding-block-start: env(safe-area-inset-top, 0px);
     }
   }
 
@@ -128,7 +134,7 @@ const {
       display: block;
       grid-column: 1 / -1;
       position: sticky;
-      top: 0;
+      top: env(safe-area-inset-top, 0px);
       z-index: 10;
       min-width: 0;
       margin-inline: calc(-1 * var(--grid-gutter));
@@ -187,6 +193,7 @@ const {
     page-footer {
       display: block;
       margin-block-start: var(--space-xl);
+      padding-block-end: env(safe-area-inset-bottom, 0px);
     }
 
     @media (width >= 64rem) {
@@ -258,7 +265,7 @@ const {
 
       page-toc {
         position: sticky;
-        top: 0;
+        top: env(safe-area-inset-top, 0px);
         align-self: start;
         z-index: 10;
       }

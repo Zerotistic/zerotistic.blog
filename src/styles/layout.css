@@ -51,6 +51,19 @@
   --project-index-width: 11rem;
 }
 
+/* Edge to edge viewports: the gutter grows to clear rounded corners and
+   the camera housing in landscape. The grid is one column there, so a
+   wider gutter changes nothing else. */
+@media (width < 64rem) {
+  :root {
+    --grid-gutter: max(
+      var(--space-s-m),
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+  }
+}
+
 html {
   scrollbar-gutter: stable;
 
@@ -62,6 +75,7 @@ html {
     --bar-nav-height: calc(2.75rem + 2 * var(--space-2xs) + 2px);
     --bar-toc-height: 0px;
     scroll-padding-block-start: calc(
+      env(safe-area-inset-top, 0px) +
       var(--bar-nav-height) +
       var(--bar-toc-height) +
       var(--space-2xs)

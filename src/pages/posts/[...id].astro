@@ -9,6 +9,7 @@ import "@/styles/callout.css"
 import ImageViewer from "@/components/ImageViewer.astro"
 import SiriClock from "@/components/SiriClock.astro"
 import SiriDemo from "@/components/SiriDemo.astro"
+import ThoughtsMarginalia from "@/components/ThoughtsMarginalia.astro"
 import MetaPost from "@/components/MetaPost.astro"
 import LinkPreviews from "@/components/LinkPreviews.astro"
 import { postLinkPreviews } from "@/lib/link-previews"
@@ -22,6 +23,7 @@ import SeriesReader from "@/components/SeriesReader.astro"
 import TableOfContents from "@/components/TableOfContents.astro"
 import Layout from "@/layouts/Layout.astro"
 import {
+  dateTransition,
   getPosts,
   getSubposts,
   pageTitle,
@@ -107,6 +109,7 @@ if (chain.length > 1) {
   <ImageViewer />
   <SiriClock />
   <SiriDemo />
+  {post.id === "i-hate-my-thoughts-posts" && <ThoughtsMarginalia />}
   <LinkPreviews />
   <CodeTools />
   <HeadingLinks />
@@ -146,7 +149,9 @@ if (chain.length > 1) {
                 </author-names>
               </post-authors>
             )}
-            <time datetime={entry.data.date.toISOString()}
+            <time
+              datetime={entry.data.date.toISOString()}
+              style={entry.id === post.id ? dateTransition(entry.id) : undefined}
               >{formatDate(entry.data.date)}</time
             >
             <reading-time>{readingTime(entry.body ?? "")}</reading-time>
@@ -214,6 +219,9 @@ if (chain.length > 1) {
       font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem);
       line-height: 1.18;
       font-weight: var(--font-weight-medium);
+      /* The cap height sits flush with the top of the header instead of
+         floating in line-height air. */
+      text-box: trim-start cap alphabetic;
     }
 
     post-meta {

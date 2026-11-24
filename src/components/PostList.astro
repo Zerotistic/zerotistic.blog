@@ -1,4 +1,5 @@
 ---
+import PostPeek from "@/components/PostPeek.astro"
 import PostRow from "@/components/PostRow.astro"
 import { getPosts, getSubposts } from "@/lib/content"
 
@@ -26,6 +27,7 @@ const entries = posts
   <ol>
     {entries.map((entry) => <PostRow {...entry} />)}
   </ol>
+  <PostPeek />
 </post-list>
 
 <style>

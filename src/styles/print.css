@@ -1,0 +1,86 @@
+/* Printed or saved as PDF: the article alone, in light colors, with the
+   addresses of external links after their text. Nothing that moves, nothing
+   that only works with a pointer. */
+@media print {
+  :root {
+    color-scheme: light !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  page-nav,
+  page-toc,
+  .avalon-scene,
+  .skip-link,
+  .artoria,
+  .mention-companion,
+  .work-cheer,
+  .work-jumping,
+  .resume,
+  .quote-link,
+  .expressive-code .copy,
+  .image-enlarge,
+  [data-heading-anchor],
+  .post-navigation,
+  footer :is(nav, ul),
+  [data-scroll-top],
+  dialog,
+  [data-tooltip-bubble] {
+    display: none !important;
+  }
+
+  page-grid {
+    display: block;
+    min-height: 0;
+    padding: 0;
+  }
+
+  page-content {
+    max-inline-size: none;
+    margin: 0;
+  }
+
+  prose-content {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  prose-content :is(p, li) a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: #555;
+    word-break: break-all;
+  }
+
+  :is(h1, h2, h3, h4) {
+    break-after: avoid;
+  }
+
+  :is(pre, figure, table, blockquote, .expressive-code, .callout, img) {
+    break-inside: avoid;
+  }
+
+  pre,
+  .expressive-code pre {
+    white-space: pre-wrap;
+    overflow: visible;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}

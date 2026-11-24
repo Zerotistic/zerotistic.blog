@@ -4,7 +4,11 @@ import { motionRunning, observeMotion } from "./ambient-motion"
 // the companion is visible and the page's initial resources have finished.
 // Decode the entire sequence before starting it so slow connections never
 // leave a blank frame halfway through a gesture.
+const reducedData = matchMedia("(prefers-reduced-data: reduce)")
+
 export function loadCompanionImages(element: HTMLElement, onReady: () => void) {
+  // Data saver on: the static pose is the whole companion.
+  if (reducedData.matches) return
   let visible = false
   let scheduled = false
   let loading = false

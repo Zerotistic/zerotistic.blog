@@ -1,4 +1,5 @@
 ---
+import PostPeek from "@/components/PostPeek.astro"
 import PostRow from "@/components/PostRow.astro"
 import { getPosts, getSubposts } from "@/lib/content"
 
@@ -23,6 +24,7 @@ const years = Map.groupBy(entries, ({ post }) =>
       </ol>
     </section>
   ))}
+  <PostPeek />
 </archive-groups>
 
 <style>

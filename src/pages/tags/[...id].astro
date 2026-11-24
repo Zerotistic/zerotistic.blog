@@ -1,6 +1,7 @@
 ---
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
+import PostPeek from "@/components/PostPeek.astro"
 import PostRow from "@/components/PostRow.astro"
 import Layout from "@/layouts/Layout.astro"
 import { getSubposts, getTags } from "@/lib/content"
@@ -40,6 +41,7 @@ const series = await getSubposts()
         />
       ))}
   </ol>
+  <PostPeek />
 </Layout>
 
 <style>

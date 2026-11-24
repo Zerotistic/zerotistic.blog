@@ -447,8 +447,8 @@
     }
 
     @media (width < 40rem) {
-      inset-block-start: 0.75rem;
-      max-block-size: calc(100dvh - 1.5rem);
+      inset-block-start: calc(0.75rem + env(safe-area-inset-top, 0px));
+      max-block-size: calc(100dvh - 1.5rem - env(safe-area-inset-top, 0px));
     }
   }
 

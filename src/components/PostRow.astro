@@ -1,6 +1,6 @@
 ---
-import { formatDate } from "@/lib/utils"
-import { titleHtml, titleTransition } from "@/lib/content"
+import { formatDate, readingTime } from "@/lib/utils"
+import { dateTransition, titleHtml, titleTransition } from "@/lib/content"
 import type { CollectionEntry } from "astro:content"
 
 type Props = {
@@ -15,10 +15,16 @@ const { post, partCount, tags, showYear = true } = Astro.props
 
 <li data-post-row data-tags={tags.join(" ")}>
   <article class:list={["editorial-row", { "short-date": !showYear }]}>
-    <a class="post-link" href={`/posts/${post.id}`}>
+    <a
+      class="post-link"
+      href={`/posts/${post.id}`}
+      data-peek={post.data.description}
+      data-peek-meta={readingTime(post.body ?? "")}
+    >
       <time
         datetime={post.data.date.toISOString()}
         aria-label={showYear ? undefined : formatDate(post.data.date)}
+        style={dateTransition(post.id)}
       >
         {formatDate(post.data.date, showYear)}
       </time>

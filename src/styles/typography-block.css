@@ -1,3 +1,29 @@
+/* Blocks far below the fold skip layout and paint until they come near.
+   Each remembers its size once rendered, so the scrollbar never jumps. */
+article:not([data-url="/posts/i-hate-my-thoughts-posts"])
+  prose-content
+  > :where(figure, table, .expressive-code) {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 14rem;
+}
+
+/* The tiny inline copy shows, blurred by scaling, until the real image has
+   decoded and fades in over it. Without JS the image is simply there. */
+.lqip {
+  display: block;
+  background: var(--lqip) center / cover no-repeat;
+  border-radius: var(--radius-md);
+  overflow: clip;
+
+  img {
+    transition: opacity 400ms var(--ease-out);
+  }
+
+  :root[data-js] &:not([data-loaded]) img {
+    opacity: 0;
+  }
+}
+
 prose-content {
   blockquote {
     border-inline-start: 2px solid var(--border);

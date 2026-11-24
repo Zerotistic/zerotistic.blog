@@ -84,10 +84,7 @@
   )
   addEventListener("pagehide", save)
 
-  const hide = () => {
-    pill.removeAttribute("data-visible")
-    setTimeout(() => (pill.hidden = true), 200)
-  }
+  const hide = () => pill.removeAttribute("data-visible")
 
   const navigation = performance.getEntriesByType("navigation")[0] as
     | PerformanceNavigationTiming
@@ -107,7 +104,7 @@
     setTimeout(() => {
       if (scrollY > innerHeight) return
       pill.hidden = false
-      requestAnimationFrame(() => pill.setAttribute("data-visible", ""))
+      pill.setAttribute("data-visible", "")
     }, 500)
 
     go.addEventListener("click", (event) => {
@@ -151,7 +148,12 @@
     opacity: 0;
     transition:
       opacity var(--dur-state) var(--ease-in),
-      translate var(--dur-state) var(--ease-in);
+      translate var(--dur-state) var(--ease-in),
+      display var(--dur-state) allow-discrete;
+
+    &:not([data-visible]) {
+      display: none;
+    }
 
     &[data-visible] {
       translate: -50% 0;
@@ -159,6 +161,11 @@
       transition:
         opacity 300ms var(--ease-out),
         translate 300ms var(--ease-out);
+
+      @starting-style {
+        translate: -50% 1rem;
+        opacity: 0;
+      }
     }
 
     svg {

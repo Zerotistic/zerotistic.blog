@@ -8,6 +8,10 @@ prose-content {
 
     @media (width >= 64rem) {
       scroll-margin-block-start: calc(var(--page-offset-top) - 0.2em);
+
+      @media (width < 64rem) {
+        scroll-margin-block-start: var(--space-s);
+      }
     }
   }
 

@@ -9,10 +9,13 @@ import { SITE } from "@/consts"
 
 <head>
   <meta charset="utf-8">
+  <!-- viewport-fit=cover lets the page run under Safari's translucent bars
+       instead of a solid strip; safe area insets keep the controls clear. -->
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes"
   >
+  <meta name="color-scheme" content="light dark">
   <meta name="generator" content={Astro.generator}>
 
   <meta name="HandheldFriendly" content="True">
@@ -42,6 +45,25 @@ import { SITE } from "@/consts"
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
 
+  <!-- Pages render in the background while the pointer rests on their
+       link, so the click lands on a finished page. Feeds and files skipped. -->
+  <script type="speculationrules" is:inline>
+    {
+      "prerender": [
+        {
+          "where": {
+            "and": [
+              { "href_matches": "/*" },
+              { "not": { "href_matches": "/*.(xml|pdf|png|jpg|webp|avif|svg|mp4|zip)" } },
+              { "not": { "selector_matches": "[download], [rel~=nofollow]" } }
+            ]
+          },
+          "eagerness": "moderate"
+        }
+      ]
+    }
+  </script>
+
   <link rel="sitemap" href="/sitemap-index.xml">
   <link
     rel="alternate"
@@ -70,7 +92,10 @@ import { SITE } from "@/consts"
         if (theme === "light" || theme === "dark") root.dataset.theme = theme
       } catch {}
       const systemTheme = matchMedia("(prefers-color-scheme: dark)")
+      // Data saver on: no scenery download. The page reads the same.
+      const reducedData = matchMedia("(prefers-reduced-data: reduce)").matches
       const landscape = () => {
+        if (reducedData) return { src: "", type: "" }
         const dark = root.dataset.theme === "dark" || (!root.dataset.theme && systemTheme.matches)
         const src = dark ? sources.night : sources.day
         const fallback = dark ? "/static/avalon-landscape-dusk.webp" : "/static/avalon-landscape.webp"
@@ -83,6 +108,8 @@ import { SITE } from "@/consts"
       }
       // The two theme-color metas follow the OS. When the reader picks a
       // theme, both report it so the browser toolbar matches the page.
+      // Safari 26 ignores them and tints from the root background instead,
+      // which color.css sets explicitly on html.
       const themeColors = document.querySelectorAll('meta[name="theme-color"]')
       const themeColor = () => {
         const theme = root.dataset.theme
@@ -92,6 +119,15 @@ import { SITE } from "@/consts"
         }
       }
       themeColor()
+      // The color-scheme meta follows the picked theme too, so the first
+      // paint and the form controls never flip to the OS scheme.
+      const schemeMeta = document.querySelector('meta[name="color-scheme"]')
+      const colorScheme = () => {
+        const theme = root.dataset.theme
+        schemeMeta.content = theme === "light" || theme === "dark" ? theme : "light dark"
+      }
+      colorScheme()
+      new MutationObserver(colorScheme).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       new MutationObserver(themeColor).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       const preload = document.createElement("link")
       preload.rel = "preload"
@@ -100,9 +136,16 @@ import { SITE } from "@/consts"
       const initial = landscape()
       preload.type = initial.type
       preload.href = initial.src
-      document.head.append(preload)
+      if (!reducedData) document.head.append(preload)
       new MutationObserver(landscape).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       systemTheme.addEventListener("change", landscape)
+
+      // The shell (build assets, fonts, scenery) comes from disk on a return
+      // visit. Registered after load so it never competes with the page.
+      if ("serviceWorker" in navigator && !reducedData && location.protocol === "https:")
+        addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => {})
+        })
     })()
   </script>
   <noscript>

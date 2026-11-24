@@ -59,6 +59,12 @@
   color: var(--foreground);
 }
 
+/* A link to a quote lands on the quote in the accent, not browser yellow. */
+::target-text {
+  background-color: var(--accent-muted);
+  color: var(--foreground);
+}
+
 /* Code gets selected to be copied, so the exact range should be obvious:
    a stronger tint, and syntax colors kept. */
 :is(pre, code)::selection,
@@ -67,8 +73,15 @@
   color: inherit;
 }
 
+/* Both roots carry the color. Safari 26 paints its toolbars and the
+   rubber band from the root canvas, and a transparent html falls back to
+   white there. */
+html,
 body {
   background-color: var(--background);
+}
+
+body {
   color: var(--foreground);
 }
 

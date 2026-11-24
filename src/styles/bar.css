@@ -6,5 +6,32 @@
     backdrop-filter: blur(var(--blur-sm));
     border-block-end: 2px solid var(--border);
     border-image: var(--bar-border-image);
+
+    @media (prefers-reduced-transparency: reduce) {
+      background-color: var(--background);
+      backdrop-filter: none;
+    }
+  }
+}
+
+/* The bar that sticks casts a shadow only once something has scrolled
+   under it. Scroll driven, so the shadow tracks the page exactly. */
+@media (width < 64rem) {
+  @supports (animation-timeline: scroll()) {
+    page-grid:not(.reading) page-header > :last-child [data-bar],
+    page-grid.reading page-toc [data-bar] {
+      animation: bar-lift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 4rem;
+    }
+  }
+}
+
+@keyframes bar-lift {
+  from {
+    box-shadow: 0 8px 24px -14px transparent;
+  }
+  to {
+    box-shadow: 0 8px 24px -14px var(--shadow-tint-strong);
   }
 }

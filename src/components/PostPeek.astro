@@ -1,0 +1,131 @@
+---
+/**
+ * Rest the pointer on a post row and its description appears under the
+ * title, like a link preview for the list. Pointer and keyboard focus only;
+ * on touch the row is the whole affordance.
+ */
+---
+
+<div class="post-peek" aria-hidden="true">
+  <p class="peek-text"></p>
+  <p class="peek-meta"></p>
+</div>
+
+<style>
+  .post-peek {
+    position: fixed;
+    z-index: 30;
+    display: none;
+    max-inline-size: min(28rem, calc(100vw - 2 * var(--grid-gutter)));
+    padding: var(--space-xs) var(--space-s);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--background);
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+    opacity: 0;
+    translate: 0 -0.25rem;
+    transition:
+      opacity 100ms ease,
+      translate 100ms ease,
+      display 100ms allow-discrete;
+
+    &[data-visible] {
+      display: block;
+      opacity: 1;
+      translate: 0 0;
+      transition:
+        opacity var(--dur-hover) var(--ease-out),
+        translate var(--dur-hover) var(--ease-out);
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 -0.25rem;
+      }
+    }
+  }
+
+  .peek-text {
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--foreground);
+    text-wrap: pretty;
+  }
+
+  .peek-meta {
+    margin-block-start: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    color: var(--muted-foreground);
+  }
+</style>
+
+<script>
+  const peek = document.querySelector<HTMLElement>(".post-peek")
+  const fine = matchMedia("(hover: hover) and (pointer: fine)")
+  if (peek && fine.matches) {
+    const text = peek.querySelector<HTMLElement>(".peek-text")!
+    const meta = peek.querySelector<HTMLElement>(".peek-meta")!
+    let timer = 0
+    let current: HTMLElement | undefined
+
+    const place = (link: HTMLElement) => {
+      const title = link.querySelector<HTMLElement>(".row-title") ?? link
+      const rect = title.getBoundingClientRect()
+      const width = Math.min(peek.offsetWidth, innerWidth - 2 * 16)
+      peek.style.insetInlineStart = `${Math.max(16, Math.min(rect.left, innerWidth - width - 16))}px`
+      // Below the row; above it if that would leave the screen.
+      const below = rect.bottom + 8
+      const fits = below + peek.offsetHeight < innerHeight - 8
+      peek.style.insetBlockStart = fits
+        ? `${below}px`
+        : `${rect.top - peek.offsetHeight - 8}px`
+    }
+    const show = (link: HTMLElement) => {
+      const description = link.dataset.peek
+      if (!description) return
+      current = link
+      text.textContent = description
+      meta.textContent = link.dataset.peekMeta ?? ""
+      peek.setAttribute("data-visible", "")
+      place(link)
+    }
+    const hide = () => {
+      clearTimeout(timer)
+      current = undefined
+      peek.removeAttribute("data-visible")
+    }
+    const linkOf = (target: EventTarget | null) =>
+      target instanceof Element
+        ? target.closest<HTMLElement>("a[data-peek]")
+        : null
+
+    document.addEventListener("pointerover", (event) => {
+      const link = linkOf(event.target)
+      if (!link || link === current) return
+      clearTimeout(timer)
+      timer = window.setTimeout(() => show(link), 450)
+    })
+    document.addEventListener("pointerout", (event) => {
+      const link = linkOf(event.target)
+      if (!link) return
+      if (
+        event.relatedTarget instanceof Node &&
+        link.contains(event.relatedTarget)
+      )
+        return
+      hide()
+    })
+    document.addEventListener("focusin", (event) => {
+      const link = linkOf(event.target)
+      if (link && link.matches(":focus-visible")) show(link)
+      else hide()
+    })
+    addEventListener("scroll", hide, { passive: true })
+    addEventListener("resize", hide)
+    document.addEventListener("pointerdown", hide, { passive: true })
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") hide()
+    })
+  }
+</script>

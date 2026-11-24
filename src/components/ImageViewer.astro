@@ -54,6 +54,18 @@
     enlarged.removeAttribute("src")
   })
 
+  // Blur up: the wrapper keeps its placeholder until the image is in.
+  for (const wrapper of document.querySelectorAll<HTMLElement>(".lqip")) {
+    const img = wrapper.querySelector("img")
+    if (!img) continue
+    const done = () => wrapper.setAttribute("data-loaded", "")
+    if (img.complete && img.naturalWidth) done()
+    else {
+      img.addEventListener("load", done, { once: true })
+      img.addEventListener("error", done, { once: true })
+    }
+  }
+
   document.querySelectorAll<HTMLImageElement>("prose-content img").forEach((img) => {
     // Keep links, diagrams, and decorative illustrations behaving as authored.
     if (img.closest("a, button, .siri-demo, .siri-phone-illustration")) return

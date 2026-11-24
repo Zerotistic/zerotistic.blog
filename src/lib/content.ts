@@ -28,6 +28,9 @@ export const titleHtml = (title: string) =>
 export const titleTransition = (id: string) =>
   `view-transition-name: post-${id.replace(/[^a-z0-9-]/gi, "-")}`
 
+export const dateTransition = (id: string) =>
+  `view-transition-name: date-${id.replace(/[^a-z0-9-]/gi, "-")}`
+
 export const pageTitle = (title: string) =>
   `${titleText(title)} | ${SITE.title}`
 

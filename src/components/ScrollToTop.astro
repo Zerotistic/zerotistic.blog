@@ -43,7 +43,10 @@ const { floating } = Astro.props
 
   button[data-floating] {
     position: fixed;
-    inset-block-end: var(--grid-gutter);
+    inset-block-end: calc(
+      var(--grid-gutter) +
+      env(safe-area-inset-bottom, 0px)
+    );
     inset-inline-end: var(--grid-gutter);
     z-index: 10;
     width: max(2.5rem, var(--icon-button-size));
@@ -53,6 +56,11 @@ const { floating } = Astro.props
     backdrop-filter: blur(var(--blur-sm));
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
+
+    @media (prefers-reduced-transparency: reduce) {
+      background-color: var(--background);
+      backdrop-filter: none;
+    }
 
     &[data-visible] {
       scale: 1;
@@ -74,6 +82,8 @@ const { floating } = Astro.props
   ]
   const main = document.getElementById("main-content")
   let lastY = scrollY
+  let wantFloating = false
+  let settleTimer = 0
 
   // The floating button covers the ends of lines, so it only shows while
   // the reader is heading back up. The sidebar one shows once past the fold.
@@ -86,13 +96,34 @@ const { floating } = Astro.props
       if (!past) button.removeAttribute("data-visible")
       else if (!button.hasAttribute("data-floating"))
         button.setAttribute("data-visible", "")
-      else if (up) button.setAttribute("data-visible", "")
-      else if (down) button.removeAttribute("data-visible")
+      else if (up) wantFloating = true
+      else if (down) {
+        wantFloating = false
+        button.removeAttribute("data-visible")
+      }
     }
     if (up || down) lastY = y
   }
 
+  // It appears once the scroll has settled, never mid fling, so it is
+  // never in the way of what the reader is reading past.
+  const settled = () => {
+    if (!wantFloating) return
+    for (const button of buttons)
+      if (button.hasAttribute("data-floating"))
+        button.setAttribute("data-visible", "")
+  }
   addEventListener("scroll", update, { passive: true })
+  if ("onscrollend" in window) addEventListener("scrollend", settled)
+  else
+    addEventListener(
+      "scroll",
+      () => {
+        clearTimeout(settleTimer)
+        settleTimer = window.setTimeout(settled, 120)
+      },
+      { passive: true },
+    )
   update()
 
   document.addEventListener("click", (event) => {

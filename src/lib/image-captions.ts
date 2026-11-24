@@ -17,10 +17,15 @@ export const imageCaptions = defineHastPlugin({
     visit(node) {
       const children = node.children.filter((child) => !isBlank(child))
       const [image, caption] = children
+      const isImage = (node: ElementContent) =>
+        node.type === "element" &&
+        (node.tagName === "img" ||
+          (node.tagName === "span" &&
+            Array.isArray(node.properties.className) &&
+            node.properties.className.includes("lqip")))
       if (
         children.length !== 2 ||
-        image.type !== "element" ||
-        image.tagName !== "img" ||
+        !isImage(image) ||
         caption.type !== "element" ||
         caption.tagName !== "em"
       )

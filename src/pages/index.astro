@@ -2,7 +2,7 @@
 import Artoria from "@/components/Artoria.astro"
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getSubposts, titleHtml, titleTransition } from "@/lib/content"
+import { dateTransition, getPosts, getSubposts, titleHtml, titleTransition } from "@/lib/content"
 import { formatDate, readingTime } from "@/lib/utils"
 
 const posts = await getPosts()
@@ -95,7 +95,7 @@ const selections = [
             </h3>
             <p class="description">{latest.data.description}</p>
             <div class="story-meta">
-              <time datetime={latest.data.date.toISOString()}>{formatDate(latest.data.date)}</time>
+              <time datetime={latest.data.date.toISOString()} style={dateTransition(latest.id)}>{formatDate(latest.data.date)}</time>
               <span aria-hidden="true">·</span>
               <span>{postReadingTime(latest)}</span>
             </div>

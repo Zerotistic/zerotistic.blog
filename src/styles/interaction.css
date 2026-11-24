@@ -1,3 +1,23 @@
+/* Taps act at once: no double tap zoom on controls, so there is nothing
+   to wait for before a tap counts. Pinch zoom on the page is untouched. */
+:where(a[href], button, summary, [role="button"], label:has(> input)) {
+  touch-action: manipulation;
+}
+
+/* The companions and stickers are part of the page, not pictures to save.
+   A long press on them does nothing instead of offering the share sheet. */
+:where(
+  :is(.artoria, .mention-companion, .work-cheer, .work-jumping) > button,
+  .range-saber,
+  .cat-sticker,
+  .collection-display img,
+  .vtuber-lineup img
+) {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 @media (any-pointer: coarse) {
   /* Radios in a segmented control already show their own moving
      highlight; a tint on top reads as a second box. */

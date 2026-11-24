@@ -11,6 +11,7 @@ import { externalLinks } from "./src/lib/external-links"
 import { headingNamespace } from "./src/lib/heading-namespace"
 import { headingAnchors } from "./src/lib/heading-anchors"
 import { imageCaptions } from "./src/lib/image-captions"
+import { imagePlaceholders } from "./src/lib/image-placeholders"
 
 export default defineConfig({
   site: "https://zerotistic.blog",
@@ -41,6 +42,7 @@ export default defineConfig({
       mdastPlugins: [calloutDirective, inlineExpressiveCode, temmlMath],
       hastPlugins: [
         externalLinks,
+        imagePlaceholders,
         imageCaptions,
         blockExpressiveCode,
         headingNamespace,

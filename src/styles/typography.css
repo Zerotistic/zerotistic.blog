@@ -93,6 +93,9 @@ prose-content {
   color: var(--foreground);
   text-wrap: pretty;
   overflow-wrap: break-word;
+  /* Opening quotes hang in the margin so the text edge stays straight.
+     Safari only; ignored elsewhere. */
+  hanging-punctuation: first allow-end;
 
   :where(
       p,
