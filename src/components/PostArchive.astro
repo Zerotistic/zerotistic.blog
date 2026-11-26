@@ -2,14 +2,20 @@
 import PostPeek from "@/components/PostPeek.astro"
 import PostRow from "@/components/PostRow.astro"
 import { getPosts, getSubposts } from "@/lib/content"
+import { readingTime } from "@/lib/utils"
 
 const posts = await getPosts()
 const series = await getSubposts()
-const entries = posts.map((post) => ({
-  post,
-  partCount: (series.get(post.id) ?? []).length,
-  tags: [],
-}))
+const entries = posts.map((post) => {
+  const parts = series.get(post.id) ?? []
+  return {
+    post,
+    partCount: parts.length,
+    readTime: readingTime(
+      [post, ...parts].map((entry) => entry.body ?? "").join("\n"),
+    ),
+  }
+})
 const years = Map.groupBy(entries, ({ post }) =>
   post.data.date.getUTCFullYear().toString(),
 )

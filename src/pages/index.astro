@@ -60,7 +60,7 @@ const selections = [
             >HiddenLayer</a
           >. I write about reverse engineering, pwn, and automation.
         </p>
-        <a class="about-link" href="/about"
+        <a class="about-link" href="/about/"
           >more about me <span class="link-arrow" aria-hidden="true">→</span></a
         >
       </div>
@@ -87,7 +87,7 @@ const selections = [
         </header>
 
         <article class="featured">
-          <a class="story-link editorial-row" href={`/posts/${latest.id}`} aria-labelledby="featured-title">
+          <a class="story-link editorial-row" href={`/posts/${latest.id}/`} aria-labelledby="featured-title">
             <p class="story-label latest-label"><span aria-hidden="true"></span> latest</p>
             <h3 id="featured-title">
               <span class="row-title" style={titleTransition(latest.id)} set:html={titleHtml(latest.data.title)} />
@@ -106,7 +106,7 @@ const selections = [
           <div class="selected-writing">
             {selections.map(({ post, label, description, parts }) => (
               <article class="selected">
-                <a class="story-link editorial-row" href={`/posts/${post.id}`} aria-labelledby={`selected-${post.id}`}>
+                <a class="story-link editorial-row" href={`/posts/${post.id}/`} aria-labelledby={`selected-${post.id}`}>
                   <p class="story-label">{label}</p>
                   <h3 id={`selected-${post.id}`}>
                     <span class="row-title" style={titleTransition(post.id)} set:html={titleHtml(post.data.title)} />
@@ -127,7 +127,7 @@ const selections = [
         )}
 
         <div class="archive-link">
-          <a href="/posts">all posts <span class="link-arrow" aria-hidden="true">→</span></a>
+          <a href="/posts/">all posts <span class="link-arrow" aria-hidden="true">→</span></a>
           <span>{posts.length} posts</span>
         </div>
       </section>

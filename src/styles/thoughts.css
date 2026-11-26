@@ -1,0 +1,1091 @@
+/* Color drains out of the whole site at "I lost my obsession." and
+   seeps back by the time the hobbies show up. --drain is 0..1. */
+:root[data-thoughts-drain] {
+  --drain: 0;
+  /* Safari tints its bars from the root canvas, so the bars drain too. */
+  background-color: color-mix(
+    in oklab,
+    var(--sand-1) calc(100% - var(--drain) * 100%),
+    light-dark(#ececec, #161616)
+  );
+  --accent: color-mix(
+    in oklab,
+    light-dark(#9c5a34, #8ea6c8) calc(100% - var(--drain) * 100%),
+    var(--sand-9)
+  );
+
+  .avalon-scene,
+  page-nav .artoria,
+  page-footer .artoria,
+  article[data-url^="/posts/i-hate-my-thoughts-posts"] :is(img, .artoria) {
+    filter: grayscale(var(--drain));
+  }
+}
+
+article[data-url^="/posts/i-hate-my-thoughts-posts"] prose-content {
+  --thoughts-ink: var(--sand-11);
+  --thoughts-mono: var(--font-mono);
+
+  /* The thesis gets a room of its own, then comes apart as you leave it. */
+  .lost-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 58vh;
+    margin-block: var(--space-m);
+    font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3rem);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-align: center;
+    white-space: nowrap;
+
+    .lost-keep {
+      white-space: pre;
+    }
+
+    /* --energy runs 1 (still obsessed) to 0 (not) as the line climbs.
+       The outer letter box dissolves; the inner one shakes. */
+    --energy: 1;
+
+    .lost-keep {
+      font-weight: var(--font-weight-normal);
+    }
+
+    /* The word's box is sized once, at full weight, so the pulse and
+       the shaking never move "I lost my". */
+    .lost-word {
+      position: relative;
+      display: inline-block;
+
+      &::before {
+        content: attr(data-word);
+        visibility: hidden;
+        font-weight: 700;
+      }
+    }
+
+    .lost-letters {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      font-weight: calc(500 + var(--energy) * 200);
+      animation: thoughts-pulse 0.42s var(--ease-in-out) infinite;
+
+      i {
+        display: inline-block;
+        font-style: normal;
+      }
+
+      span {
+        display: inline-block;
+        animation: thoughts-jitter 0.11s steps(2, jump-none) infinite;
+      }
+
+      i:nth-child(2n) span {
+        animation-duration: 0.13s;
+        animation-direction: reverse;
+      }
+      i:nth-child(3n) span {
+        animation-duration: 0.09s;
+        animation-delay: -0.05s;
+      }
+      i:nth-child(5n) span {
+        animation-duration: 0.15s;
+        animation-delay: -0.02s;
+      }
+    }
+
+    &[data-still] .lost-letters,
+    &[data-still] .lost-word span {
+      animation-play-state: paused;
+    }
+
+    .lost-word i:nth-child(1) {
+      --i: -4.5;
+    }
+    .lost-word i:nth-child(2) {
+      --i: -3.5;
+    }
+    .lost-word i:nth-child(3) {
+      --i: -2.5;
+    }
+    .lost-word i:nth-child(4) {
+      --i: -1.5;
+    }
+    .lost-word i:nth-child(5) {
+      --i: -0.5;
+    }
+    .lost-word i:nth-child(6) {
+      --i: 0.5;
+    }
+    .lost-word i:nth-child(7) {
+      --i: 1.5;
+    }
+    .lost-word i:nth-child(8) {
+      --i: 2.5;
+    }
+    .lost-word i:nth-child(9) {
+      --i: 3.5;
+    }
+    .lost-word i:nth-child(10) {
+      --i: 4.5;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .lost-line {
+      view-timeline: --lost-line block;
+      animation: thoughts-arrive linear both;
+      animation-timeline: view();
+      animation-range: entry 30% entry 100%;
+    }
+
+    /* The letters follow the whole line's timeline, not their own. */
+    .lost-line .lost-word i {
+      animation: thoughts-dissolve linear both;
+      animation-timeline: --lost-line;
+      animation-range: exit -38% exit 12%;
+    }
+  }
+
+  /* One more thing, later every time. */
+  .one-more-night {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-s) var(--space-m);
+    margin-block: var(--space-xs) var(--space-m);
+    padding-inline-start: var(--space-2xs);
+
+    .night-clock {
+      display: block;
+      inline-size: 100%;
+      block-size: auto;
+      color: var(--thoughts-ink);
+      outline: none;
+    }
+
+    .clock-hour,
+    .clock-minute {
+      transform-box: view-box;
+      transform-origin: 60px 60px;
+    }
+    .clock-hour {
+      transform: rotate(calc(270deg + var(--minutes, 0) * 0.5deg));
+    }
+    .clock-minute {
+      transform: rotate(calc(var(--minutes, 0) * 6deg));
+    }
+
+    .one-more-list {
+      display: grid;
+      gap: 0.2em;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        --dim: 0%;
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-xs);
+        margin: 0;
+        padding: 0;
+        color: color-mix(
+          in oklab,
+          var(--prose-foreground) calc(100% - var(--dim)),
+          var(--sand-7)
+        );
+
+        &::before {
+          display: none;
+        }
+
+        time {
+          flex: none;
+          font-family: var(--thoughts-mono);
+          font-size: var(--text-meta);
+          letter-spacing: 0;
+          font-variant-numeric: tabular-nums;
+          color: var(--muted-foreground);
+        }
+      }
+
+      li:nth-child(2) { --dim: 10%; }
+      li:nth-child(3) { --dim: 20%; }
+      li:nth-child(4) { --dim: 28%;
+        time {
+          color: var(--accent);
+        }
+      }
+      li:nth-child(5) { --dim: 32%;
+        font-style: italic;
+        time {
+          color: var(--accent);
+        }
+      }
+    }
+
+    @media (width < 40rem) {
+      grid-template-columns: 1fr;
+      justify-items: center;
+
+      .night-clock {
+        inline-size: 4.5rem;
+      }
+
+      .one-more-list {
+        justify-self: stretch;
+      }
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .one-more-list li {
+      animation: thoughts-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+
+  /* Every window opened to explain the one before it, left wherever it
+     landed. Positions come from the markup as percentages. */
+  .rabbit-hole {
+    position: relative;
+    block-size: 30rem;
+    margin-block: var(--space-s) var(--space-m);
+
+    .hole-win {
+      position: absolute;
+      inset-inline-start: var(--x);
+      inset-block-start: var(--y);
+      inline-size: var(--w);
+      display: grid;
+      gap: 0.3rem;
+      padding: 0.35rem 0.65rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--sand-1);
+      box-shadow: 0 8px 22px -12px rgb(0 0 0 / 0.35);
+      font-family: var(--thoughts-mono);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+      rotate: var(--r);
+      transition:
+        translate var(--dur-state) var(--ease-out),
+        box-shadow var(--dur-state) var(--ease-out);
+
+      &:hover {
+        z-index: 20;
+        translate: 0 -2px;
+        box-shadow: 0 12px 26px -12px rgb(0 0 0 / 0.4);
+      }
+    }
+
+    .hole-win:nth-child(1) {
+      z-index: 1;
+    }
+    .hole-win:nth-child(2) {
+      z-index: 2;
+    }
+    .hole-win:nth-child(3) {
+      z-index: 3;
+    }
+    .hole-win:nth-child(4) {
+      z-index: 4;
+    }
+    .hole-win:nth-child(5) {
+      z-index: 5;
+    }
+    .hole-win:nth-child(6) {
+      z-index: 6;
+    }
+    .hole-win:nth-child(7) {
+      z-index: 7;
+    }
+    .hole-win:nth-child(8) {
+      z-index: 8;
+    }
+    .hole-win:nth-child(9) {
+      z-index: 9;
+    }
+    .hole-win:nth-child(10) {
+      z-index: 10;
+    }
+    .hole-win:nth-child(11) {
+      z-index: 11;
+    }
+    .hole-win:nth-child(12) {
+      z-index: 12;
+    }
+
+    .hole-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.22rem;
+      min-inline-size: 0;
+
+      i {
+        flex: none;
+        inline-size: 0.3rem;
+        block-size: 0.3rem;
+        border-radius: 50%;
+        background: var(--sand-6);
+      }
+    }
+
+    .hole-title {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      margin-inline-start: 0.4rem;
+      color: var(--foreground);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hole-body {
+      display: grid;
+      gap: 0.1rem;
+      color: var(--muted-foreground);
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .hole-cursor {
+      display: block;
+      inline-size: 0.55em;
+      block-size: 1em;
+      background: var(--muted-foreground);
+      animation: thoughts-blink 1.1s steps(1) infinite;
+    }
+
+    @media (width < 48rem) {
+      block-size: 34rem;
+    }
+
+    @media (width < 40rem) {
+      block-size: 36rem;
+      font-size: 0.6rem;
+
+      .hole-win {
+        inline-size: min(calc(var(--w) + 32%), calc(100% - var(--x) * 0.5));
+        inset-inline-start: calc(var(--x) * 0.5);
+      }
+    }
+  }
+
+  /* A few windows got out of the column. Wide screens only. --spill
+     runs 0..1 with scroll while the pile is near the viewport, and
+     each window has its own --k so they arrive and leave in turn. */
+  .rabbit-hole {
+    --spill: 0;
+  }
+
+  /* Hidden outright until the spill starts. Safari 26 reads the
+     background of any fixed element touching a viewport edge, even at
+     opacity 0, and would tint its toolbar with a window nobody sees. */
+  .rabbit-hole .hole-out {
+    display: none;
+  }
+
+  @media (width >= 64rem) {
+    .rabbit-hole[data-spilling] .hole-out {
+      --k: 0;
+      --show: clamp(0, calc((var(--spill) - var(--k)) / 0.4), 1);
+      position: fixed;
+      inset-inline-start: var(--vx);
+      inset-block-start: var(--vy);
+      inline-size: 15rem;
+      z-index: 30;
+      display: grid;
+      opacity: var(--show);
+      scale: calc(0.94 + var(--show) * 0.06);
+      pointer-events: none;
+      animation: none;
+      transition:
+        opacity 120ms linear,
+        scale 120ms linear;
+    }
+  }
+
+  /* Each window's place in the opening order. */
+  .rabbit-hole .hole-win {
+    --n: 0;
+  }
+  .rabbit-hole .hole-win:nth-child(2) {
+    --n: 1;
+  }
+  .rabbit-hole .hole-win:nth-child(3) {
+    --n: 2;
+  }
+  .rabbit-hole .hole-win:nth-child(4) {
+    --n: 3;
+  }
+  .rabbit-hole .hole-win:nth-child(5) {
+    --n: 4;
+  }
+  .rabbit-hole .hole-win:nth-child(6) {
+    --n: 5;
+  }
+  .rabbit-hole .hole-win:nth-child(7) {
+    --n: 6;
+  }
+  .rabbit-hole .hole-win:nth-child(8) {
+    --n: 7;
+  }
+  .rabbit-hole .hole-win:nth-child(9) {
+    --n: 8;
+  }
+  .rabbit-hole .hole-win:nth-child(10) {
+    --n: 9;
+  }
+  .rabbit-hole .hole-win:nth-child(11) {
+    --n: 10;
+  }
+  .rabbit-hole .hole-win:nth-child(12) {
+    --n: 11;
+  }
+
+  /* Windows open one after the other as the pile scrolls in. */
+  @supports (animation-timeline: view()) {
+    .rabbit-hole .hole-win:not(.hole-out) {
+      animation: thoughts-open linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--n) * 7%) entry
+        calc(30% + var(--n) * 7%);
+    }
+  }
+
+  /* Fifty words in, a few hours out. */
+  .prompt-trade {
+    margin-block: var(--space-s) var(--space-m);
+
+    .prompt-box {
+      padding: var(--space-s) var(--space-s) var(--space-xs);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--sand-2);
+    }
+
+    .prompt-text {
+      margin: 0;
+      font-family: var(--thoughts-mono);
+      font-size: var(--step--1);
+      line-height: 1.55;
+      letter-spacing: 0;
+      color: var(--foreground);
+    }
+
+    .prompt-you {
+      display: inline-block;
+      margin-inline-end: 0.6em;
+      padding: 0.05em 0.4em;
+      border-radius: var(--radius-sm);
+      background: var(--sand-4);
+      font-size: var(--text-meta);
+      color: var(--muted-foreground);
+    }
+
+    .prompt-log {
+      display: grid;
+      gap: 0.25em;
+      margin: var(--space-xs) 0 0;
+      padding: var(--space-xs) 0 0;
+      border-block-start: 1px dashed var(--border);
+      list-style: none;
+      font-family: var(--thoughts-mono);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+
+      li {
+        display: flex;
+        gap: var(--space-xs);
+        align-items: baseline;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        transform: translateY(0.3em);
+        transition:
+          opacity var(--dur-state) var(--ease-out),
+          transform var(--dur-state) var(--ease-out);
+
+        &::before {
+          display: none;
+        }
+
+        time {
+          flex: none;
+          font-variant-numeric: tabular-nums;
+          color: var(--muted-foreground);
+        }
+
+        &[data-shown] {
+          opacity: 1;
+          transform: none;
+        }
+
+        &:last-child span {
+          color: var(--accent);
+        }
+      }
+    }
+
+    .prompt-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-s);
+      margin-block-start: var(--space-xs);
+      padding-block-start: var(--space-2xs);
+      border-block-start: 1px dashed var(--border);
+      font-family: var(--thoughts-mono);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
+      color: var(--muted-foreground);
+      font-variant-numeric: tabular-nums;
+
+      b {
+        font-weight: var(--font-weight-medium);
+        color: var(--foreground);
+      }
+    }
+
+    .prompt-timer {
+      transition: color var(--dur-state) var(--ease-out);
+    }
+    &[data-done] .prompt-timer {
+      color: var(--accent);
+    }
+  }
+
+  /* Two Sabers, one reading, one at the range. */
+  .hobbies {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--space-l);
+    margin-block: var(--space-l) var(--space-m);
+    padding-block-start: 2.75rem;
+  }
+
+  .artoria-slot {
+    position: relative;
+    inline-size: 8.5rem;
+    margin: 0;
+
+    .artoria-remark {
+      inset-inline: -2rem;
+      max-inline-size: calc(100% + 4rem);
+    }
+  }
+
+  .artoria-solo {
+    inline-size: 8rem;
+    margin: var(--space-m) auto var(--space-m);
+    padding-block-start: 3.25rem;
+  }
+
+  .range-saber {
+    inline-size: 7.5rem;
+    margin: 0;
+
+    img,
+    .image-enlarge {
+      display: block;
+      inline-size: 100%;
+      block-size: auto;
+      margin: 0;
+      border-radius: 0;
+      outline: none;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  @media (width < 40rem) {
+    .hobbies {
+      gap: var(--space-m);
+      margin-block-start: var(--space-xl);
+      padding-block-start: 2.75rem;
+    }
+    .artoria-slot {
+      inline-size: 7rem;
+    }
+    .range-saber {
+      inline-size: 6rem;
+    }
+  }
+
+  /* One octave, in the house line style. */
+  .piano {
+    margin-block: var(--space-s) var(--space-m);
+
+    .piano-keys {
+      --white-w: calc(100% / 8);
+      position: relative;
+      display: flex;
+      block-size: clamp(6.5rem, 22vw, 9rem);
+      padding: 0;
+      border: 1.5px solid light-dark(var(--sand-11), var(--sand-8));
+      border-block-start-width: 6px;
+      border-radius: var(--radius-sm);
+      background: light-dark(var(--sand-1), #e4e3df);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .key {
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        background-color var(--dur-press) var(--ease-out),
+        transform var(--dur-press) var(--ease-out);
+
+      &:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: -3px;
+      }
+    }
+
+    .key.white {
+      flex: 1 1 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-block-end: 0.4rem;
+      border-inline-end: 1px solid light-dark(var(--sand-6), #3a3a37);
+      background: light-dark(var(--sand-1), #e4e3df);
+      color: light-dark(var(--muted-foreground), #575650);
+      font-family: var(--thoughts-mono);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
+
+      &:last-child {
+        border-inline-end: 0;
+      }
+
+      &:hover {
+        background: light-dark(var(--sand-2), #d9d8d3);
+      }
+
+      &.down {
+        background: light-dark(var(--sand-4), #c8c7c1);
+        color: light-dark(var(--foreground), #21201c);
+        transform: translateY(1px);
+      }
+    }
+
+    .key.black {
+      position: absolute;
+      inset-block-start: 0;
+      inline-size: calc(var(--white-w) * 0.58);
+      block-size: 60%;
+      margin-inline-start: calc(var(--white-w) * -0.29);
+      border-radius: 0 0 3px 3px;
+      background: #21201c;
+      box-shadow: inset 0 -4px 0 rgb(255 255 255 / 0.12);
+      z-index: 1;
+
+      &:hover {
+        background: #2e2d29;
+      }
+
+      &.down {
+        background: #403f3a;
+        box-shadow: none;
+        transform: translateY(1px);
+      }
+    }
+
+    .key.black[data-note="C#4"] {
+      inset-inline-start: calc(var(--white-w) * 1);
+    }
+    .key.black[data-note="D#4"] {
+      inset-inline-start: calc(var(--white-w) * 2);
+    }
+    .key.black[data-note="F#4"] {
+      inset-inline-start: calc(var(--white-w) * 4);
+    }
+    .key.black[data-note="G#4"] {
+      inset-inline-start: calc(var(--white-w) * 5);
+    }
+    .key.black[data-note="A#4"] {
+      inset-inline-start: calc(var(--white-w) * 6);
+    }
+  }
+
+  /* The detail nobody will notice. */
+  .unnoticed {
+    position: relative;
+    text-decoration: underline dotted
+      color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+    text-underline-offset: 0.2em;
+    cursor: default;
+
+    &::after {
+      content: attr(data-reveal);
+      position: absolute;
+      inset-block-end: calc(100% + 0.2em);
+      inset-inline-start: 50%;
+      padding: 0.15em 0.5em;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--background);
+      font-family: var(--thoughts-mono);
+      font-size: var(--text-meta);
+      letter-spacing: 0;
+      white-space: nowrap;
+      color: var(--muted-foreground);
+      opacity: 0;
+      transform: translate(-50%, 0.3em);
+      transition:
+        opacity var(--dur-state) var(--ease-out),
+        transform var(--dur-state) var(--ease-out);
+      pointer-events: none;
+    }
+
+    &:hover::after,
+    &:active::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  /* A sentence with something beside it instead of under it. */
+  .aside-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    align-items: center;
+    gap: var(--space-m);
+    margin-block: var(--space-s) var(--space-m);
+
+    > p {
+      margin: 0;
+    }
+
+    @media (width < 40rem) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* The whole list. It does not end. */
+  .endless-list {
+    position: relative;
+    block-size: 12.5rem;
+    margin: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 22%,
+      #000 72%,
+      transparent
+    );
+    font-family: var(--thoughts-mono);
+    font-size: var(--text-meta);
+    letter-spacing: 0;
+    color: var(--muted-foreground);
+
+    .endless-track {
+      display: grid;
+      inline-size: fit-content;
+      margin-inline: auto;
+      animation: thoughts-endless 70s linear infinite;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      margin: 0;
+      padding: 0.12em 0;
+      text-align: center;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    &:hover .endless-track {
+      animation-play-state: paused;
+    }
+  }
+
+  /* What I search instead of practicing. */
+  .search-box {
+    margin-block: var(--space-s) var(--space-m);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--sand-1);
+    box-shadow: 0 8px 22px -12px rgb(0 0 0 / 0.3);
+    font-family: var(--thoughts-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0;
+    overflow: hidden;
+
+    .search-field {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.9rem;
+      border-block-end: 1px solid var(--border);
+      color: var(--foreground);
+
+      svg {
+        flex: none;
+        color: var(--sand-9);
+      }
+    }
+
+    .search-caret {
+      inline-size: 1px;
+      block-size: 1.1em;
+      background: var(--foreground);
+      animation: thoughts-blink 1.1s steps(1) infinite;
+    }
+
+    .search-suggest {
+      margin: 0;
+      padding: 0.3rem 0;
+      list-style: none;
+
+      li {
+        --n: 0;
+        margin: 0;
+        padding: 0.3rem 0.9rem 0.3rem 2.5rem;
+        color: var(--muted-foreground);
+        opacity: 0;
+        transition: opacity var(--dur-state) var(--ease-out);
+        transition-delay: calc(var(--n) * 120ms);
+
+        &::before {
+          display: none;
+        }
+
+        b {
+          font-weight: var(--font-weight-medium);
+          color: var(--foreground);
+        }
+
+        &:nth-child(2) {
+          --n: 1;
+        }
+        &:nth-child(3) {
+          --n: 2;
+        }
+        &:nth-child(4) {
+          --n: 3;
+        }
+        &:nth-child(5) {
+          --n: 4;
+          transition-delay: 900ms;
+        }
+      }
+
+      .search-skipped {
+        color: var(--muted-foreground);
+        font-style: italic;
+
+        b {
+          color: var(--accent);
+          font-weight: var(--font-weight-normal);
+        }
+      }
+    }
+
+    &[data-seen] .search-suggest li {
+      opacity: 1;
+    }
+
+    @media (width < 40rem) {
+      .search-prefix {
+        display: none;
+      }
+
+      .search-suggest li {
+        padding-inline-start: 2.2rem;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lost-line,
+    .lost-line .lost-letters,
+    .lost-line .lost-word i,
+    .lost-line .lost-word span,
+    .one-more-list li,
+    .rabbit-hole .hole-win,
+    .hole-cursor {
+      animation: none;
+    }
+    .search-suggest li,
+    .search-caret,
+    .endless-track,
+    .rabbit-hole .hole-out,
+    .prompt-timer,
+    .unnoticed::after,
+    .hole-win {
+      transition: none;
+    }
+  }
+}
+
+/* Browsers without scroll driven animations (Firefox) get the same
+   beats as transitions, switched by the script with observers. */
+@supports not (animation-timeline: view()) {
+  article[data-url^="/posts/i-hate-my-thoughts-posts"] prose-content {
+    .lost-line {
+      opacity: 0;
+      filter: blur(6px);
+      letter-spacing: 0.06em;
+      transition:
+        opacity 700ms var(--ease-out),
+        filter 700ms var(--ease-out),
+        letter-spacing 700ms var(--ease-out);
+
+      &[data-in] {
+        opacity: 1;
+        filter: none;
+        letter-spacing: -0.015em;
+      }
+
+      .lost-word i {
+        transition:
+          opacity 600ms var(--ease-in),
+          filter 600ms var(--ease-in),
+          transform 600ms var(--ease-in);
+      }
+
+      &[data-gone] .lost-word i {
+        opacity: 0;
+        filter: blur(3px);
+        transform: translate(
+          calc(var(--i) * 0.55em),
+          calc(var(--i) * var(--i) * -0.04em)
+        );
+      }
+    }
+
+    .one-more-list li {
+      opacity: 0;
+      transform: translateY(0.4em);
+      transition:
+        opacity 500ms var(--ease-out),
+        transform 500ms var(--ease-out);
+
+      &[data-in] {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .rabbit-hole .hole-win:not(.hole-out) {
+      opacity: 0;
+      scale: 0.92;
+      transition:
+        opacity 400ms var(--ease-out) calc(var(--n) * 70ms),
+        scale 400ms var(--ease-out) calc(var(--n) * 70ms),
+        translate var(--dur-state) var(--ease-out);
+    }
+
+    .rabbit-hole[data-in] .hole-win:not(.hole-out) {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+}
+
+@keyframes thoughts-arrive {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    letter-spacing: 0.06em;
+  }
+}
+
+@keyframes thoughts-pulse {
+  50% {
+    font-weight: calc(500 + var(--energy) * 60);
+    letter-spacing: calc(var(--energy) * -0.03em);
+  }
+}
+
+@keyframes thoughts-jitter {
+  0% {
+    transform: translate(
+        calc(var(--energy) * 1.6px),
+        calc(var(--energy) * -1.2px)
+      )
+      rotate(calc(var(--energy) * 0.8deg));
+  }
+  50% {
+    transform: translate(
+        calc(var(--energy) * -1.4px),
+        calc(var(--energy) * 1px)
+      )
+      rotate(calc(var(--energy) * -0.6deg));
+  }
+  100% {
+    transform: translate(
+        calc(var(--energy) * 0.8px),
+        calc(var(--energy) * 1.4px)
+      )
+      rotate(calc(var(--energy) * 0.3deg));
+  }
+}
+
+@keyframes thoughts-dissolve {
+  to {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translate(
+      calc(var(--i) * 0.55em),
+      calc(var(--i) * var(--i) * -0.04em)
+    );
+  }
+}
+
+@keyframes thoughts-open {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+
+@keyframes thoughts-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+
+@keyframes thoughts-endless {
+  to {
+    translate: 0 -50%;
+  }
+}
+
+@keyframes thoughts-blink {
+  50% {
+    opacity: 0;
+  }
+}

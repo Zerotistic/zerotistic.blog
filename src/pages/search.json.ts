@@ -1,4 +1,5 @@
 import { duplicateProject, products } from "@/data/cves"
+import { mentionGroups } from "@/data/mentions"
 import { talks } from "@/data/talks"
 import { getPosts, getSubposts, titleText } from "@/lib/content"
 import { formatDate } from "@/lib/utils"
@@ -7,7 +8,7 @@ import { render } from "astro:content"
 /** One searchable thing. Short keys keep the file small. */
 type Entry = {
   /** kind */
-  k: "post" | "section" | "cve" | "talk" | "page"
+  k: "post" | "section" | "cve" | "talk" | "mention" | "page"
   /** title */
   t: string
   /** url */
@@ -38,7 +39,7 @@ const plain = (markdown: string) =>
 
 const identifiers = (code: string) =>
   [...new Set(code.match(/[A-Za-z_][A-Za-z0-9_]{3,}/g) ?? [])]
-    .slice(0, 200)
+    .slice(0, 120)
     .join(" ")
 
 // Split a post body at its headings: the text before the first heading,
@@ -69,7 +70,7 @@ export async function GET() {
 
   for (const parent of posts) {
     for (const post of [parent, ...(series.get(parent.id) ?? [])]) {
-      const url = `/posts/${post.id}`
+      const url = `/posts/${post.id}/`
       const title = titleText(post.data.title)
       const parts = chunks(post.body ?? "")
       const { headings } = await render(post)
@@ -81,7 +82,9 @@ export async function GET() {
         u: url,
         c: post.data.description,
         m: formatDate(post.data.date),
-        x: [parts[0]?.text, ...(post.data.tags ?? [])].join(" "),
+        x: [(parts[0]?.text ?? "").slice(0, 1000), ...(post.data.tags ?? [])]
+          .filter(Boolean)
+          .join(" "),
         i: parts[0]?.ids || undefined,
       })
 
@@ -95,7 +98,7 @@ export async function GET() {
           t: text,
           u: `${url}#${slug}`,
           c: title,
-          x: part.text.slice(0, 4000),
+          x: part.text.slice(0, 1000),
           i: part.ids || undefined,
         })
       })
@@ -107,10 +110,13 @@ export async function GET() {
       // The duplicate write-up has no score of its own.
       const severity = "severity" in finding ? finding.severity : undefined
       const score = "score" in finding ? finding.score : undefined
+      const anchor = finding.id.includes("XXXX")
+        ? `${product.id}-pending`
+        : finding.id.toLowerCase()
       entries.push({
         k: "cve",
         t: finding.title,
-        u: `/cves#${finding.id.toLowerCase()}`,
+        u: `/cves/#${anchor}`,
         c: `${product.name} · ${finding.id}`,
         m: severity ? `${severity} ${score ?? ""}`.trim() : "duplicate",
         x: `${finding.id} ${severity ?? "duplicate"} ${product.name} ${product.context} ${finding.summary}`,
@@ -122,20 +128,33 @@ export async function GET() {
     entries.push({
       k: "talk",
       t: talk.title,
-      u: `/talks#${talk.id}`,
+      u: `/talks/#${talk.id}`,
       c: `${talk.event} · ${talk.location}`,
       m: talk.dateLabel,
       x: talk.description,
     })
   }
 
+  for (const group of mentionGroups) {
+    for (const mention of group.mentions) {
+      entries.push({
+        k: "mention",
+        t: mention.name,
+        u: `/mentions/#${group.id}`,
+        c: mention.context,
+        m: mention.year,
+        x: `${mention.kind} ${mention.research.label} ${mention.description}`,
+      })
+    }
+  }
+
   const pages: [string, string, string][] = [
-    ["posts", "/posts", "Everything I’ve written"],
-    ["about", "/about", "Who I am, CTFs over the years, what I’m into"],
-    ["work", "/work", "Experience and education"],
-    ["talks", "/talks", "Conference and meetup talks"],
-    ["cves", "/cves", "Published vulnerabilities"],
-    ["mentions", "/mentions", "Press coverage and citations"],
+    ["posts", "/posts/", "Everything I’ve written"],
+    ["about", "/about/", "Who I am, CTFs over the years, what I’m into"],
+    ["work", "/work/", "Experience and education"],
+    ["talks", "/talks/", "Conference and meetup talks"],
+    ["cves", "/cves/", "Published vulnerabilities"],
+    ["mentions", "/mentions/", "Press coverage and citations"],
     ["rss", "/rss.xml", "Subscribe to new posts"],
   ]
   for (const [t, u, c] of pages) entries.push({ k: "page", t, u, c })

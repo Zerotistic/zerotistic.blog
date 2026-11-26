@@ -8,7 +8,9 @@
       pathname = decodeURIComponent(pathname)
     } catch {}
     document
-      .querySelector(`article[data-embedded][data-url="${pathname}"]`)
+      .querySelector(
+        `article[data-embedded][data-url="${pathname}/"], article[data-embedded][data-url="${pathname}"]`,
+      )
       ?.scrollIntoView({ behavior: "instant" })
   })()
 </script>
@@ -44,7 +46,8 @@
     if (link.getAttribute("href")?.startsWith("#")) return hashTarget(link.hash)
     if (link.origin !== location.origin || link.search) return null
     const article = articles.find(
-      (article) => article.dataset.url === normalizePath(link.pathname),
+      (article) =>
+        normalizePath(article.dataset.url ?? "") === normalizePath(link.pathname),
     )
     if (!article) return null
     return link.hash ? (hashTarget(link.hash) ?? article) : article
@@ -60,7 +63,7 @@
       crumb.hidden = false
       crumbLink.href = article.dataset.url ?? ""
       crumbLink.textContent =
-        article.querySelector("header h1")?.textContent ?? ""
+        article.querySelector("header :is(h1, h2)")?.textContent ?? ""
       crumbLink.setAttribute("aria-current", "page")
       parentLink.removeAttribute("aria-current")
     }
@@ -113,7 +116,10 @@
     const current = atBottom()
       ? articles[articles.length - 1]
       : articles.find((article) => inBand.has(article))
-    if (current && current.dataset.url !== normalizePath(location.pathname)) {
+    if (
+      current &&
+      normalizePath(current.dataset.url ?? "") !== normalizePath(location.pathname)
+    ) {
       sync(current)
     }
   }

@@ -1,7 +1,7 @@
 ---
 import { getEntry } from "astro:content"
 import DiscordEmbed from "@/components/DiscordEmbed.astro"
-import { SITE } from "@/consts"
+import { SITE, SOCIALS } from "@/consts"
 import { pageTitle } from "@/lib/content"
 
 type Props = {
@@ -18,7 +18,49 @@ const fullTitle = title ? pageTitle(title) : SITE.title
 const canonical = new URL(Astro.url.pathname, base)
 const ogImage = new URL(SITE.defaultPageImage, base)
 const isHome = Astro.url.pathname === "/" && !noindex
+const isAbout = Astro.url.pathname.replace(/\/+$/, "") === "/about" && !noindex
 const author = isHome ? await getEntry("authors", "zerotistic") : undefined
+
+const personSchema = {
+  "@type": "Person",
+  "@id": new URL("/#person", base).href,
+  name: SITE.title,
+  url: new URL("/", base).href,
+  jobTitle: "Security Researcher",
+  worksFor: {
+    "@type": "Organization",
+    name: "HiddenLayer",
+    url: "https://hiddenlayer.com",
+  },
+  sameAs: SOCIALS.map((social) => social.href),
+}
+
+const jsonLd = isHome
+  ? {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": new URL("/#website", base).href,
+          name: SITE.title,
+          description: SITE.description,
+          url: new URL("/", base).href,
+          inLanguage: SITE.locale,
+          author: { "@id": personSchema["@id"] },
+        },
+        personSchema,
+      ],
+    }
+  : isAbout
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        url: canonical.href,
+        name: fullTitle,
+        description,
+        mainEntity: personSchema,
+      }
+    : undefined
 ---
 
 <title>{fullTitle}</title>
@@ -44,6 +86,10 @@ const author = isHome ? await getEntry("authors", "zerotistic") : undefined
 <meta name="twitter:image" content={ogImage}>
 <meta name="twitter:image:alt" content={ogTitle}>
 
+{jsonLd && (
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+)}
+
 {isHome && (
   <DiscordEmbed
     title={SITE.title}
@@ -54,6 +100,6 @@ const author = isHome ? await getEntry("authors", "zerotistic") : undefined
       url: new URL(author.data.avatar, base),
       description: `${author.data.name}'s avatar`,
     }}
-    link={{ url: new URL("/cves", base), label: "Explore my research" }}
+    link={{ url: new URL("/cves/", base), label: "Explore my research" }}
   />
 )}

@@ -354,11 +354,18 @@ const investigating = pose.name === "investigating"
 </style>
 
 <script>
-  import { initArtoria } from "@/lib/artoria-companion"
-  import { initArtoriaFrames } from "@/lib/artoria-frame-player"
-  for (const element of document.querySelectorAll<HTMLElement>(".artoria")) {
-    if (element.classList.contains("artoria-inline")) {
-      initArtoriaFrames(element)
-    } else initArtoria(element)
+  const elements = [...document.querySelectorAll<HTMLElement>(".artoria")]
+  const inline = elements.filter((el) => el.classList.contains("artoria-inline"))
+  const companions = elements.filter((el) => !el.classList.contains("artoria-inline"))
+
+  if (inline.length) {
+    import("@/lib/artoria-frame-player").then(({ initArtoriaFrames }) => {
+      for (const element of inline) initArtoriaFrames(element)
+    })
+  }
+  if (companions.length) {
+    import("@/lib/artoria-companion").then(({ initArtoria }) => {
+      for (const element of companions) initArtoria(element)
+    })
   }
 </script>

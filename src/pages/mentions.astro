@@ -146,8 +146,8 @@ const groups = mentionGroups.map((group) => ({
       &[aria-current] {
         color: var(--foreground);
         .index-count {
-          color: var(--accent);
-          background: var(--accent-muted);
+          color: light-dark(#7c4322, #b4c8e4);
+          background: color-mix(in oklab, var(--accent) 14%, transparent);
         }
       }
       @media (hover: hover) {

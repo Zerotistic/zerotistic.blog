@@ -7,7 +7,7 @@
 /* The companions and stickers are part of the page, not pictures to save.
    A long press on them does nothing instead of offering the share sheet. */
 :where(
-  :is(.artoria, .mention-companion, .work-cheer, .work-jumping) > button,
+  :is(.artoria, .mention-companion, .work-jumping) > button,
   .range-saber,
   .cat-sticker,
   .collection-display img,

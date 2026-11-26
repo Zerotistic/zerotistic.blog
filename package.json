@@ -21,11 +21,15 @@
     "@astrojs/sitemap": "^3.7.3",
     "@expressive-code/plugin-collapsible-sections": "^0.42.0",
     "@expressive-code/plugin-line-numbers": "^0.42.0",
+    "@fontsource/ibm-plex-mono": "^5.2.5",
+    "@fontsource/ibm-plex-sans": "^5.2.5",
+    "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.3.3",
     "github-slugger": "^2.0.0",
     "hast-util-select": "^6.0.4",
     "hast-util-to-html": "^9.0.5",
     "hastscript": "^9.0.1",
+    "satori": "^0.12.2",
     "satteri": "0.9.4",
     "satteri-expressive-code": "^0.1.15",
     "sharp": "^0.35.4",
@@ -39,10 +43,5 @@
     "linkedom": "^0.18.13",
     "mdast-util-to-hast": "^13.2.1",
     "typescript": "^6.0.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "lru-cache": "11.5.1"
-    }
   }
 }

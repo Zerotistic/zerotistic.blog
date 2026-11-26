@@ -5,13 +5,29 @@ import PageHeader from "@/components/PageHeader.astro"
 import CveFinding from "@/components/CveFinding.astro"
 import Layout from "@/layouts/Layout.astro"
 
-const findingCount = products
-  .flatMap((product) => product.findings)
-  .filter((finding) => finding.published).length
-const criticalCount = products
-  .flatMap((product) => product.findings)
-  .filter((finding) => finding.severity === "critical").length
+const allFindings = products.flatMap((product) => product.findings)
+const findingCount = allFindings.filter((finding) => finding.published).length
+const criticalCount = allFindings.filter(
+  (finding) => finding.severity === "critical",
+).length
+const highCount = allFindings.filter(
+  (finding) => finding.severity === "high",
+).length
+const mediumCount = allFindings.filter(
+  (finding) => finding.severity === "medium",
+).length
 const duplicateFinding = duplicateProject.findings[0]
+const totalCount = allFindings.length + duplicateProject.findings.length
+const writeupCount = duplicateProject.findings.filter(
+  (finding) => "writeup" in finding && finding.writeup,
+).length
+const filters = [
+  { id: "all", label: "all", count: totalCount },
+  { id: "critical", label: "critical", count: criticalCount },
+  { id: "high", label: "high", count: highCount },
+  { id: "medium", label: "medium", count: mediumCount },
+  { id: "writeup", label: "write-up", count: writeupCount },
+].filter((f) => f.id === "all" || f.count > 0)
 const findingAnchor = (id: string, product: string) =>
   id.includes("XXXX") ? `${product}-pending` : id.toLowerCase()
 ---
@@ -22,6 +38,55 @@ const findingAnchor = (id: string, product: string) =>
     title="CVEs"
     description="A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling."
   />
+
+  <svg class="cve-sprite" aria-hidden="true" style="display:none">
+    <defs>
+      <symbol id="cve-icon-chevron" viewBox="0 0 16 16">
+        <path
+          d="m4 6 4 4 4-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+      </symbol>
+      <symbol id="cve-icon-link" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M1.25 9A6.75 6.75 0 0 1 8 2.25h4a6.75 6.75 0 0 1 0 13.5h-2a.75.75 0 0 1 0-1.5h2a5.25 5.25 0 1 0 0-10.5H8a5.25 5.25 0 0 0-3.913 8.75a.75.75 0 0 1-1.118 1A6.73 6.73 0 0 1 1.25 9M12 9.75a5.25 5.25 0 1 0 0 10.5h4a5.25 5.25 0 0 0 3.913-8.75a.75.75 0 1 1 1.118-1A6.75 6.75 0 0 1 16 21.75h-4a6.75 6.75 0 0 1 0-13.5h2a.75.75 0 0 1 0 1.5z"
+        />
+      </symbol>
+      <symbol id="cve-icon-copy" viewBox="0 0 24 24">
+        <rect
+          x="8"
+          y="8"
+          width="12"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+      </symbol>
+      <symbol id="cve-icon-check" viewBox="0 0 24 24">
+        <path
+          d="m5 12.5 4.5 4.5L19 7.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </symbol>
+    </defs>
+  </svg>
 
   <div slot="toc" class="project-navigation">
     <div class="project-picker" data-bar>
@@ -118,6 +183,24 @@ const findingAnchor = (id: string, product: string) =>
       <dd>{criticalCount.toString().padStart(2, "0")}</dd>
     </div>
   </dl>
+
+  <div class="cve-filters" role="group" aria-label="Filter findings" hidden>
+    <span class="filter-label" aria-hidden="true">// filter</span>
+    <div class="filter-buttons">
+      {filters.map((filter) => (
+        <button
+          type="button"
+          class="filter-btn"
+          data-filter={filter.id}
+          aria-pressed={filter.id === "all" ? "true" : "false"}
+        >
+          <span>{filter.label}</span>
+          <span class="filter-count">{filter.count.toString().padStart(2, "0")}</span>
+        </button>
+      ))}
+    </div>
+    <span class="visually-hidden" role="status" id="cve-filter-status"></span>
+  </div>
 
   <div class="product-index" aria-label="Vulnerabilities grouped by product">
     {products.map((product) => (
@@ -281,7 +364,7 @@ const findingAnchor = (id: string, product: string) =>
   .stats {
     display: flex;
     align-items: center;
-    margin-block-end: var(--space-l);
+    margin-block-end: var(--space-m);
     padding-block: var(--space-xs);
     border-block: 1px solid var(--border);
 
@@ -309,6 +392,76 @@ const findingAnchor = (id: string, product: string) =>
       font-size: var(--step-1);
       font-variant-numeric: tabular-nums;
     }
+  }
+
+  .cve-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-s);
+    margin-block-end: var(--space-l);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    letter-spacing: 0;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .filter-label {
+    color: var(--muted-foreground);
+    font-size: var(--text-caption);
+  }
+
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-xs);
+  }
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: var(--radius-sm);
+    color: var(--muted-foreground);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: max(1px, 0.0625em);
+    text-underline-offset: 0.3em;
+    transition:
+      color var(--dur-hover) ease,
+      background-color var(--dur-hover) ease,
+      text-decoration-color var(--dur-hover) ease;
+
+    &[aria-pressed="true"] {
+      color: var(--foreground);
+      background-color: var(--row-hover);
+      text-decoration-color: var(--accent);
+
+      .filter-count {
+        color: var(--foreground);
+      }
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--foreground);
+      }
+    }
+
+    @media (any-pointer: coarse) {
+      min-block-size: 2.75rem;
+    }
+  }
+
+  .filter-count {
+    font-size: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-foreground);
   }
 
   .product-index {
@@ -515,6 +668,8 @@ const findingAnchor = (id: string, product: string) =>
   const projectNav = document.querySelector<HTMLElement>(".project-nav")
   const picker = document.querySelector<HTMLSelectElement>("#project-picker")
   const pickerBar = document.querySelector<HTMLElement>(".project-picker")
+  const filterBar = document.querySelector<HTMLElement>(".cve-filters")
+  const filterStatus = document.querySelector<HTMLElement>("#cve-filter-status")
 
   if (projectNav && picker && pickerBar) {
     picker.disabled = false
@@ -528,6 +683,8 @@ const findingAnchor = (id: string, product: string) =>
     })
 
     const updateActiveProject = () => {
+      const visibleSections = sections.filter(({ section }) => !section.hidden)
+      if (!visibleSections.length) return
       // A project is current once its heading passes a line a third of the
       // way down, so the index never names a section that has left the
       // screen while the next one fills it.
@@ -535,12 +692,12 @@ const findingAnchor = (id: string, product: string) =>
         (mobile.matches ? pickerBar.getBoundingClientRect().height : 0) + 32,
         innerHeight * 0.35,
       )
-      let active = sections[0]
-      for (const entry of sections) {
+      let active = visibleSections[0]
+      for (const entry of visibleSections) {
         if (entry.section.getBoundingClientRect().top <= offset) active = entry
       }
       if (scrollY + innerHeight >= document.documentElement.scrollHeight - 2) {
-        active = sections.at(-1) ?? active
+        active = visibleSections.at(-1) ?? active
       }
       if (!active) return
       for (const { link } of sections) {
@@ -558,6 +715,105 @@ const findingAnchor = (id: string, product: string) =>
         scheduled = false
         updateActiveProject()
       })
+    }
+
+    // Severity & write-up filter
+    if (filterBar) {
+      filterBar.hidden = false
+      const buttons = [
+        ...filterBar.querySelectorAll<HTMLButtonElement>("[data-filter]"),
+      ]
+      const duplicateBoard =
+        document.querySelector<HTMLElement>(".duplicate-board")
+      const duplicateNavBoard = document.querySelector<HTMLElement>(
+        ".duplicate-nav-board",
+      )
+      const groups = [
+        ...document.querySelectorAll<HTMLElement>(".product-group"),
+      ]
+      let currentFilter = "all"
+
+      const matchesFilter = (finding: HTMLElement, filter: string) => {
+        if (filter === "all") return true
+        if (filter === "writeup") return finding.dataset.hasWriteup === "true"
+        return finding.dataset.severity === filter
+      }
+
+      const applyFilter = (filter: string, announce = true) => {
+        currentFilter = filter
+        let shownTotal = 0
+        for (const button of buttons) {
+          button.setAttribute("aria-pressed", String(button.dataset.filter === filter))
+        }
+        for (const group of groups) {
+          const items = [...group.querySelectorAll<HTMLElement>(".finding-list > li")]
+          let shownInGroup = 0
+          for (const item of items) {
+            const finding = item.querySelector<HTMLElement>(".cve-finding")
+            const show = !!finding && matchesFilter(finding, filter)
+            item.hidden = !show
+            if (show) shownInGroup++
+          }
+          group.hidden = shownInGroup === 0
+          shownTotal += shownInGroup
+          const padded = shownInGroup.toString().padStart(2, "0")
+          const countEl = group.querySelector<HTMLElement>(".product-count")
+          if (countEl) {
+            countEl.textContent = padded
+            countEl.setAttribute(
+              "aria-label",
+              `${shownInGroup} ${shownInGroup === 1 ? "finding" : "findings"}`,
+            )
+          }
+          const navLink = projectNav.querySelector<HTMLAnchorElement>(
+            `a[href="#${group.id}"]`,
+          )
+          const navItem = navLink?.closest("li")
+          if (navItem) navItem.hidden = shownInGroup === 0
+          const navCount = navLink?.querySelector<HTMLElement>(".index-count")
+          if (navCount) navCount.textContent = padded
+          const option = picker.querySelector<HTMLOptionElement>(
+            `option[value="${group.id}"]`,
+          )
+          if (option) {
+            option.hidden = shownInGroup === 0
+            option.disabled = shownInGroup === 0
+            const name = option.textContent?.split(" · ")[0] ?? group.id
+            option.textContent = `${name} · ${shownInGroup}`
+          }
+        }
+        if (duplicateBoard) {
+          const dupGroup = duplicateBoard.querySelector<HTMLElement>(".product-group")
+          const hideDup = !dupGroup || dupGroup.hidden
+          duplicateBoard.hidden = hideDup
+          if (duplicateNavBoard) duplicateNavBoard.hidden = hideDup
+        }
+        if (announce && filterStatus) {
+          filterStatus.textContent = `Showing ${shownTotal} ${shownTotal === 1 ? "finding" : "findings"}`
+        }
+        scheduleUpdate()
+      }
+
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          const next = button.dataset.filter ?? "all"
+          applyFilter(next)
+        })
+      }
+
+      // If a permalink hash points to a filtered-out finding, reset to all.
+      const ensureHashVisible = () => {
+        if (currentFilter === "all" || !location.hash) return
+        let id = ""
+        try {
+          id = decodeURIComponent(location.hash.slice(1))
+        } catch {
+          return
+        }
+        const target = document.getElementById(id)
+        if (target?.closest("[hidden]")) applyFilter("all", false)
+      }
+      addEventListener("hashchange", ensureHashVisible)
     }
 
     picker.addEventListener("change", () => {

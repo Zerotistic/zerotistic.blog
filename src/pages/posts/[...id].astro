@@ -6,6 +6,8 @@ import "@/styles/typography-block.css"
 import "@/styles/typography-tables.css"
 import "@/styles/typography-math.css"
 import "@/styles/callout.css"
+import siriCss from "@/styles/siri.css?url"
+import thoughtsCss from "@/styles/thoughts.css?url"
 import ImageViewer from "@/components/ImageViewer.astro"
 import SiriClock from "@/components/SiriClock.astro"
 import SiriDemo from "@/components/SiriDemo.astro"
@@ -80,23 +82,28 @@ const crumbs: { label: string; href: string }[] = []
 if (chain.length > 1) {
   crumbs.push({
     label: titleText(parent.data.title),
-    href: `/posts/${parent.id}`,
+    href: `/posts/${parent.id}/`,
   })
   if (isSubpost(post.id)) {
     crumbs.push({
       label: titleText(post.data.title),
-      href: `/posts/${post.id}`,
+      href: `/posts/${post.id}/`,
     })
   }
 }
+const isThoughts = post.id === "i-hate-my-thoughts-posts"
+const isSiri = post.id === "siri-linux-minecraft"
 ---
 
 <Layout crumbs={crumbs} reading>
-  <MetaPost
-    slot="head"
-    post={post}
-    canonical={isSubpost(post.id) ? `/posts/${parent.id}` : undefined}
-  />
+  <Fragment slot="head">
+    <MetaPost
+      post={post}
+      canonical={isSubpost(post.id) ? `/posts/${parent.id}/` : undefined}
+    />
+    {isThoughts && <link rel="stylesheet" href={thoughtsCss} />}
+    {isSiri && <link rel="stylesheet" href={siriCss} />}
+  </Fragment>
   {hasToc && (
       <TableOfContents
         slot="toc"
@@ -107,24 +114,31 @@ if (chain.length > 1) {
   <ScrollToTop slot="actions" />
   <ScrollToTop floating />
   <ImageViewer />
-  <SiriClock />
-  <SiriDemo />
-  {post.id === "i-hate-my-thoughts-posts" && <ThoughtsMarginalia />}
+  {isSiri && (
+    <>
+      <SiriClock />
+      <SiriDemo />
+    </>
+  )}
+  {isThoughts && <ThoughtsMarginalia />}
   <LinkPreviews />
   <CodeTools />
   <HeadingLinks />
   <QuoteLink />
   <ResumeReading />
-  {rendered.map(({ entry, Content, authors, linkPreviews }, i) => (
+  {rendered.map(({ entry, Content, authors, linkPreviews }, i) => {
+    const Heading = i === 0 ? "h1" : "h2"
+    return (
       <article
         id={i === 0 ? "introduction" : subpostSlug(entry.id)}
-        data-url={`/posts/${entry.id}`}
+        data-url={`/posts/${entry.id}/`}
         data-title={pageTitle(entry.data.title)}
         data-link-previews={JSON.stringify(linkPreviews)}
         data-embedded={i > 0 || undefined}
       >
         <header>
-          <h1
+          <Heading
+            class="post-heading"
             style={entry.id === post.id ? titleTransition(entry.id) : undefined}
             set:html={titleHtml(entry.data.title)}
           />
@@ -149,17 +163,19 @@ if (chain.length > 1) {
                 </author-names>
               </post-authors>
             )}
-            <time
-              datetime={entry.data.date.toISOString()}
-              style={entry.id === post.id ? dateTransition(entry.id) : undefined}
-              >{formatDate(entry.data.date)}</time
-            >
-            <reading-time>{readingTime(entry.body ?? "")}</reading-time>
+            <meta-timing>
+              <time
+                datetime={entry.data.date.toISOString()}
+                style={entry.id === post.id ? dateTransition(entry.id) : undefined}
+                >{formatDate(entry.data.date)}</time
+              >
+              <reading-time>{readingTime(entry.body ?? "")}</reading-time>
+            </meta-timing>
           </post-meta>
             {entry.data.tags && (
               <post-tags>
                 {entry.data.tags.map((tag) => (
-                  <a href={`/tags/${tag}`}>#{tag}</a>
+                  <a href={`/tags/${tag}/`}>#{tag}</a>
                 ))}
               </post-tags>
             )}
@@ -195,7 +211,8 @@ if (chain.length > 1) {
           <Content />
         </prose-content>
       </article>
-    ))}
+    )
+  })}
   <PostNavigation prev={prev} next={next} />
   {chain.length > 1 && <SeriesReader />}
 </Layout>
@@ -207,7 +224,7 @@ if (chain.length > 1) {
     border-block-start: 2px solid var(--border);
     scroll-margin-block-start: calc(-2px - 0.2 * var(--step-2));
 
-    header h1 {
+    header .post-heading {
       font-size: var(--step-2);
     }
   }
@@ -215,7 +232,7 @@ if (chain.length > 1) {
   header {
     margin-block-end: var(--space-xl);
 
-    h1 {
+    .post-heading {
       font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem);
       line-height: 1.18;
       font-weight: var(--font-weight-medium);
@@ -236,6 +253,13 @@ if (chain.length > 1) {
       font-size: var(--text-meta);
       letter-spacing: 0;
       color: var(--muted-foreground);
+
+      meta-timing {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6em;
+        white-space: nowrap;
+      }
 
       time,
       reading-time {
@@ -267,9 +291,17 @@ if (chain.length > 1) {
         }
       }
 
-      post-authors ~ time::before {
+      post-authors ~ meta-timing::before {
         content: "·";
-        margin-inline-end: var(--space-3xs);
+      }
+
+      @media (width < 30rem) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        post-authors ~ meta-timing::before {
+          content: none;
+        }
       }
 
       a {

@@ -6,20 +6,25 @@ import type { CollectionEntry } from "astro:content"
 type Props = {
   post: CollectionEntry<"blog">
   partCount: number
-  tags: string[]
+  readTime?: string
   showYear?: boolean
 }
 
-const { post, partCount, tags, showYear = true } = Astro.props
+const {
+  post,
+  partCount,
+  readTime = readingTime(post.body ?? ""),
+  showYear = true,
+} = Astro.props
 ---
 
-<li data-post-row data-tags={tags.join(" ")}>
+<li data-post-row>
   <article class:list={["editorial-row", { "short-date": !showYear }]}>
     <a
       class="post-link"
-      href={`/posts/${post.id}`}
+      href={`/posts/${post.id}/`}
       data-peek={post.data.description}
-      data-peek-meta={readingTime(post.body ?? "")}
+      data-peek-meta={readTime}
     >
       <time
         datetime={post.data.date.toISOString()}
@@ -40,11 +45,6 @@ const { post, partCount, tags, showYear = true } = Astro.props
       </row-title>
       <span class="post-arrow link-arrow" aria-hidden="true">→</span>
     </a>
-    {tags.length > 0 && (
-      <row-tags aria-label="Tags">
-        {tags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}
-      </row-tags>
-    )}
   </article>
 </li>
 
@@ -138,29 +138,6 @@ const { post, partCount, tags, showYear = true } = Astro.props
     }
   }
 
-  row-tags {
-    z-index: 1;
-    grid-row: 2;
-    grid-column: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2xs);
-    font-family: var(--font-mono);
-    font-size: var(--text-meta);
-    letter-spacing: 0;
-
-    a {
-      color: var(--muted-foreground);
-      text-decoration-color: transparent;
-
-      @media (hover: hover) {
-        &:hover {
-          color: var(--foreground);
-        }
-      }
-    }
-  }
-
   @media (width < 34rem) {
     article {
       grid-template-columns: minmax(0, 1fr) auto;
@@ -185,11 +162,6 @@ const { post, partCount, tags, showYear = true } = Astro.props
         grid-column: 2;
         grid-row: 2;
       }
-    }
-
-    row-tags {
-      grid-row: 3;
-      grid-column: 1;
     }
   }
 </style>

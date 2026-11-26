@@ -25,7 +25,7 @@ const ogImage = new URL(`/og/${post.id}.png`, base)
 const ogImageVersion = createHash("sha256")
   .update(
     JSON.stringify({
-      renderer: 2,
+      renderer: 3,
       title: post.data.title,
       date: post.data.date,
       tags: post.data.tags,
@@ -34,6 +34,33 @@ const ogImageVersion = createHash("sha256")
   .digest("hex")
   .slice(0, 12)
 ogImage.searchParams.set("v", ogImageVersion)
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: cleanTitle,
+  description,
+  datePublished: date.toISOString(),
+  url: url.href,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonical.href,
+  },
+  image: ogImage.href,
+  inLanguage: SITE.locale,
+  author: authors.map((author) => ({
+    "@type": "Person",
+    name: author.data.name,
+    url: new URL("/", base).href,
+  })),
+  publisher: {
+    "@type": "Person",
+    "@id": new URL("/#person", base).href,
+    name: SITE.title,
+    url: new URL("/", base).href,
+  },
+  ...(post.data.tags?.length ? { keywords: post.data.tags.join(", ") } : {}),
+}
 ---
 
 <title>{pageTitle(title)}</title>
@@ -52,6 +79,7 @@ ogImage.searchParams.set("v", ogImageVersion)
 <meta property="og:image:height" content="630">
 
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content={SITE.twitterHandle}>
 <meta name="twitter:title" content={embedTitle}>
 <meta name="twitter:description" content={description}>
 <meta name="twitter:image" content={ogImage}>
@@ -60,6 +88,8 @@ ogImage.searchParams.set("v", ogImageVersion)
 
 <meta property="article:published_time" content={date.toISOString()}>
 {authorNames.map((name) => <meta property="article:author" content={name} />)}
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
 <DiscordEmbed
   title={title}

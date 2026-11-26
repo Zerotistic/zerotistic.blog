@@ -35,10 +35,10 @@
     <input
       type="search"
       role="combobox"
-      aria-expanded="true"
+      aria-expanded="false"
       aria-controls="search-results"
       aria-autocomplete="list"
-      aria-label="Search posts, sections, CVEs and talks"
+      aria-label="Search posts, sections, CVEs, talks and mentions"
       placeholder="search posts, sections, cves…"
       autocomplete="off"
       autocapitalize="off"
@@ -59,7 +59,7 @@
 <script>
   import { closeOnBack } from "@/lib/overlay-history"
 
-  type Kind = "post" | "section" | "cve" | "talk" | "page"
+  type Kind = "post" | "section" | "cve" | "talk" | "mention" | "page"
   type Entry = {
     k: Kind
     t: string
@@ -78,7 +78,10 @@
   const input = dialog.querySelector("input")!
   const list = dialog.querySelector<HTMLElement>("#search-results")!
   const status = dialog.querySelector<HTMLElement>("#search-status")!
-  const mac = /Mac|iPhone|iPad/.test(navigator.platform)
+  const platform =
+    (navigator as Navigator & { userAgentData?: { platform?: string } })
+      .userAgentData?.platform ?? navigator.userAgent
+  const mac = /Mac|iPhone|iPad|iPod/i.test(platform)
   opener.dataset.tooltip = `Search  ${mac ? "⌘K" : "Ctrl K"}`
 
   // Shorthand people type versus the words posts use. Either side finds
@@ -123,14 +126,16 @@
     page: 1.1,
     talk: 1,
     cve: 1,
+    mention: 0.95,
     section: 0.9,
   }
-  const order: Kind[] = ["post", "section", "cve", "talk", "page"]
+  const order: Kind[] = ["post", "section", "cve", "talk", "mention", "page"]
   const limits: Record<Kind, number> = {
     post: 4,
     section: 6,
     cve: 5,
     talk: 2,
+    mention: 3,
     page: 3,
   }
   const labels: Record<Kind, string> = {
@@ -138,6 +143,7 @@
     section: "sections",
     cve: "cves",
     talk: "talks",
+    mention: "mentions",
     page: "pages",
   }
 
@@ -270,10 +276,20 @@
       "gi",
     )
 
-  const highlight = (text: string, tokens: string[]) =>
-    tokens.length
-      ? escape(text).replace(termPattern(tokens), "<mark>$1</mark>")
-      : escape(text)
+  const highlight = (text: string, tokens: string[]) => {
+    if (!tokens.length) return escape(text)
+    const pattern = termPattern(tokens)
+    let out = ""
+    let last = 0
+    for (const match of text.matchAll(pattern)) {
+      const at = match.index ?? 0
+      if (at > last) out += escape(text.slice(last, at))
+      out += `<mark>${escape(match[0])}</mark>`
+      last = at + match[0].length
+    }
+    if (last < text.length) out += escape(text.slice(last))
+    return out
+  }
 
   // A short window of body text around the first matching word.
   const snippet = (doc: Doc, tokens: string[]) => {
@@ -287,9 +303,9 @@
   }
 
   let active = 0
-  let options: HTMLAnchorElement[] = []
+  let options: HTMLElement[] = []
 
-  const setActive = (index: number) => {
+  const setActive = (index: number, scroll = true) => {
     if (!options.length) {
       input.removeAttribute("aria-activedescendant")
       return
@@ -299,17 +315,20 @@
       option.setAttribute("aria-selected", String(i === active)),
     )
     input.setAttribute("aria-activedescendant", options[active].id)
-    options[active].scrollIntoView({ block: "nearest" })
+    if (scroll) options[active].scrollIntoView({ block: "nearest" })
   }
 
   const row = (doc: Doc, query: string, index: number) => {
     const terms = query ? matchedTerms(doc, query) : []
     const sub = doc.k === "section" && query ? snippet(doc, terms) : doc.c
-    return `<a class="search-option" role="option" id="search-option-${index}" href="${escape(doc.u)}" data-kind="${doc.k}">
-      <span class="search-title">${highlight(doc.t, terms)}</span>
-      ${sub ? `<span class="search-context">${highlight(sub, terms)}</span>` : ""}
-      ${doc.m ? `<span class="search-meta">${escape(doc.m)}</span>` : ""}
-    </a>`
+    const external = /^https?:\/\//.test(doc.u)
+    return `<div class="search-option" role="option" id="search-option-${index}" data-kind="${doc.k}" data-href="${escape(doc.u)}"${external ? ' data-external="true"' : ""}>
+      <a class="search-option-link" href="${escape(doc.u)}" tabindex="-1"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>
+        <span class="search-title">${highlight(doc.t, terms)}</span>
+        ${sub ? `<span class="search-context">${highlight(sub, terms)}</span>` : ""}
+        ${doc.m ? `<span class="search-meta">${escape(doc.m)}</span>` : ""}
+      </a>
+    </div>`
   }
 
   const render = () => {
@@ -341,7 +360,8 @@
           )
           .join("")
       : `<p class="search-empty">${docs ? `Nothing for “${escape(query)}”. Fewer or shorter words help.` : "Loading…"}</p>`
-    options = [...list.querySelectorAll<HTMLAnchorElement>(".search-option")]
+    options = [...list.querySelectorAll<HTMLElement>(".search-option")]
+    input.setAttribute("aria-expanded", String(dialog.open && options.length > 0))
     status.textContent = query ? `${options.length} results` : ""
     setActive(0)
   }
@@ -360,17 +380,28 @@
 
   dialog.addEventListener("close", () => {
     document.documentElement.style.overflow = ""
+    input.setAttribute("aria-expanded", "false")
   })
 
+  let inputTimer: ReturnType<typeof setTimeout> | undefined
   opener.addEventListener("click", open)
-  input.addEventListener("input", render)
+  input.addEventListener("input", () => {
+    clearTimeout(inputTimer)
+    inputTimer = setTimeout(render, 60)
+  })
   input.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault()
+      dialog.close()
+      return
+    }
     if (event.key === "ArrowDown") setActive(active + 1)
     else if (event.key === "ArrowUp") setActive(active - 1)
     else if (event.key === "Enter" && options[active]) {
-      const href = options[active].href
+      const href = options[active].dataset.href!
+      const external = options[active].dataset.external === "true"
       back.forget()
-      if (event.metaKey || event.ctrlKey)
+      if (external || event.metaKey || event.ctrlKey)
         window.open(href, "_blank", "noopener")
       else location.assign(href)
     } else return
@@ -378,11 +409,11 @@
   })
 
   list.addEventListener("pointermove", (event) => {
-    const option = (event.target as Element).closest<HTMLAnchorElement>(
+    const option = (event.target as Element).closest<HTMLElement>(
       ".search-option",
     )
     if (option && options.indexOf(option) !== active)
-      setActive(options.indexOf(option))
+      setActive(options.indexOf(option), false)
   })
   list.addEventListener("click", (event) => {
     if ((event.target as Element).closest(".search-option")) back.forget()
@@ -508,13 +539,7 @@
   }
 
   .search-option {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: var(--space-s);
-    padding: var(--space-2xs) var(--space-xs);
     border-radius: var(--radius-md);
-    color: var(--foreground);
-    text-decoration: none;
     scroll-margin-block: var(--space-xs);
 
     &[aria-selected="true"] {
@@ -530,6 +555,16 @@
       text-decoration-thickness: 2px;
       text-underline-offset: 0.18em;
     }
+  }
+
+  .search-option-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-s);
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: inherit;
+    color: var(--foreground);
+    text-decoration: none;
   }
 
   .search-title {

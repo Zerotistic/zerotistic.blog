@@ -1,4 +1,5 @@
 import deloitteLogo from "@/assets/optimized/logos/deloitte.webp?url"
+import ecole2600Logo from "@/assets/optimized/logos/ecole-2600.webp?url"
 import hackcyomLogo from "@/assets/optimized/logos/hackcyom.webp?url"
 import hiddenlayerLogo from "@/assets/optimized/logos/hiddenlayer.webp?url"
 export type WorkEntry = {
@@ -70,7 +71,7 @@ export const work: WorkEntry[] = [
 export const education: WorkEntry = {
   id: "ecole-2600",
   organization: "École 2600",
-  logo: "/static/work/ecole-2600.png",
+  logo: ecole2600Logo,
   role: "Cybersecurity apprenticeship",
   kind: "Education",
   start: "2022",

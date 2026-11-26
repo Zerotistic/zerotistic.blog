@@ -55,6 +55,8 @@ const pendingLabel = finding.id.includes("XXXX")
 <article
   id={anchor}
   class="cve-finding editorial-row"
+  data-severity={finding.severity ?? (writeup ? "duplicate" : "pending")}
+  data-has-writeup={writeup ? "true" : undefined}
   aria-labelledby={`${anchor}-title`}
 >
   <!-- A summary is a button to assistive tech, which flattens any heading
@@ -77,15 +79,8 @@ const pendingLabel = finding.id.includes("XXXX")
       ) : (
         <span class="severity" id={`${anchor}-severity`}>{writeup ? "Duplicate" : "Score pending"}</span>
       )}
-      <svg
-        class="disclosure"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        aria-hidden="true"
-      >
-        <path d="m4 6 4 4 4-4" />
+      <svg class="disclosure" viewBox="0 0 16 16" aria-hidden="true">
+        <use href="#cve-icon-chevron" />
       </svg>
     </summary>
 

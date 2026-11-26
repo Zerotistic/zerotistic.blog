@@ -1,6 +1,4 @@
 ---
-import LinkIcon from "@/assets/icons/link.svg"
-
 type Props = { id: string; anchor?: string }
 const { id, anchor = id.toLowerCase() } = Astro.props
 const publishedId = /^(CVE-\d{4}-\d+|GHSA-[\da-z-]+)$/.test(id)
@@ -14,17 +12,18 @@ const publishedId = /^(CVE-\d{4}-\d+|GHSA-[\da-z-]+)$/.test(id)
     aria-label={`Permalink to ${id}`}
     data-tooltip="Permalink to finding"
   >
-    <LinkIcon aria-hidden="true" />
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <use href="#cve-icon-link" />
+    </svg>
   </a>
   {publishedId && (
     <span class="copy-id">
       <button type="button" data-icon-button data-icon-swap data-copy-id={id} aria-label={`Copy ${id} ID`} data-tooltip="Copy finding ID" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <rect x="8" y="8" width="12" height="12" rx="2" />
-          <path d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4" />
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <use href="#cve-icon-copy" />
         </svg>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <use href="#cve-icon-check" />
         </svg>
       </button>
       <span class="copy-status" role="status" aria-live="polite" aria-atomic="true"></span>

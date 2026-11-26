@@ -592,7 +592,7 @@ export const duplicateProject = {
       title: "Redis Streams use-after-free",
       summary:
         "I independently found this vulnerability, but my report was marked as a duplicate. My exploit chain takes a different route to remote code execution, so I documented it anyway.",
-      writeup: "/posts/redis-stream-pel-uaf",
+      writeup: "/posts/redis-stream-pel-uaf/",
       note: "https://x.com/gegrgtezrze/status/2062320078280859820",
     },
   ],

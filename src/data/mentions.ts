@@ -19,12 +19,12 @@ export type MentionGroup = {
 
 const cffResearch = {
   label: "Breaking Control Flow Flattening",
-  href: "/posts/cff-remover",
+  href: "/posts/cff-remover/",
 }
 
 const findMyResearch = {
   label: "Find My People on Linux",
-  href: "/posts/find-my-people-linux",
+  href: "/posts/find-my-people-linux/",
 }
 
 export const mentionGroups: MentionGroup[] = [

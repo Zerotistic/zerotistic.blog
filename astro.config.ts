@@ -15,19 +15,19 @@ import { imagePlaceholders } from "./src/lib/image-placeholders"
 
 export default defineConfig({
   site: "https://zerotistic.blog",
+  trailingSlash: "always",
   compressHTML: true,
-  prefetch: { prefetchAll: true },
   // Old Jekyll/Chirpy URLs that must keep resolving.
   redirects: {
-    "/tags": "/posts",
+    "/tags": "/posts/",
     "/posts/binary-ninja-serie-announcement":
-      "/posts/binary-ninja-zero-to-hero",
+      "/posts/binary-ninja-zero-to-hero/",
     "/posts/binary-ninja-zero-to-hero-1":
-      "/posts/binary-ninja-zero-to-hero/part-1",
+      "/posts/binary-ninja-zero-to-hero/part-1/",
     "/posts/binary-ninja-zero-to-hero-2":
-      "/posts/binary-ninja-zero-to-hero/part-2",
-    "/archives": "/posts",
-    "/categories": "/tags",
+      "/posts/binary-ninja-zero-to-hero/part-2/",
+    "/archives": "/posts/",
+    "/categories": "/posts/",
   },
   integrations: [
     sitemap({

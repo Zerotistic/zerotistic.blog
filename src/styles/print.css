@@ -17,19 +17,33 @@
   .skip-link,
   .artoria,
   .mention-companion,
-  .work-cheer,
   .work-jumping,
   .resume,
   .quote-link,
   .expressive-code .copy,
-  .image-enlarge,
   [data-heading-anchor],
   .post-navigation,
   footer :is(nav, ul),
   [data-scroll-top],
   dialog,
-  [data-tooltip-bubble] {
+  .tooltip,
+  .link-preview-trigger,
+  .depth-stub,
+  depth-dial {
     display: none !important;
+  }
+
+  /* Keep wrapped prose images visible when printing, without button chrome. */
+  .image-enlarge {
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+  }
+
+  /* Print the full article even if the reader was in skim/idea depth mode. */
+  prose-content > [hidden] {
+    display: revert !important;
   }
 
   page-grid {

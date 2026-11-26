@@ -46,7 +46,9 @@ const pose = artoriaForPath(Astro.url.pathname)
 
 <html lang={SITE.locale} dir={SITE.dir}>
   <MetaHead>
-    {showArtoria && <link rel="preload" as="image" href={pose.src} />}
+    {showArtoria && (
+      <link rel="preload" as="image" href={pose.src} media="(min-width: 64rem)" />
+    )}
     <slot name="head" />
   </MetaHead>
   <body>

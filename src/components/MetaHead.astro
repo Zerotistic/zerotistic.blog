@@ -13,16 +13,10 @@ import { SITE } from "@/consts"
        instead of a solid strip; safe area insets keep the controls clear. -->
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
   <meta name="color-scheme" content="light dark">
   <meta name="generator" content={Astro.generator}>
-
-  <meta name="HandheldFriendly" content="True">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content={SITE.title}>
   <meta
     name="format-detection"
     content="telephone=no,date=no,address=no,email=no,url=no"
@@ -111,33 +105,29 @@ import { SITE } from "@/consts"
       // Safari 26 ignores them and tints from the root background instead,
       // which color.css sets explicitly on html.
       const themeColors = document.querySelectorAll('meta[name="theme-color"]')
-      const themeColor = () => {
+      const schemeMeta = document.querySelector('meta[name="color-scheme"]')
+      const syncTheme = () => {
         const theme = root.dataset.theme
         for (const meta of themeColors) {
           const own = meta.media.includes("dark") ? "#111110" : "#fdfdfc"
           meta.content = theme ? (theme === "dark" ? "#111110" : "#fdfdfc") : own
         }
-      }
-      themeColor()
-      // The color-scheme meta follows the picked theme too, so the first
-      // paint and the form controls never flip to the OS scheme.
-      const schemeMeta = document.querySelector('meta[name="color-scheme"]')
-      const colorScheme = () => {
-        const theme = root.dataset.theme
         schemeMeta.content = theme === "light" || theme === "dark" ? theme : "light dark"
+        return landscape()
       }
-      colorScheme()
-      new MutationObserver(colorScheme).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
-      new MutationObserver(themeColor).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
-      const preload = document.createElement("link")
-      preload.rel = "preload"
-      preload.as = "image"
-      preload.fetchPriority = "high"
-      const initial = landscape()
-      preload.type = initial.type
-      preload.href = initial.src
-      if (!reducedData) document.head.append(preload)
-      new MutationObserver(landscape).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
+      const initial = syncTheme()
+      // Only hint the decorative scenery on wide desktop viewports, at low
+      // priority so it never competes with fonts or hero content.
+      if (!reducedData && initial.src && matchMedia("(width >= 80rem)").matches) {
+        const preload = document.createElement("link")
+        preload.rel = "preload"
+        preload.as = "image"
+        preload.fetchPriority = "low"
+        preload.type = initial.type
+        preload.href = initial.src
+        document.head.append(preload)
+      }
+      new MutationObserver(syncTheme).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       systemTheme.addEventListener("change", landscape)
 
       // The shell (build assets, fonts, scenery) comes from disk on a return

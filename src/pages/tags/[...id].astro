@@ -5,6 +5,7 @@ import PostPeek from "@/components/PostPeek.astro"
 import PostRow from "@/components/PostRow.astro"
 import Layout from "@/layouts/Layout.astro"
 import { getSubposts, getTags } from "@/lib/content"
+import { readingTime } from "@/lib/utils"
 import type { CollectionEntry } from "astro:content"
 
 export async function getStaticPaths() {
@@ -21,7 +22,7 @@ const { tag, posts } = Astro.props
 const series = await getSubposts()
 ---
 
-<Layout wide crumbs={[{ label: `#${tag}`, href: `/tags/${tag}` }]}>
+<Layout wide crumbs={[{ label: `#${tag}`, href: `/tags/${tag}/` }]}>
   <MetaPage
     slot="head"
     title={`Posts tagged "${tag}"`}
@@ -33,13 +34,18 @@ const series = await getSubposts()
     description={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
   />
   <ol>
-    {posts.map((post) => (
+    {posts.map((post) => {
+      const parts = series.get(post.id) ?? []
+      return (
         <PostRow
           post={post}
-          partCount={(series.get(post.id) ?? []).length}
-          tags={[]}
+          partCount={parts.length}
+          readTime={readingTime(
+            [post, ...parts].map((entry) => entry.body ?? "").join("\n"),
+          )}
         />
-      ))}
+      )
+    })}
   </ol>
   <PostPeek />
 </Layout>

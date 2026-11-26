@@ -110,7 +110,7 @@ body {
   prose-content :is(img:not([src$=".svg"]), video),
   post-banner img,
   .video-poster,
-  :is(.artoria, .mention-companion, .work-cheer, .work-jumping) > button,
+  :is(.artoria, .mention-companion, .work-jumping) > button,
   .range-saber,
   .cat-sticker,
   .favorite-cover,

@@ -1,4 +1,4 @@
-import atlasSource from "@/assets/optimized/newspaper/inbetweens-padded.webp?url"
+import atlasSource from "@/assets/optimized/newspaper/inbetweens-padded.avif?url"
 
 // Drawn poses between the original keyframes, packed in a single decoded atlas.
 const frameWidth = 360

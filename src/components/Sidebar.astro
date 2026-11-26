@@ -15,9 +15,10 @@ const { crumbs = [], showArtoria = true } = Astro.props
 const pathname = normalizePath(Astro.url.pathname) || "/"
 // Tags have no index of their own, they live under posts.
 const sectionPath = pathname.startsWith("/tags/") ? "/posts/tags" : pathname
-const section = NAVIGATION.find(
-  ({ href }) => sectionPath === href || sectionPath.startsWith(`${href}/`),
-)
+const section = NAVIGATION.find(({ href }) => {
+  const base = normalizePath(href)
+  return sectionPath === base || sectionPath.startsWith(`${base}/`)
+})
 ---
 
 <aside data-bar>
@@ -28,12 +29,14 @@ const section = NAVIGATION.find(
     <nav aria-label="Main navigation">
       <ScrollEdges>
       <ul data-site-links>
-        {NAVIGATION.map((item) => (
+        {NAVIGATION.map((item) => {
+          const itemPath = normalizePath(item.href)
+          return (
             <li>
               <a
                 href={item.href}
                 aria-current={
-                  pathname === item.href
+                  pathname === itemPath
                     ? "page"
                     : item === section
                       ? "location"
@@ -47,7 +50,7 @@ const section = NAVIGATION.find(
                   )}
                 </span>
               </a>
-              {item === section && crumbs.length > 0 && pathname !== item.href && (
+              {item === section && crumbs.length > 0 && pathname !== itemPath && (
                 <ul>
                   {crumbs.map((crumb, i) => (
                     <li data-depth={i ? 1 : undefined}>
@@ -64,7 +67,8 @@ const section = NAVIGATION.find(
                 </ul>
               )}
             </li>
-          ))}
+          )
+        })}
         {!section &&
             crumbs.map((crumb, i) => (
               <li data-depth={i ? 1 : undefined}>
