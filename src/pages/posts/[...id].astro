@@ -16,6 +16,7 @@ import MetaPost from "@/components/MetaPost.astro"
 import LinkPreviews from "@/components/LinkPreviews.astro"
 import { postLinkPreviews } from "@/lib/link-previews"
 import PostNavigation from "@/components/PostNavigation.astro"
+import RelatedPosts from "@/components/RelatedPosts.astro"
 import CodeTools from "@/components/CodeTools.astro"
 import HeadingLinks from "@/components/HeadingLinks.astro"
 import QuoteLink from "@/components/QuoteLink.astro"
@@ -99,6 +100,7 @@ const isSiri = post.id === "siri-linux-minecraft"
   <Fragment slot="head">
     <MetaPost
       post={post}
+      parent={isSubpost(post.id) ? parent : undefined}
       canonical={isSubpost(post.id) ? `/posts/${parent.id}/` : undefined}
     />
     {isThoughts && <link rel="stylesheet" href={thoughtsCss} />}
@@ -213,6 +215,7 @@ const isSiri = post.id === "siri-linux-minecraft"
       </article>
     )
   })}
+  <RelatedPosts current={parent} />
   <PostNavigation prev={prev} next={next} />
   {chain.length > 1 && <SeriesReader />}
 </Layout>

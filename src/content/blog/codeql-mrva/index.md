@@ -1,6 +1,6 @@
 ---
 title: "Rediscovering Vulnerabilities with CodeQL MRVA"
-description: "Setting up Multi-Repository Variant Analysis, writing a CodeQL query to find LDAP injection, and scanning a thousand repositories to rediscover a bug in a 24k-star project."
+description: "Setting up CodeQL MRVA, writing an LDAP injection query, and scanning 1,000 repositories to rediscover a vulnerability in a 24k-star project."
 date: 2024-01-29
 authors:
   - zerotistic

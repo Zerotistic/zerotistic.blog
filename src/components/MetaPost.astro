@@ -1,20 +1,26 @@
 ---
 import { getEntries, type CollectionEntry } from "astro:content"
 import DiscordEmbed from "@/components/DiscordEmbed.astro"
-import { SITE } from "@/consts"
+import { SITE, SOCIALS } from "@/consts"
 import { pageTitle, titleEmbedText, titleText } from "@/lib/content"
+import { breadcrumbSchema, personId, type Breadcrumb } from "@/lib/schema"
 import { formatDate, readingTime } from "@/lib/utils"
 import { createHash } from "node:crypto"
 
 type Props = {
   post: CollectionEntry<"blog">
+  parent?: CollectionEntry<"blog">
   canonical?: string
 }
 
-const { post, canonical: canonicalPath } = Astro.props
-const { title, description, date } = post.data
+const { post, parent, canonical: canonicalPath } = Astro.props
+const { title, description, date, updated } = post.data
 const cleanTitle = titleText(title)
 const embedTitle = titleEmbedText(title)
+const fullTitle =
+  parent && parent.id !== post.id
+    ? pageTitle(`${cleanTitle} — ${titleText(parent.data.title)}`)
+    : pageTitle(title)
 
 const base = Astro.site ?? new URL(Astro.url.origin)
 const authors = await getEntries(post.data.authors)
@@ -35,12 +41,27 @@ const ogImageVersion = createHash("sha256")
   .slice(0, 12)
 ogImage.searchParams.set("v", ogImageVersion)
 
-const jsonLd = {
-  "@context": "https://schema.org",
+const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length
+const modified = updated ?? date
+
+const breadcrumbs: Breadcrumb[] = [
+  { name: SITE.title, path: "/" },
+  { name: "Posts", path: "/posts/" },
+  ...(parent && parent.id !== post.id
+    ? [{ name: titleText(parent.data.title), path: `/posts/${parent.id}/` }]
+    : []),
+  { name: cleanTitle, path: `/posts/${post.id}/` },
+]
+
+const blogPosting = {
   "@type": "BlogPosting",
   headline: cleanTitle,
   description,
   datePublished: date.toISOString(),
+  dateModified: modified.toISOString(),
+  wordCount,
+  articleSection:
+    post.data.facts?.category ?? post.data.tags?.[0] ?? "Security Research",
   url: url.href,
   mainEntityOfPage: {
     "@type": "WebPage",
@@ -50,22 +71,32 @@ const jsonLd = {
   inLanguage: SITE.locale,
   author: authors.map((author) => ({
     "@type": "Person",
+    ...(author.id === "zerotistic" ? { "@id": personId(base) } : {}),
     name: author.data.name,
     url: new URL("/", base).href,
+    ...(author.id === "zerotistic"
+      ? { sameAs: SOCIALS.map((social) => social.href) }
+      : {}),
   })),
   publisher: {
     "@type": "Person",
-    "@id": new URL("/#person", base).href,
+    "@id": personId(base),
     name: SITE.title,
     url: new URL("/", base).href,
   },
   ...(post.data.tags?.length ? { keywords: post.data.tags.join(", ") } : {}),
 }
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [blogPosting, breadcrumbSchema(breadcrumbs, base)].filter(Boolean),
+}
 ---
 
-<title>{pageTitle(title)}</title>
+<title>{fullTitle}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
+<link rel="alternate" type="text/markdown" href={new URL(`/posts/${post.id}.md`, base)} title={cleanTitle}>
 
 <meta property="og:title" content={embedTitle}>
 <meta property="og:description" content={description}>
@@ -87,6 +118,7 @@ const jsonLd = {
 <meta name="twitter:creator" content={SITE.twitterHandle}>
 
 <meta property="article:published_time" content={date.toISOString()}>
+{updated && <meta property="article:modified_time" content={updated.toISOString()} />}
 {authorNames.map((name) => <meta property="article:author" content={name} />)}
 
 <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

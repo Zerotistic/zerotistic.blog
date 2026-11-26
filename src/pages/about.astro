@@ -7,14 +7,20 @@ import ContactLinks from "@/components/ContactLinks.astro"
 import CtfHistory from "@/components/CtfHistory.astro"
 import MetaPage from "@/components/MetaPage.astro"
 import OffDuty from "@/components/OffDuty.astro"
+import { SITE } from "@/consts"
 import Layout from "@/layouts/Layout.astro"
 ---
 
 <Layout wide showArtoria={false} footerSocials={false}>
   <MetaPage
     slot="head"
-    title="About me"
-    description="Zerotistic: security researcher, anime and manga enjoyer, cat lover, and hopelessly fond of Artoria."
+    title="About zerotistic — Security Researcher"
+    description="Zerotistic: security researcher at HiddenLayer, reverse engineer, CTF player, anime and manga enjoyer, and cat lover."
+    ogImage="/og/about.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "About", path: "/about/" },
+    ]}
   />
 
   <article class="about-page" aria-labelledby="about-heading">
@@ -59,8 +65,9 @@ import Layout from "@/layouts/Layout.astro"
         <p class="bio-links">
           See my
           <a href="/work/">work history</a>,
-          <a href="/cves/">published CVEs</a>, and
-          <a href="/talks/">talks</a>
+          <a href="/cves/">published CVEs</a>,
+          <a href="/talks/">talks</a>, and
+          <a href="/mentions/">mentions</a>
           for more.
         </p>
       </div>

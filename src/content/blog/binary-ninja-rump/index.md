@@ -1,6 +1,6 @@
 ---
 title: "Binary Ninja: How to Reverse with Style"
-description: "Slides and annotations from a lightning talk given at an HackTheBox meetup in Paris on why Binary Ninja is a solid choice for reverse engineering."
+description: "Slides and annotations from a lightning talk given at a HackTheBox meetup in Paris on why Binary Ninja is a solid choice for reverse engineering."
 date: 2024-01-16
 authors:
   - zerotistic
@@ -10,7 +10,7 @@ tags:
 image: ./assets/slide-1.png
 ---
 
-I got the occasion to give a small talk at an HackTheBox meetup in Paris on January 16th, 2024. The following are my slides.
+I got the occasion to give a small talk at a HackTheBox meetup in Paris on January 16th, 2024. The following are my slides.
 
 The talk is mostly about why Binary Ninja is a viable option and what you could do with it. Sadly it was in Paris and thus in French. You'll find annotations under each slide.
 

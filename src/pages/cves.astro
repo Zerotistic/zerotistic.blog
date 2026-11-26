@@ -4,6 +4,8 @@ import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
 import CveFinding from "@/components/CveFinding.astro"
 import Layout from "@/layouts/Layout.astro"
+import { SITE } from "@/consts"
+import { personId } from "@/lib/schema"
 
 const allFindings = products.flatMap((product) => product.findings)
 const findingCount = allFindings.filter((finding) => finding.published).length
@@ -30,13 +32,69 @@ const filters = [
 ].filter((f) => f.id === "all" || f.count > 0)
 const findingAnchor = (id: string, product: string) =>
   id.includes("XXXX") ? `${product}-pending` : id.toLowerCase()
+
+const base = Astro.site ?? new URL(Astro.url.origin)
+const cveItems = [
+  ...products.flatMap((product) =>
+    product.findings.map((finding) => ({
+      id: finding.id,
+      name: `${finding.id}: ${finding.title} (${product.name})`,
+      description: finding.summary,
+      url: new URL(`/cves/#${findingAnchor(finding.id, product.id)}`, base).href,
+      datePublished: finding.published,
+      sameAs: finding.advisory?.href ?? finding.url,
+    })),
+  ),
+  {
+    id: duplicateFinding.id,
+    name: `${duplicateFinding.id}: ${duplicateFinding.title} (${duplicateProject.name})`,
+    description: duplicateFinding.summary,
+    url: new URL(`/cves/#${duplicateFinding.id.toLowerCase()}`, base).href,
+    datePublished: undefined,
+    sameAs: cveUrl(duplicateFinding.id),
+  },
+]
+
+const cveSchema = {
+  "@type": "CollectionPage",
+  name: "Published CVEs & Security Advisories",
+  description:
+    "A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling.",
+  url: new URL("/cves/", base).href,
+  inLanguage: SITE.locale,
+  author: { "@id": personId(base) },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: cveItems.length,
+    itemListElement: cveItems.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "CreativeWork",
+        identifier: item.id,
+        name: item.name,
+        description: item.description,
+        url: item.url,
+        ...(item.datePublished ? { datePublished: item.datePublished } : {}),
+        ...(item.sameAs ? { sameAs: item.sameAs } : {}),
+        author: { "@id": personId(base) },
+      },
+    })),
+  },
+}
 ---
 
 <Layout reading narrowToc>
   <MetaPage
     slot="head"
-    title="CVEs"
+    title="Published CVEs & Security Advisories"
     description="A running index of CVEs discovered by zerotistic across AI infrastructure, machine-learning frameworks, and security tooling."
+    ogImage="/og/cves.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "CVEs", path: "/cves/" },
+    ]}
+    schema={cveSchema}
   />
 
   <svg class="cve-sprite" aria-hidden="true" style="display:none">

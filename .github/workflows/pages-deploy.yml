@@ -26,15 +26,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install, build, and upload site
         uses: withastro/action@v4
         with:
           node-version: 22
-          # Pin to the pnpm major that generated the lockfile. pnpm 11 moved
-          # `overrides` out of package.json into pnpm-workspace.yaml, which
-          # would otherwise cause a frozen-install config mismatch.
-          package-manager: pnpm@10.33.4
+          # Pin to the pnpm version that generated pnpm-lock.yaml and
+          # pnpm-workspace.yaml to avoid frozen-install config mismatches.
+          package-manager: pnpm@12.3.4
 
   deploy:
     environment:
@@ -46,3 +47,34 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Notify IndexNow
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, re, time, urllib.request
+          time.sleep(10)
+          key = "788cc24dcc0321309d2af42c1ee023ef"
+          host = "zerotistic.blog"
+          sitemap_url = f"https://{host}/sitemap-0.xml?v={int(time.time())}"
+          with urllib.request.urlopen(sitemap_url, timeout=15) as r:
+              xml = r.read().decode("utf-8")
+          urls = re.findall(r"<loc>(https://[^<]+)</loc>", xml)
+          if not urls:
+              raise SystemExit("No URLs found in sitemap")
+          payload = json.dumps({
+              "host": host,
+              "key": key,
+              "keyLocation": f"https://{host}/{key}.txt",
+              "urlList": urls,
+          }).encode("utf-8")
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=payload,
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=15) as resp:
+              print(f"IndexNow HTTP {resp.status} for {len(urls)} URLs")
+          PY

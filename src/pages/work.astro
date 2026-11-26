@@ -2,16 +2,35 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
 import WorkJumpingCheer from "@/components/WorkJumpingCheer.astro"
+import { SITE } from "@/consts"
 import { education, work } from "@/data/work"
 import Layout from "@/layouts/Layout.astro"
+import { personId } from "@/lib/schema"
 import { formatWorkDate } from "@/lib/work"
+
+const base = Astro.site ?? new URL(Astro.url.origin)
+const workSchema = {
+  "@type": "WebPage",
+  name: "Experience & Education",
+  description:
+    "Experience and education. HiddenLayer, Hackcyom, Deloitte, and École 2600.",
+  url: new URL("/work/", base).href,
+  inLanguage: SITE.locale,
+  about: { "@id": personId(base) },
+}
 ---
 
 <Layout showArtoria={false} wide>
   <MetaPage
     slot="head"
-    title="Work"
+    title="Experience & Education"
     description="Experience and education. HiddenLayer, Hackcyom, Deloitte, and École 2600."
+    ogImage="/og/work.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "Work", path: "/work/" },
+    ]}
+    schema={workSchema}
   />
 
   <div class="work-page">

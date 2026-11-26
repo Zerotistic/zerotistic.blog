@@ -1,17 +1,72 @@
 ---
-import { Image } from "astro:assets"
+import { getImage, Image } from "astro:assets"
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
 import TalkVideo from "@/components/TalkVideo.astro"
+import { SITE } from "@/consts"
 import { talks } from "@/data/talks"
 import Layout from "@/layouts/Layout.astro"
+import { personId } from "@/lib/schema"
+
+const base = Astro.site ?? new URL(Astro.url.origin)
+const toIsoDuration = (mmss: string) => {
+  const [m, s] = mmss.split(":").map(Number)
+  return `PT${m}M${s}S`
+}
+const talkSchemas = await Promise.all(
+  talks.map(async (talk) => {
+    const thumb = await getImage({ src: talk.preview, width: 960, format: "webp" })
+    const thumbnailUrl = new URL(thumb.src, base).href
+    if (talk.kind === "recording") {
+      return {
+        "@type": "VideoObject",
+        name: talk.title,
+        description: talk.description,
+        thumbnailUrl,
+        uploadDate: `${talk.date}T00:00:00Z`,
+        duration: toIsoDuration(talk.duration),
+        contentUrl: talk.href,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${talk.videoId}`,
+        inLanguage: "en",
+        author: { "@id": personId(base) },
+      }
+    }
+    return {
+      "@type": "PresentationDigitalDocument",
+      name: talk.title,
+      description: talk.description,
+      datePublished: talk.date,
+      url: new URL(talk.href, base).href,
+      image: thumbnailUrl,
+      author: { "@id": personId(base) },
+    }
+  }),
+)
+const talksPageSchema = [
+  {
+    "@type": "CollectionPage",
+    name: "Security Research Talks & Slides",
+    description:
+      "Conference and meetup talks by zerotistic, on vulnerability research and reverse engineering. Recordings, slides, and notes.",
+    url: new URL("/talks/", base).href,
+    inLanguage: SITE.locale,
+    author: { "@id": personId(base) },
+  },
+  ...talkSchemas,
+]
 ---
 
 <Layout wide>
   <MetaPage
     slot="head"
-    title="Talks"
+    title="Security Research Talks & Slides"
     description="Conference and meetup talks by zerotistic, on vulnerability research and reverse engineering. Recordings, slides, and notes."
+    ogImage="/og/talks.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "Talks", path: "/talks/" },
+    ]}
+    schema={talksPageSchema}
   />
 
   <div class="talks-page">

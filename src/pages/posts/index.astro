@@ -2,11 +2,45 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
 import PostArchive from "@/components/PostArchive.astro"
+import { SITE } from "@/consts"
 import Layout from "@/layouts/Layout.astro"
+import { getPosts, titleText } from "@/lib/content"
+import { personId } from "@/lib/schema"
+
+const base = Astro.site ?? new URL(Astro.url.origin)
+const posts = await getPosts()
+const description =
+  "Technical writeups on reverse engineering, Binary Ninja, vulnerability research, pwn, deobfuscation, and CTF challenges by zerotistic."
+const blogSchema = {
+  "@type": "Blog",
+  name: `${SITE.title} — Posts`,
+  description,
+  url: new URL("/posts/", base).href,
+  inLanguage: SITE.locale,
+  author: { "@id": personId(base) },
+  blogPost: posts.map((post) => ({
+    "@type": "BlogPosting",
+    headline: titleText(post.data.title),
+    description: post.data.description,
+    datePublished: post.data.date.toISOString(),
+    url: new URL(`/posts/${post.id}/`, base).href,
+    author: { "@id": personId(base) },
+  })),
+}
 ---
 
 <Layout wide>
-  <MetaPage slot="head" title="Posts" />
+  <MetaPage
+    slot="head"
+    title="Reverse Engineering & Vulnerability Research Posts"
+    description={description}
+    ogImage="/og/posts.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "Posts", path: "/posts/" },
+    ]}
+    schema={blogSchema}
+  />
   <PageHeader
     title="posts"
     description="Everything I’ve written, newest first."

@@ -2,9 +2,12 @@
 import MentionCompanion from "@/components/MentionCompanion.astro"
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
+import { SITE } from "@/consts"
 import { mentionGroups } from "@/data/mentions"
 import Layout from "@/layouts/Layout.astro"
+import { personId } from "@/lib/schema"
 
+const base = Astro.site ?? new URL(Astro.url.origin)
 const groups = mentionGroups.map((group) => ({
   ...group,
   shortTitle: group.id === "research-citations" ? "Research" : "Press",
@@ -14,13 +17,45 @@ const groups = mentionGroups.map((group) => ({
     ).values(),
   ],
 }))
+const allMentions = mentionGroups.flatMap((group) => group.mentions)
+const mentionsSchema = {
+  "@type": "CollectionPage",
+  name: "Press Mentions & Research Citations",
+  description:
+    "Selected press coverage, academic citations, and technical references to zerotistic’s research.",
+  url: new URL("/mentions/", base).href,
+  inLanguage: SITE.locale,
+  about: { "@id": personId(base) },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: allMentions.length,
+    itemListElement: allMentions.map((mention, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "CreativeWork",
+        name: `${mention.name} — ${mention.context}`,
+        description: mention.description,
+        url: mention.href,
+        datePublished: mention.year,
+        mentions: { "@id": personId(base) },
+      },
+    })),
+  },
+}
 ---
 
 <Layout showArtoria={false} wide>
   <MetaPage
     slot="head"
-    title="Mentions"
+    title="Press Mentions & Research Citations"
     description="Selected press coverage, academic citations, and technical references to zerotistic’s research."
+    ogImage="/og/mentions.png"
+    breadcrumbs={[
+      { name: SITE.title, path: "/" },
+      { name: "Mentions", path: "/mentions/" },
+    ]}
+    schema={mentionsSchema}
   />
 
   <div class="mentions-page">

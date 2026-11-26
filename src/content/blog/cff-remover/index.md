@@ -1,6 +1,6 @@
 ---
 title: "Breaking Control Flow Flattening: A Deep Technical Analysis"
-description: "How a Binary Ninja plugin automatically defeats control flow flattening — dispatcher detection, state variable recovery with Z3, and CFG reconstruction — and the math that makes it work."
+description: "How a Binary Ninja plugin defeats control flow flattening — dispatcher detection, Z3 state variable recovery, CFG reconstruction, and the math behind it."
 date: 2024-11-03
 authors:
   - zerotistic

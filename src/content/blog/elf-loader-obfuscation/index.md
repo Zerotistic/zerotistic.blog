@@ -1,6 +1,6 @@
 ---
 title: "When Linux and Your Decompiler Load Different Programs"
-description: "A set of ELF probes where Linux and static tools reconstruct different runtime state, including one relocation-shadowing file that produces the same false imported-call identification in seven decompilers."
+description: "ELF probes where Linux and static tools reconstruct different runtime state, including a relocation-shadowing file that fools seven decompilers."
 date: 2026-07-11
 authors:
   - zerotistic
