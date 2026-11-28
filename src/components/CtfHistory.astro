@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import idekLogo from "@/assets/about/teams/idek.png"
 import sekaiLogo from "@/assets/about/teams/project-sekai.png"
 import { ctfTimeline } from "@/data/ctf-history"
@@ -74,9 +74,12 @@ const timelineRows = ctfTimeline.map((entry, index) => ({
                   <span class="action-symbol" aria-hidden="true">+</span>
                   <span>Joined</span>
                   <a class="team-identity" href={entry.href} target="_blank" rel="noopener noreferrer">
-                    <Image
+                    <Picture
                       class="team-logo"
                       src={teamLogos[entry.team]}
+                      formats={["avif"]}
+                      fallbackFormat="webp"
+                      pictureAttributes={{ style: "display: contents" }}
                       width={24}
                       height={24}
                       widths={[24, 48]}

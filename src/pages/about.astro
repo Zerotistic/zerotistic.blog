@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import avatar from "@/assets/about/avatar.png"
 import artoriaHeart from "@/assets/about/artoria-heart.webp"
 import Artoria from "@/components/Artoria.astro"
@@ -27,9 +27,12 @@ import Layout from "@/layouts/Layout.astro"
     <header class="introduction">
       <div class="intro-copy">
         <div class="identity">
-          <Image
+          <Picture
             class="avatar"
             src={avatar}
+            formats={["avif"]}
+            fallbackFormat="webp"
+            pictureAttributes={{ style: "display: contents" }}
             alt="Zerotistic’s illustrated avatar"
             width={44}
             height={44}
@@ -131,15 +134,17 @@ import Layout from "@/layouts/Layout.astro"
           href={artoriaHeart.src}
           aria-label="Open the full Artoria collage"
         >
-          <Image
+          <Picture
             src={artoriaHeart}
+            formats={["avif"]}
+            fallbackFormat="webp"
+            pictureAttributes={{ style: "display: contents" }}
             width={440}
             widths={[320, 440, 640, 891]}
             sizes="(max-width: 527px) calc(100vw - 48px), (max-width: 767px) 480px, 420px"
             alt="A collage of Artoria smiling, eating and relaxing, with a small red heart between her hands in the foreground."
             loading="lazy"
             decoding="async"
-            quality={90}
           />
         </a>
       </figure>

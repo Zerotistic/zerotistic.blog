@@ -90,6 +90,17 @@ export default defineConfig({
   site: "https://zerotistic.blog",
   trailingSlash: "always",
   compressHTML: true,
+  image: {
+    layout: "constrained",
+    breakpoints: [480, 768, 1200, 1600],
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+      config: {
+        avif: { quality: 62 },
+        webp: { quality: 82 },
+      },
+    },
+  },
   // Old Jekyll/Chirpy URLs that must keep resolving.
   redirects: {
     "/tags": "/posts/",

@@ -92,32 +92,6 @@ const section = NAVIGATION.find(({ href }) => {
   </sidebar-toggle>
 </aside>
 
-<script>
-  const mobileNavigation = matchMedia("(width < 64rem)")
-
-  document.querySelectorAll<HTMLElement>("[data-site-links]").forEach((links) => {
-    const reveal = (link: HTMLAnchorElement | null) => {
-      if (!mobileNavigation.matches || !link) return
-      const bounds = links.getBoundingClientRect()
-      const item = link.getBoundingClientRect()
-      // Scroll only the link strip, never the page or its hash destination.
-      if (item.left < bounds.left) links.scrollLeft += item.left - bounds.left
-      else if (item.right > bounds.right) links.scrollLeft += item.right - bounds.right
-    }
-
-    const revealCurrent = () => reveal(
-      links.querySelector<HTMLAnchorElement>(":scope > li > a[aria-current]"),
-    )
-    links.addEventListener("focusin", (event) => {
-      if (event.target instanceof Element) reveal(event.target.closest("a"))
-    })
-
-    new ResizeObserver(revealCurrent).observe(links)
-    document.fonts.ready.then(revealCurrent)
-    mobileNavigation.addEventListener("change", revealCurrent)
-  })
-</script>
-
 <style>
   aside {
     position: sticky;

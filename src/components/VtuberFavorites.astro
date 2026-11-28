@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import ayame from "@/assets/about/vtubers/ayame.webp"
 import mari from "@/assets/about/vtubers/mari-mari.png"
 import shiina from "@/assets/about/vtubers/shiina.png"
@@ -53,14 +53,15 @@ const favorites = [
         >
           <span class="portrait-stage">
             <span class="portrait-motion">
-              <Image
+              <Picture
                 class="portrait"
                 src={portrait}
+                formats={["avif"]}
+                fallbackFormat="webp"
+                pictureAttributes={{ style: "display: contents" }}
                 width={256}
                 widths={[128, 256, 512]}
                 sizes="(max-width: 767px) 192px, 256px"
-                format="webp"
-                quality={85}
                 alt=""
                 loading="lazy"
                 decoding="async"

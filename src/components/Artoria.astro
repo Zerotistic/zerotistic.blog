@@ -65,7 +65,7 @@ const investigating = pose.name === "investigating"
         </>}
       </defs>
       <image
-        href={pose.src}
+        data-pose-src={pose.src}
         width="360"
         height="540"
         clip-path={`url(#${id}-skirt)`}
@@ -74,7 +74,7 @@ const investigating = pose.name === "investigating"
         <g class="artoria-greeting">
           <g class="artoria-breath">
             <image
-              href={pose.src}
+              data-pose-src={pose.src}
               width="360"
               height="540"
               clip-path={`url(#${id}-upper)`}
@@ -352,20 +352,3 @@ const investigating = pose.name === "investigating"
     }
   }
 </style>
-
-<script>
-  const elements = [...document.querySelectorAll<HTMLElement>(".artoria")]
-  const inline = elements.filter((el) => el.classList.contains("artoria-inline"))
-  const companions = elements.filter((el) => !el.classList.contains("artoria-inline"))
-
-  if (inline.length) {
-    import("@/lib/artoria-frame-player").then(({ initArtoriaFrames }) => {
-      for (const element of inline) initArtoriaFrames(element)
-    })
-  }
-  if (companions.length) {
-    import("@/lib/artoria-companion").then(({ initArtoria }) => {
-      for (const element of companions) initArtoria(element)
-    })
-  }
-</script>

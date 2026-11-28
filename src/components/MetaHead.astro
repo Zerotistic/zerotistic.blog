@@ -86,10 +86,11 @@ import { SITE } from "@/consts"
         if (theme === "light" || theme === "dark") root.dataset.theme = theme
       } catch {}
       const systemTheme = matchMedia("(prefers-color-scheme: dark)")
-      // Data saver on: no scenery download. The page reads the same.
+      // Data saver on or narrow viewport: skip scenery download. The page reads the same.
       const reducedData = matchMedia("(prefers-reduced-data: reduce)").matches
+      const wideScenery = matchMedia("(width >= 80rem)")
       const landscape = () => {
-        if (reducedData) return { src: "", type: "" }
+        if (reducedData || !wideScenery.matches) return { src: "", type: "" }
         const dark = root.dataset.theme === "dark" || (!root.dataset.theme && systemTheme.matches)
         const src = dark ? sources.night : sources.day
         const fallback = dark ? "/static/avalon-landscape-dusk.webp" : "/static/avalon-landscape.webp"
@@ -118,7 +119,7 @@ import { SITE } from "@/consts"
       const initial = syncTheme()
       // Only hint the decorative scenery on wide desktop viewports, at low
       // priority so it never competes with fonts or hero content.
-      if (!reducedData && initial.src && matchMedia("(width >= 80rem)").matches) {
+      if (initial.src) {
         const preload = document.createElement("link")
         preload.rel = "preload"
         preload.as = "image"
@@ -129,6 +130,7 @@ import { SITE } from "@/consts"
       }
       new MutationObserver(syncTheme).observe(root, { attributes: true, attributeFilter: ["data-theme"] })
       systemTheme.addEventListener("change", landscape)
+      wideScenery.addEventListener("change", landscape)
 
       // The shell (build assets, fonts, scenery) comes from disk on a return
       // visit. Registered after load so it never competes with the page.
@@ -140,9 +142,11 @@ import { SITE } from "@/consts"
   </script>
   <noscript>
     <style is:inline>
-      :root { --avalon-day-image: url("/static/avalon-landscape.webp"); }
-      @media (prefers-color-scheme: dark) {
-        :root { --avalon-day-image: none; --avalon-night-image: url("/static/avalon-landscape-dusk.webp"); }
+      @media (width >= 80rem) {
+        :root { --avalon-day-image: url("/static/avalon-landscape.webp"); }
+        @media (prefers-color-scheme: dark) {
+          :root { --avalon-day-image: none; --avalon-night-image: url("/static/avalon-landscape-dusk.webp"); }
+        }
       }
     </style>
   </noscript>

@@ -4,8 +4,8 @@ import "@/styles/typography-inline.css"
 import "@/styles/typography-lists.css"
 import "@/styles/typography-block.css"
 import "@/styles/typography-tables.css"
-import "@/styles/typography-math.css"
 import "@/styles/callout.css"
+import mathCss from "@/styles/typography-math.css?url"
 import siriCss from "@/styles/siri.css?url"
 import thoughtsCss from "@/styles/thoughts.css?url"
 import ImageViewer from "@/components/ImageViewer.astro"
@@ -35,7 +35,7 @@ import {
   titleTransition,
 } from "@/lib/content"
 import { formatDate, isSubpost, readingTime, subpostSlug } from "@/lib/utils"
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import { getEntries, render, type CollectionEntry } from "astro:content"
 
 export async function getStaticPaths() {
@@ -94,6 +94,12 @@ if (chain.length > 1) {
 }
 const isThoughts = post.id === "i-hate-my-thoughts-posts"
 const isSiri = post.id === "siri-linux-minecraft"
+const hasMath = chain.some((entry) => {
+  const prose = (entry.body ?? "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`\n]+`/g, "")
+  return /(?<!\\)\$\$[\s\S]+?\$\$|(?<!\\)\$(?!\s)[^$\n]+?(?<!\s)\$/.test(prose)
+})
 ---
 
 <Layout crumbs={crumbs} reading>
@@ -103,6 +109,7 @@ const isSiri = post.id === "siri-linux-minecraft"
       parent={isSubpost(post.id) ? parent : undefined}
       canonical={isSubpost(post.id) ? `/posts/${parent.id}/` : undefined}
     />
+    {hasMath && <link rel="stylesheet" href={mathCss} />}
     {isThoughts && <link rel="stylesheet" href={thoughtsCss} />}
     {isSiri && <link rel="stylesheet" href={siriCss} />}
   </Fragment>
@@ -200,8 +207,10 @@ const isSiri = post.id === "siri-linux-minecraft"
         </header>
         {entry.data.image && (
           <post-banner>
-            <Image
+            <Picture
               src={entry.data.image}
+              formats={["avif"]}
+              fallbackFormat="webp"
               alt=""
               width={1200}
               height={630}
@@ -218,6 +227,9 @@ const isSiri = post.id === "siri-linux-minecraft"
   <RelatedPosts current={parent} />
   <PostNavigation prev={prev} next={next} />
   {chain.length > 1 && <SeriesReader />}
+  <script>
+    import "@/lib/post"
+  </script>
 </Layout>
 
 <style>
@@ -386,6 +398,10 @@ const isSiri = post.id === "siri-linux-minecraft"
   post-banner {
     display: block;
     margin-block-end: var(--space-m);
+
+    :global(picture) {
+      display: block;
+    }
 
     :global(img) {
       inline-size: 100%;

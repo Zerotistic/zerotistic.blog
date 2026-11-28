@@ -1,38 +1,3 @@
-<script>
-  import { copyText } from "@/lib/clipboard"
-  import { haptic } from "@/lib/haptics"
-
-  // Clicking a heading's "#" still jumps there and updates the address bar,
-  // and also copies the link, confirmed by a check in place of the "#".
-  const status = document.createElement("span")
-  status.className = "visually-hidden"
-  status.setAttribute("role", "status")
-  document.body.append(status)
-  const timers = new WeakMap<Element, ReturnType<typeof setTimeout>>()
-
-  document.addEventListener("click", (event) => {
-    const anchor =
-      event.target instanceof Element
-        ? event.target.closest<HTMLAnchorElement>("[data-heading-anchor]")
-        : null
-    if (!anchor) return
-    haptic("success")
-    void copyText(anchor.href).then((copied) => {
-      if (!copied) return
-      clearTimeout(timers.get(anchor))
-      anchor.setAttribute("data-copied", "")
-      status.textContent = "Link copied"
-      timers.set(
-        anchor,
-        setTimeout(() => {
-          anchor.removeAttribute("data-copied")
-          status.textContent = ""
-        }, 1500),
-      )
-    })
-  })
-</script>
-
 <style is:global>
   prose-content [data-heading-anchor][data-copied] {
     opacity: 1;

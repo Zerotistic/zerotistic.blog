@@ -1,5 +1,5 @@
 ---
-import { getImage, Image } from "astro:assets"
+import { getImage, Picture } from "astro:assets"
 import MetaPage from "@/components/MetaPage.astro"
 import PageHeader from "@/components/PageHeader.astro"
 import TalkVideo from "@/components/TalkVideo.astro"
@@ -113,15 +113,17 @@ const talksPageSchema = [
                 />
               ) : (
                 <a class="slide-preview" href={talk.href} aria-label={`Read the slides and notes for ${talk.title}`}>
-                  <Image
+                  <Picture
                     src={talk.preview}
+                    formats={["avif"]}
+                    fallbackFormat="webp"
+                    pictureAttributes={{ style: "display: contents" }}
                     width={480}
                     widths={[320, 480, 640, 960]}
                     sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 1023px) 48vw, 432px"
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    quality={85}
                   />
                 </a>
               )}

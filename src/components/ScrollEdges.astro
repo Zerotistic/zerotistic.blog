@@ -43,39 +43,3 @@
     }
   }
 </style>
-
-<script>
-  class ScrollEdges extends HTMLElement {
-    scroller?: HTMLElement
-    observer?: ResizeObserver
-
-    update = () => {
-      if (!this.scroller) return
-      const { scrollLeft, scrollWidth, clientWidth } = this.scroller
-      this.toggleAttribute("data-overflow-start", scrollLeft > 1)
-      this.toggleAttribute(
-        "data-overflow-end",
-        scrollWidth - clientWidth - scrollLeft > 1,
-      )
-    }
-
-    connectedCallback() {
-      const scroller = this.firstElementChild
-      if (!(scroller instanceof HTMLElement)) return
-      this.scroller = scroller
-      scroller.addEventListener("scroll", this.update, { passive: true })
-      this.observer = new ResizeObserver(this.update)
-      this.observer.observe(scroller)
-      for (const child of scroller.children) this.observer.observe(child)
-      this.update()
-    }
-
-    disconnectedCallback() {
-      this.scroller?.removeEventListener("scroll", this.update)
-      this.observer?.disconnect()
-    }
-  }
-
-  if (!customElements.get("scroll-edges"))
-    customElements.define("scroll-edges", ScrollEdges)
-</script>

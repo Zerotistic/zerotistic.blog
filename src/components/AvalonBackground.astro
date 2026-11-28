@@ -91,9 +91,7 @@
 
   @media (width < 80rem) {
     .avalon-landscape {
-      inset-block-start: auto;
-      block-size: 12rem;
-      mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.22));
+      display: none;
     }
   }
 
@@ -106,10 +104,3 @@
     }
   }
 </style>
-
-<script>
-  import { initAvalon } from "@/lib/avalon-scene"
-  const scene = document.querySelector<HTMLElement>(".avalon-scene")
-  const [left, right] = document.querySelectorAll<HTMLCanvasElement>(".avalon-life")
-  if (scene && left && right) initAvalon(scene, left, right)
-</script>

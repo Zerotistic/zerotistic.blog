@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import ayame from "@/assets/about/collection/ayame-plush.webp"
 import boysAbyss from "@/assets/about/collection/boys-abyss.jpg"
 import goodbyeEri from "@/assets/about/collection/goodbye-eri.webp"
@@ -32,13 +32,14 @@ const pieces = [
         <li class={"shelf-piece " + kind}>
           <a class="item-link" href={collectionUrl} aria-label={"Browse my collection — pictured: " + name + ", " + detail}>
             <span class="item-art">
-              <Image
+              <Picture
                 src={image}
+                formats={["avif"]}
+                fallbackFormat="webp"
+                pictureAttributes={{ style: "display: contents" }}
                 width={160}
                 widths={[96, 160, 320]}
                 sizes="(max-width: 479px) 96px, 160px"
-                format="webp"
-                quality={85}
                 alt=""
                 loading="lazy"
                 decoding="async"

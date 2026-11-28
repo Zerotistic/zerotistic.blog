@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 import blackCat from "@/assets/about/black-cat.png"
 import rangeSaber from "@/assets/about/saber-range.png"
 import Artoria from "@/components/Artoria.astro"
@@ -44,9 +44,12 @@ import { favoriteShelves } from "@/data/favorites"
     <div class="cat-note">
       <h3 class="note-heading">and three cats</h3>
       <p>I have a particularly big soft spot for the black one.</p>
-      <Image
+      <Picture
         class="cat-sticker"
         src={blackCat}
+        formats={["avif"]}
+        fallbackFormat="webp"
+        pictureAttributes={{ style: "display: contents" }}
         width={120}
         widths={[120, 240]}
         sizes="(max-width: 639px) 96px, 112px"
@@ -91,9 +94,12 @@ import { favoriteShelves } from "@/data/favorites"
                 aria-label={title + (note ? " — " + note : "") + " on AniList (opens in a new tab)"}
               >
                 <span class="cover-wrap">
-                  <Image
+                  <Picture
                     class="favorite-cover"
                     src={cover}
+                    formats={["avif"]}
+                    fallbackFormat="webp"
+                    pictureAttributes={{ style: "display: contents" }}
                     width={72}
                     widths={[72, 144]}
                     sizes="64px"
